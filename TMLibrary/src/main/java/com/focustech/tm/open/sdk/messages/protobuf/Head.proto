@@ -1,0 +1,12 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+message Head
+{
+    required string domainName = 1;
+    required string cmd = 2;
+    required string version = 3;
+    required uint32 cliSeqId = 4;
+    optional string svrSeqId = 5;
+    optional string channelId = 6;
+    optional string clientIp = 7;
+}

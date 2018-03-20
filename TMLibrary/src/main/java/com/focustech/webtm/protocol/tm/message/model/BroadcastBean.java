@@ -1,0 +1,68 @@
+package com.focustech.webtm.protocol.tm.message.model;
+
+import android.content.Context;
+import android.content.Intent;
+
+import java.io.Serializable;
+
+/**
+ * Created by Administrator on 2017/7/18.
+ */
+
+public class BroadcastBean implements Serializable {
+    public enum MTCommand implements Serializable {
+        HeartBeat,               // 自增，用于标志心跳包
+        Conn,
+        Disconn,
+        LoginRsp,
+        LoginRspERROR,
+        UserInfoRsp,
+        FriendGroupsRsp,
+        FriendInfoRsp,
+        FriendInfoEndRsp,
+        GetOfflineMessageRsp,
+        UpdateUserStatusNty,
+        Message,
+        MessageSend,             // 自增，用于标志发送的消息完成
+        MessageVoiceDownload,    // 自增，用于标志接收到的语音消息下载完成
+        MessageUploadComp,       // 自增，用于标志发送的语音消息上传完成
+        MessageUploadFail,       // 自增，用于标志发送的语音消息上传失败
+        ReceptNty,
+        UpdateRead,               // 自增，用于标志未读消息清除
+        NewSysNty,
+        GetFriendRuleRsp,
+        DeleteFriendRsp,
+        SystemMessageBean,
+        AddFriendWithoutValidateSucceededSysNty,
+        FriendInfoNty
+    }
+
+    MTCommand command;
+    Serializable serializable;
+
+    public MTCommand getCommand() {
+        return command;
+    }
+
+    public void setCommand(MTCommand command) {
+        this.command = command;
+    }
+
+    public Serializable getSerializable() {
+        return serializable;
+    }
+
+    public void setSerializable(Serializable serializable) {
+        this.serializable = serializable;
+    }
+
+    public static void sendBroadcast(Context context, MTCommand command, Serializable serializable) {
+        BroadcastBean bean=new BroadcastBean();
+        bean.setCommand(command);
+        bean.setSerializable(serializable);
+        Intent intent=new Intent();
+        intent.putExtra("broadcast", bean);
+        intent.setAction("MT");
+        context.sendBroadcast(intent);
+    }
+}

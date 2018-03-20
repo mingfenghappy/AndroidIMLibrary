@@ -1,0 +1,151 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+import "Enums.proto";
+
+// 拉获讨论组列表请求
+message DiscussionsReq
+{
+    required uint64 timestamp = 1;   // 用户资料最后更新时间戳
+}
+
+// 拉获讨论组列表响应
+message DiscussionsRsp
+{
+    repeated DiscussionRsp discussions = 1;      // 群ID集合，包含用户
+}
+
+// 拉获讨论组列表
+message DiscussionRsp
+{
+    required string discussionId = 1;        // 群ID集合
+    repeated FriendStatusRsp friends = 2;    // 群好友，包含状态
+}
+
+// 获取讨论组信息请求
+message DiscussionsInfoReq
+{
+    required uint64 timestamp = 1;   // 用户资料最后更新时间戳
+}
+
+// 获取讨论组信息请求
+message DiscussionsInfoRsp
+{
+    repeated DiscussionInfoRsp discussionInfoRsp = 1;   // 讨论组响应报文
+}
+
+// 讨论组响应报文，拉取讨论组列表。有变更的讨论组信息返回给用户
+message DiscussionInfoRsp
+{
+    required string discussionId = 1;         // 讨论组ID
+    required string discussionName = 2;       // 讨论组名称
+    required string userId = 3;               // 创建人
+    required string userName = 4;             // 创建人名称
+    required uint64 timestamp = 5;            // 创建时间
+    optional Enable discussionEnable = 6;     // 讨论组是否停用状态
+    required uint64 lastActiveTimestamp = 7;  // 最后更新时间戳
+}
+
+// 获取讨论组成员资料
+message DiscussionUserInfosReq
+{
+    required string discussionId = 1;         // 讨论组ID
+    required uint64 timestamp = 2;   // 用户资料最后更新时间戳
+}
+
+// 讨论组成员资料，给所有群成员发
+message DiscussionUserInfosRsp
+{
+    repeated DiscussionUserInfoRsp discussionUserInfos = 1;   // 一个讨论组里面所有的用户信息响应
+    required uint64 timestamp = 2;   // 用户资料最后更新时间戳
+}
+
+// 讨论组成员资料，给所有群成员发
+message DiscussionUserInfoRsp
+{
+    required string discussionId = 1;          // 讨论组ID
+    required string userId = 2;                // 用户ID
+    required string userName = 3;              // 用户名称
+}
+
+// 创建讨论组请求，响应：system -> 创建人和成员(DiscussionInfoRsp)，system -> 创建人和成员(DiscussionUserInfosRsp)
+// system -> 成员 (DiscussionMessage，欢迎加入聊天消息)
+message AddDiscussionReq
+{
+    required string discussionName = 1;        // 讨论组名称
+    repeated string userIds = 2;               // 加入讨论组成员的ID集合
+}
+
+// 创建讨论组请求，响应：system -> 新成员(DiscussionInfoRsp)，system -> 创建人和成员(DiscussionUserInfosRsp)
+// system -> 成员 (DiscussionMessage，欢迎加入聊天消息)
+message InviteDiscussionReq
+{
+    required string discussionId = 1;          // 讨论组ID
+    repeated string userIds = 2;               // 加入讨论组成员的ID集合
+}
+
+// 退出讨论组请求，响应操作人  ExitDiscussionRsp
+message ExitDiscussionReq
+{
+    required string discussionId = 1;        // 讨论组ID
+}
+
+// 退出讨论组响应，响应操作人  ExitDiscussionRsp
+message ExitDiscussionRsp
+{
+    required string discussionId = 1;        // 讨论组ID
+    required string userId = 2;              // 用户ID
+}
+
+// 讨论组失效响应，system -> 操作人
+message DiscussionInvalidRsp
+{
+    required string discussionId = 1;        // 讨论组ID
+}
+
+// 修改讨论组设置请求
+message UpdateDiscussionUserSettingReq
+{
+    required string discussionId = 1;         // 讨论组ID
+    optional string newSetting = 2;          // 新的讨论组消息设置
+    required MessageSetting  messageSetting = 3;  // 新的讨论组消息设置
+}
+
+// 修改讨论组设置响应，给自己
+message UpdateDiscussionUserSettingRsp
+{
+    required string discussionId = 1;         // 讨论组ID
+    optional string newSetting = 2;      // 新的讨论组消息设置
+    required MessageSetting  messageSetting = 3;  // 新的讨论组消息设置
+}
+
+// 讨论组设置响应，给自己
+message DiscussionUserSettingRsp
+{
+    repeated UpdateDiscussionUserSettingRsp newSetting = 1;      // 讨论组消息设置
+}
+
+// 修改讨论组主题名称请求
+message UpdateDiscussionNameReq
+{
+    required string discussionId = 1;             // 讨论组ID
+    required string DiscussionName = 2;           // 新的讨论组主题名称
+}
+
+// 修改讨论组主题名称响应，给群所有人
+message UpdateDiscussionNameRsp
+{
+    required string discussionId = 1;             // 讨论组ID
+    required string DiscussionName = 2;           // 新的讨论组主题名称
+}
+
+// 拉去讨论组成员状态，响应 DiscussionRsp
+message GetDiscussionUserStatusReq
+{
+    required string discussionId = 1;             // 讨论组ID
+}
+
+// 获取单个讨论组信息
+message GetSingleDiscussionInfoReq
+{
+    required string discussionId = 1;             // 讨论组ID
+}

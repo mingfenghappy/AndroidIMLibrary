@@ -1,0 +1,151 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+import "Enums.proto";
+
+// -----------------------------用户相关报文--------------------------------------
+
+// 获取用户详细信息(单个)
+message UserInfoReq
+{
+    required string targetUserId = 1;    // 目标用户ID
+}
+// 获取用户详细信息(多个)
+message UsersInfoReq
+{
+    repeated string targetUserId = 1;    // 目标用户ID
+}
+// 用户响应详细信息(多个)
+message UsersInfoRsp
+{
+    repeated UserInfoRsp userInfoRsp = 1;    // 用户响应信息
+}
+
+// 用户响应信息
+message UserInfoRsp
+{
+    required string userId = 1;          // 用户ID
+    required string userName = 2;        // 用户名
+    optional string token = 3;           // token
+    optional string userNickName = 4;    // 用户昵称
+    optional string userSignature = 5;   // 用户签名
+    optional HeadType userHeadType = 6;  // 用户头像类型
+    optional string userHeadId = 7;      // 用户头像ID
+    optional string netIp = 8;           // 用户公网ID
+    optional uint64 timestamp = 9;       // 用户资料最后更新时间戳
+    repeated EquipmentStatus equipments = 10;    // 好友状态
+    optional uint64 tmNum = 11;           // 麦通号码
+    optional uint32 role = 12;      //用户状态
+}
+
+// 修改用户基本信息
+message UpdateUserInfoReq
+{
+    optional string userNickName = 1;    // 用户昵称
+    optional string userSignature = 2;   // 用户签名
+    optional HeadType userHeadType = 3;  // 用户头像类型
+    optional string userHeadId = 4;      // 用户头像ID
+}
+
+// 用户响应通知
+message UserInfoNty
+{
+    required string userId = 1;          // 用户ID
+    optional string userNickName = 2;    // 用户昵称
+    optional string userSignature = 3;   // 用户签名
+    optional HeadType userHeadType = 4;  // 用户头像类型
+    optional string userHeadId = 5;      // 用户头像ID
+    optional uint64 timestamp = 6;       // 用户资料最后更新时间戳
+    optional uint64 tmNum = 7;           // 麦通号码
+}
+
+
+// 修改用户签名请求
+message UpdateUserSignatureReq
+{
+    required string userSignature = 1;    // 用户签名
+}
+
+// 用户签名修改通知
+message UserSignatureNty
+{
+    required string userId = 1;             // 用户签名
+    required string userSignature = 2;      // 用户签名
+}
+
+
+// 修改用户昵称请求(内部版没有修改昵称)
+message UpdateUserNickNameReq
+{
+    required string nickName = 1;    // 用户昵称
+}
+
+// 用户昵称修改通知(内部版没有修改昵称)
+message UserNickNameNty
+{
+    required string userId = 1;             // 用户签名
+    required string nickName = 2;           // 用户昵称
+}
+
+
+// 修改用户头像请求
+message UserHeadReq
+{
+    required HeadType userHeadType = 1;  // 用户头像类型
+    required string userHeadId = 2;      // 用户头像ID
+    optional string ext = 3;             // 客户端自己的信息，通过服务器透传
+}
+
+// 修改用户头像通知
+message UserHeadNty
+{
+    required string userId = 1;
+    required HeadType userHeadType = 2;  // 用户头像类型
+    required string userHeadId = 3;      // 用户头像ID
+    optional string ext = 4;             // 客户端自己的信息，通过服务器透传
+}
+
+
+// 修改个人设置(移动端暂时用不到)
+message UpdateUserSettingReq
+{
+    optional Enable allowStrangerChatToMe = 1;    // 是否允许陌生人给我发送消息
+    optional ValidateRule friendRule = 2;         // 好友验证规则
+    optional Enable allowChatRecordOnServer = 3;  // 允许在线聊天记录保存在服务器
+    optional ValidateRule groupRule = 4;          // 群验证规则
+    optional string customerSettings = 5;         // 客户端自己的设置，服务端不关心，格式不关心，客户端自己使用。
+}
+
+// 获取个人设置
+message UserSettingReq
+{
+    optional uint64 timestamp = 8;       // 用户资料最后更新时间戳
+}
+
+// 修改个人设置
+message UserSettingRsp
+{
+    optional Enable allowStrangerChatToMe = 1;    // 是否允许陌生人给我发送消息
+    optional ValidateRule friendRule = 2;         // 好友验证规则
+    optional Enable allowChatRecordOnServer = 3;  // 允许在线聊天记录保存在服务器
+    optional ValidateRule groupRule = 4;          // 群验证规则
+    optional string customerSettings = 5;         // 客户端自己的设置，服务端不关心，格式不关心，客户端自己使用。
+    optional uint64 timestamp = 6;                // 最近一次设置生效时间
+}
+
+
+// -----------------------------用户状态变更相关报文--------------------------------------
+
+// 请求更新状态
+message UpdateUserStatusReq
+{
+    required Status status = 3;                         // 状态
+    optional Enable isNotice = 4;
+}
+
+// 用户状态通知
+message UpdateUserStatusNty
+{
+    required string userId = 1;                         // 状态更新的用户userId
+    required EquipmentStatus status = 3;                // 状态
+    optional Enable isNotice = 4;
+}

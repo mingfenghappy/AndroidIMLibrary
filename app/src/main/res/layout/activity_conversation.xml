@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.dreamtobe.kpswitch.widget.KPSwitchRootRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/layout_conversation_controll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal">
+            <EditText
+                android:id="@+id/edit_conversation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dip"
+                android:layout_weight="1"
+                android:lineSpacingExtra="5dip"
+                android:background="@android:color/white"
+                android:gravity="center|left"
+                android:padding="5dip"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/btn_send_conversation"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="#0099ff"
+                android:clickable="true"
+                android:gravity="center"
+                android:text="发送"
+                android:layout_marginRight="5dip"
+                android:layout_marginLeft="5dip"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dip"
+            android:background="#cccccc"></View>
+        <RelativeLayout
+            android:background="#ebebeb"
+            android:layout_width="match_parent"
+            android:layout_height="45dip">
+            <ImageView
+                android:id="@+id/iv_image"
+                android:layout_marginLeft="16dip"
+                android:src="@mipmap/ic_conversation_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"/>
+            <ImageView
+                android:id="@+id/iv_emoji"
+                android:layout_toRightOf="@id/iv_image"
+                android:layout_marginLeft="30dip"
+                android:src="@mipmap/ic_conversation_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true" />
+            <ImageView
+                android:id="@+id/iv_sendvoice"
+                android:layout_toRightOf="@id/iv_emoji"
+                android:layout_marginLeft="30dip"
+                android:src="@mipmap/ic_conversation_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dip"
+            android:background="#cccccc"></View>
+        <cn.dreamtobe.kpswitch.widget.KPSwitchPanelRelativeLayout
+            android:id="@+id/kp_panel_root"
+            android:layout_width="match_parent"
+            android:layout_height="150dip"
+            android:background="#fefefe"
+            android:visibility="gone">
+            <include
+                android:id="@+id/layout_imagechoice"
+                layout="@layout/panel_content" />
+            <include
+                android:id="@+id/layout_emojichoice"
+                layout="@layout/panel_content" />
+            <include
+                android:id="@+id/layout_voicechoice"
+                layout="@layout/panel_recordvoice" />
+        </cn.dreamtobe.kpswitch.widget.KPSwitchPanelRelativeLayout>
+    </LinearLayout>
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="44dip"
+        android:id="@+id/nav_layout"
+        layout="@layout/view_nav"></include>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_conversation"
+        android:layout_above="@id/layout_conversation_controll"
+        android:layout_below="@id/nav_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+    <RelativeLayout
+        android:id="@+id/layout_record"
+        android:layout_width="176dp"
+        android:layout_height="203dp"
+        android:layout_centerInParent="true"
+        android:background="#00ffffff"
+        android:visibility="gone" >
+        <ImageView
+            android:id="@+id/iv_record"
+            android:layout_width="176dp"
+            android:layout_height="183dp"
+            android:layout_alignParentTop="true" />
+        <TextView
+            android:id="@+id/tv_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="149dp"
+            android:textColor="#ffffff"
+            android:textSize="15sp" />
+    </RelativeLayout>
+</cn.dreamtobe.kpswitch.widget.KPSwitchRootRelativeLayout>

@@ -1,0 +1,316 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+import "Enums.proto";
+
+// -----------------------------聊天消息相关报文--------------------------------------
+
+// 发送聊天消息请求
+message Message
+{
+    required string msg = 1;                      // 消息内容
+    optional string msgMeta = 2;                  // 消息元数据
+    required MessageType msgType = 3;             // 消息类型
+    required string userId = 4;                   // c -> s 代表接收方用户，s -> c 代表发送方用户
+    required uint64 timestamp = 5;                // 客户端自己的NTP时间戳
+    optional string svrMsgId = 6;                 // 客户端需要--离线消息时会传递，用于客户端自己去重判断
+    optional string fromSvrMsgId = 7;             //媒体消息绑定SvrMsgId
+    optional Enable sync = 8;
+    optional Enable resend = 9;
+}
+
+// 发送群聊天消息请求
+message GroupMessage
+{
+    required string msg = 1;                      // 消息内容
+    optional string msgMeta = 2;                  // 消息元数据
+    required MessageType msgType = 3;             // 消息类型
+    required string userId = 4;                   // 发送人用户ID
+    required string groupId = 5;                  // 群ID
+    required uint64 timestamp = 6;                // 客户端自己的NTP时间戳
+    optional string svrMsgId = 7;                 // 客户端需要--离线消息时会传递，用于客户端自己去重判断
+    optional Enable sync = 8;                     // 消息是否同步
+    optional Enable resend = 9;                   // 是否是重发消息
+}
+
+message MessageSync
+{
+    required Message source = 1;                      // 原始消息
+    optional Equipment equipment = 2;                  // 消息产生源设备
+}
+
+// 设备之间的同步聊天消息请求
+message MessageSyncNty
+{
+    required string msg = 1;                      // 消息内容
+    optional string msgMeta = 2;                  // 消息元数据
+    required MessageType msgType = 3;             // 消息类型
+    required string userId = 4;                   // c -> s 代表接收方用户，s -> c 代表发送方用户
+    required uint64 timestamp = 5;                // 时间戳
+}
+
+//多端群消息同步
+message GroupMessageSync
+{
+	required GroupMessage source = 1;				//原始消息
+	optional Equipment equipment = 2;				//消息产生源设备
+}
+
+// 增加一个多媒体实体
+message AddMultiMediaReq
+{
+    required string fileId = 1;     // 文件ID
+    required string svrMsgId = 2;   // 回执的服务端消息ID
+    required string toUserId = 3;   // 给谁的消息
+    required MessageSense messageSense = 4; // 消息来源
+    optional string meta = 5;       // 元数据
+}
+
+message GetMultiMediaNtySync
+{
+    required GetMultiMediaNty source = 1;             // 原始消息
+    optional Equipment equipment = 2;                 // 消息产生源设备
+}
+
+// 获取多媒体实体的通知
+message GetMultiMediaNty
+{
+    required string fileId = 1;             // 文件ID
+    required string svrMsgId = 2;           // 回执的服务端消息ID
+    required string fromUserId = 3;         // 谁发的
+    required MessageSense messageSense = 4; // 消息来源
+    optional string meta = 5;               // 元数据
+}
+
+
+message GetMultiMediasNty
+{
+    repeated GetMultiMediaNty  multiMediaNtys = 1;
+}
+// 增加一个离线文件
+message AddOfflineFileReq
+{
+    required string fileId = 1;        // 文件ID
+    required string toUserId = 2;      // 给谁的消息
+    optional string meta = 3;          // 元数据
+    required uint64 timestamp = 4;     // 时间戳
+}
+
+// 主动获取一个离线文件请求
+message GetOfflineFileReq
+{
+    required uint64 timestamp = 1;     // 时间戳
+    optional Equipment equipment = 4;  // 设备
+}
+
+// 增加一个离线文件通知
+message GetOfflineFilesRsp
+{
+    repeated GetOfflineFileNty offlineFileNtys = 1;
+}
+
+// 增加一个离线文件通知
+message GetOfflineFileNty
+{
+    required string fileId = 1;        // 文件ID
+    required string fromUserId = 2;    // 给谁的消息
+    required uint32 remainingTime = 3; // 剩余时间
+    optional string meta = 4;          // 元数据
+    required uint64 timestamp = 5;     // 时间戳
+}
+
+// 获取接收离线文件完成请求
+message GetOfflineFileCompleteReq
+{
+    required string fileId = 1;        // 文件ID
+    required string userId = 2;        // 发送离线文件的用户ID
+    required uint64 timestamp = 3;     // 时间戳
+}
+
+// 拒绝接收离线文件请求
+message RefuseOfflineFileReq
+{
+    required string fileId = 1;        // 文件ID
+    required string userId = 2;        // 发送离线文件的用户ID
+    required uint64 timestamp = 3;     // 时间戳
+}
+
+//接收离线文件通知
+message ReceiveOfflineFileSysNty
+{
+     required string  fileId = 1;                   // 文件ID
+     required ReceiveStatus receiveStatus = 2;      // 接收类型
+     optional string  meta = 3;                     // 元数据
+     required string userId = 4;                    // 拒绝接收离线文件通知的用户ID
+     required uint64 timestamp = 5;                 // 时间戳
+}
+
+//忽略文件
+message IgnoreOfflineFileReq
+{
+     required string fileId = 1;
+     required string userId = 2;
+     required uint64 timestamp = 3;
+     required Equipment equipment = 4;
+}
+
+// 消息已读通知
+message ReadMessageNty
+{
+    required string userId = 1;
+    required Equipment equipment = 2; //消息读取设备
+}
+
+// 群消息已读通知(不做)
+message ReadGroupMessageNty
+{
+    required string groupId = 1;
+    required Equipment equipment = 2; //消息读取设备
+}
+
+// -----------------------------系统消息相关报文--------------------------------------
+// 系统消息通知
+message NewSysNty
+{
+    required uint64 timestamp = 1;     // 时间戳
+}
+
+// 获取系统消息请求
+message GetSysNtyReq
+{
+    required uint64 timestamp = 1;     // 时间戳
+    optional Equipment equipment = 2;
+}
+
+
+// -----------------------------离线消息相关报文--------------------------------------
+// 获取离线消息请求
+message GetOfflineMessageReq
+{
+    required uint64 timestamp = 1;     // 时间戳
+}
+
+// 获取离线消息响应
+message GetOfflineMessageRsp
+{
+    repeated Message message = 1;      // 离线消息
+    required Enable hasMore = 2;       // 是否还有离线消息
+    optional uint64  count = 3;        // 离线消息总数
+}
+
+// 获取群离线消息请求(不做)
+message GetGroupOfflineMessageReq
+{
+    required uint64 timestamp = 1;     // 时间戳
+    required string groupId = 2;         // 群ID
+}
+
+// 获取群离线消息响应(不做)
+message GetGroupOfflineMessageRsp
+{
+    repeated GroupMessage messages = 1; // 离线消息
+    required Enable hasMore = 2;       // 是否还有离线消息
+    optional string groupId = 3;         // 群ID
+    optional uint64  count = 4;        // 离线消息总数
+}
+
+// -----------------------------回执相关报文--------------------------------------
+// 回执消息
+message ReceptNty
+{
+    optional string cmd = 1;      // 回执的报文类型
+    optional Equipment equipment = 2;
+}
+
+
+// -----------------------------透传报文--------------------------------------------
+message Transparent
+{
+    required string fromUserId = 1;     // 来源用户
+    required string toUserId = 2;       // 目标用户
+    required bytes  data = 3;           // 透传报文内容
+    optional string meta = 4;           // meta信息
+}
+// -----------------------------系统推送相关报文--------------------------------------------
+//backend推送给逻辑服务器的公告报文
+message BulletinReq
+{
+    repeated string userId = 1;         // 用户ID
+    required uint32 bulletinType = 2;   //推送类型
+}
+
+//逻辑服务器推送给客户端的公告报文
+message BulletinNty
+{
+    required uint64 timestamp = 1;     // 时间戳
+}
+
+//系统消息已处理通知
+message SystemMsgProcessedNty
+{
+    required string svrMsgId=1;
+    required Enable result=2;
+    required Equipment equipment=3;
+
+}
+
+//系统消息处理响应
+message SystemMsgProcessedRsp
+{
+    required Enable result = 1;//只用于判断是否多端处理
+    optional Enable handleResult = 2;//处理结果
+    optional string handleUserId = 3;
+    optional string handleUserName = 4;
+
+}
+
+// -----------------------------反馈推送相关报文--------------------------------------------
+
+//逻辑服务器推送给客户端的公告报文
+message SystemPushSysNty
+{
+    required bytes content = 1;       // 推送信息
+    required string pushType = 2;    //推送类型
+}
+
+//逻辑服务器推送给客户端的公告报文
+message FeedbackNty
+{
+    required uint64 timestamp = 1;     // 时间戳
+}
+
+// -----------------------------讨论组消息收发相关报文--------------------------------------------
+//发送讨论组聊天消息请求
+message DiscussionMessage
+{
+    required string msg = 1;                      // 消息内容
+    optional string msgMeta = 2;                  // 消息元数据
+    required MessageType msgType = 3;             // 消息类型
+    required string userId = 4;                   // 发送人用户ID
+    required string discussionId = 5;             // 群ID
+    required uint64 timestamp = 6;                // 客户端自己的NTP时间戳
+    optional string svrMsgId = 7;                 // 客户端需要--离线消息时会传递，用于客户端自己去重判断
+    optional Enable sync = 8;                     // 消息是否同步
+    optional Enable resend = 9;                   // 是否是重发消息
+}
+
+//多端讨论组消息同步
+message DiscussionMessageSync
+{
+	required DiscussionMessage source = 1;   //原始消息
+	optional Equipment equipment = 2;
+}
+
+//获取讨论组离线消息请求
+message GetDiscussionOfflineMessageReq
+{
+ 	required uint64 timestamp = 1;   //时间戳
+ 	required string discussionId = 2; //讨论组ID
+}
+
+message GetDiscussionOfflineMessageRsp
+{
+    repeated DiscussionMessage messages = 1; // 离线消息
+    required Enable hasMore = 2;       // 是否还有离线消息
+    optional string discussionId = 3;         // 讨论组ID
+    optional uint64  count = 4;        // 离线消息总数
+}

@@ -1,0 +1,130 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+// 公用报文
+// 状态消息
+message EquipmentStatus
+{
+    optional Equipment equipment = 1 [default = PC];    // 设备
+    required Status status = 2;                         // 状态
+}
+
+// 好友状态响应
+message FriendStatusRsp
+{
+    required string friendUserId = 1;       // 好友ID
+    repeated EquipmentStatus status = 2;    // 好友状态
+}
+
+// -----------------------------系统枚举--------------------------------------
+enum Enable
+{
+    DISABLE = 0;     // 假
+    ENABLE = 1;      // 真
+}
+
+enum Equipment
+{
+    PC = 1;      // PC客户端
+    WEB = 2;     // WEB客户端
+    MOBILE_IOS = 3;  // 移动IOS客户端
+    MOBILE_ANDROID = 4;  // 移动android客户端
+}
+
+// 用户头像类型枚举
+enum HeadType
+{
+    SYSTEM = 0;  // 系统头像
+    CUSTOM = 1;  // 自定义头像
+}
+
+// 用户登陆状态枚举
+enum Status
+{
+    ONLINE = 1;  // 在线状态
+    LEAVE = 2;   // 离开状态
+    BUSY = 3;    // 忙碌状态
+    HIDE = 4;    // 隐身状态
+    OFFLINE = 5; // 离线状态
+    LOGIC_ONLINE = 6; // 逻辑在线状态
+}
+
+// 好友分组类型
+enum FriendGroupType
+{
+    // 0：默认分组；1：陌生人；2：黑名单；3：用户自定义分组
+    DEFAULT = 0;   // 默认分组
+    STRANGER = 1;  // 陌生人
+    BLACKLIST = 2; // 黑名单
+    USER_CUSTOM = 3;    // 用户自定义分组
+}
+
+// 最近联系类型
+enum RecentContactType
+{
+    PERSON = 0;      // 人
+    GROUP = 1;       // 群组
+    DISCUSSION = 2;  // 讨论组
+}
+
+// 验证规则
+enum ValidateRule
+{
+    ALLOW_WITHOUT_VALIDATE = 0;  // 不需要验证允许
+    ALLOW_AFTER_VALIDATE = 1;    // 验证后允许
+    DENY = 2;                    // 拒绝所有人
+}
+
+// 好友应答枚举
+enum FriendAnswer
+{
+    REFUSE = 0;         // 拒绝
+    AGREE = 1;          // 同意
+    AGREE_AND_ADD = 2;  // 同意并添加
+}
+
+// 消息类型    枚举值。0：文本消息；1：多媒体消息；
+enum MessageType
+{
+    TEXT = 0;             // 文本消息
+    MULTI_MEDIA = 1;      // 多媒体消息
+    USER_ADD = 2;         // 用户加入
+    USER_QUIT = 3;        // 用户退出
+    INVITE_USER_JOIN = 4; //邀请用户加入
+    AUTO_REPLY = 5;       //自动回复
+}
+enum MessageSense
+{
+     MESSAGE = 0;              // 聊天消息
+     GROUP_MESSAGE = 1;        // 群消息
+     DISCUSSION_MESSAGE = 2;   // 讨论组消息
+}
+//
+enum ReceiveStatus
+{
+    FILE_SUCCESS = 0;     // 成功
+    FILE_REFUSE = 1;      // 拒绝
+}
+
+enum GroupType
+{
+    LEARNING_IS_LIMITLESS = 0;     // 学海无涯
+    INNOVATION_WORKS = 1;          // 创新工厂
+    ALL_SORTS_OF_GOSSIP = 2;       // 七嘴八舌
+    USER_EXPERIENCE = 3;           // 用户体验
+    CASUAL_FASHION = 4;            // 时尚休闲
+    OTHER = 5;                     // 其他
+}
+
+enum UserType
+{
+    NORMAL = 0;                     // 普通用户
+    ADMIN = 1;                      // 管理员
+    OWNER = 2;                      // 群主
+}
+
+enum MessageSetting
+{
+   ACCEPT_AND_PROMPT = 0;              // 接受并提示
+   ACCEPT_NO_PROMPT = 1;                           // 接受不提示
+   REFUSE_MESSAGE = 2;						    // 屏蔽
+}

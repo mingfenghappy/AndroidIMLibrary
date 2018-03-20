@@ -1,0 +1,505 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+import "Enums.proto";
+
+// -----------------------------群相关报文--------------------------------------
+// 获取群规则(用于申请入群时获取对应群的设置)
+message GetGroupRuleReq
+{
+    required string groupId = 1;   // 群ID
+}
+
+// 群验证规则响应(用于申请入群时获取对应群的设置的响应)
+message GetGroupRuleRsp
+{
+    required string groupId = 1;
+    required ValidateRule groupRule = 2;
+}
+
+// 获取单个人的群验证规则(用于群邀请人之前获取被邀请人的群设置)
+message GetGroupUserRuleReq
+{
+    required string groupId = 1;   // 群ID
+    required string userId = 2;    // 用户ID
+}
+
+// 获取单个人的群验证规则响应(用于群邀请人之前获取被邀请人的群设置)
+message GetGroupUserRuleRsp
+{
+    required string groupId = 1;           // 群ID
+    required string userId = 2;            // 用户ID
+    required ValidateRule groupRule = 3;   // 用户群设置规则
+}
+
+//---------------群列表----------------------
+// 拉获群列表请求
+message GroupsReq
+{
+    required uint64 timestamp = 1;   // 用户资料最后更新时间戳
+}
+
+// 拉获群列表响应
+message GroupsRsp
+{
+    repeated GroupRsp groups = 1;      // 群ID集合，包含用户
+}
+
+// 拉获群列表
+message GroupRsp
+{
+    required string groupId = 1;             // 群ID集合
+    repeated FriendStatusRsp friends = 2;    // 群好友，包含状态
+}
+
+// 群信息响应
+message GroupsInfoRsp
+{
+  repeated MyGroupInfoRsp myGroupInfoRsp  = 1; // 群信息响应
+}
+
+// 群消息设置响应，给自己
+message GroupUserSettingRsp
+{
+    repeated UpdateGroupUserSettingRsp updateGroupUserSettingRsp = 1;         // 群设置响应
+}
+
+// 群信息请求(未用)
+message GroupInfoReq
+{
+    required string groupId = 1;               // 群ID
+}
+
+// 群信息响应
+message MyGroupInfoRsp
+{
+  required GroupInfoRsp groupInfoRsp = 1;  // 群信息响应
+  optional string groupRemark = 2;         // 群备注
+}
+
+// 群信息响应
+message GroupInfoRsp
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    optional string groupSignature = 3;        // 群签名
+    optional string groupKeyword = 4;          // 群关键字
+    optional string groupDesc = 5;             // 群描述
+    required GroupType groupType = 6;          // 群类型
+    required ValidateRule validateRule = 7;    // 群验证规则
+    required string addUserId = 8;             // 群创建人
+    required string addUserName = 9;           // 群创建人名称
+    required string groupNo = 10;              // 群号
+    required int32 limit = 11;                 // 群上限人数
+    required int32 adminCount = 12;            // 群管理员人数
+    optional Enable groupEnable = 13;          // 群可用状态
+    optional uint64 timestamp = 14;            // 群最后更新时间戳
+}
+//---------------------------------------------------------------
+
+
+//--------------------------修改群相关信息和设置---------------------------
+// 修改群备注
+message UpdateGroupRemarkReq
+{
+    required string groupId = 1;             // 群名称
+    required string newGroupRemark = 2;      // 新的群备注
+}
+
+// 修改群备注响应，给自己
+message UpdateGroupRemarkRsp
+{
+    required string groupId = 1;             // 群名称
+    required string newGroupRemark = 2;      // 新的群备注
+}
+
+// 修改群昵称请求
+message UpdateGroupNickNameReq
+{
+    required string groupId = 1;             // 群ID
+    required string newGroupNickName = 2;    // 新的昵称
+    required string userId = 3; // 被修改昵称的用户id
+}
+
+// 修改群昵称响应，给群所有人
+message UpdateGroupNickNameRsp
+{
+    required string groupId = 1;             // 群ID
+    required string newGroupNickName = 2;    // 新的昵称
+    required string userId = 3;              // 用户ID
+}
+
+// 修改群消息设置请求
+message UpdateGroupUserSettingReq
+{
+    required string groupId = 1;         // 群ID
+    optional string newSetting = 2;      // 新的群设置
+    required MessageSetting  messageSetting = 3;  // 新的群消息设置
+}
+
+// 修改群消息设置响应，给自己
+message UpdateGroupUserSettingRsp
+{
+    required string groupId = 1;         // 群ID
+    optional string newSetting = 2;      // 新的群设置
+    required MessageSetting  messageSetting = 3;  // 新的群消息设置
+}
+
+// 修改群资料，响应 MyGroupInfoRsp，给所有群成员(所有信息覆盖？)
+message UpdateGroupInfoReq
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    optional string groupSignature = 3;        // 群签名
+    optional string groupKeyword = 4;          // 群关键字
+    optional string groupDesc = 5;             // 群描述
+    required GroupType groupType = 6;          // 群类型
+    required ValidateRule validateRule = 7;    // 群验证规则
+}
+//-----------------------------------------------------------------
+
+
+//--------------------退出群------------------
+// 退出群请求
+message ExitGroupReq
+{
+    required string groupId = 1;         // 群ID
+    required uint64 timestamp = 2;       // 用户请求退出群的时间
+}
+
+// 用户退出群响应，给群里所有人 (?)
+message ExitGroupRsp
+{
+    required string groupId = 1;         // 群ID
+    required string userId = 2;          // 用户ID
+}
+
+// 用户退出群系统消息，给群主和管理员
+message ExitGroupSysNty
+{
+    required string groupId = 1;         // 群ID
+    required string groupName = 2;       // 群名称
+    required string userId = 3;          // 用户ID
+    required string userName = 4;        // 用户名称
+    required uint64 timestamp = 5;       //系统接收到消息请求的时间
+}
+//-------------------------------------------------
+
+
+//-----------------------群成员-----------------------
+// 请求群成员资料
+message GroupUserInfoReq
+{
+  required string groupId = 1;               // 群ID
+  required uint64 timestamp = 2;             // 时间戳
+}
+
+// 群成员资料，给所有群成员发
+message GroupUserInfosRsp
+{
+    repeated GroupUserInfoRsp groupUserInfos = 1; // 一个群里面所有的用户信息响应
+    required uint64 timestamp = 2;             // 时间戳
+}
+
+// 请求单个群成员资料
+message GroupSingleUserInfoReq
+{
+  required string groupId = 1;               // 群ID
+  required string userId = 2;                // 用户ID
+}
+
+// 群成员资料，给所有群成员发
+message GroupUserInfoRsp
+{
+    required string groupId = 1;               // 群ID
+    required string userId = 2;                // 用户ID
+    required string userName = 3;              // 用户名称
+    required UserType userType = 4;            // 用户类型
+    optional string groupNickName = 5;         // 用户群昵称
+    optional uint64 lastChatTimestamp = 6;     // 最后聊天时间
+    optional Enable nickNameSetting = 7;       // 用户是否允许管理员修改群昵称设置
+}
+
+// 拉取群成员状态，响应 GroupRsp(该报文无效)
+message GetGroupUserStatusReq
+{
+    required string groupId = 1;             // 群ID
+}
+
+//-------------------邀请加群---------------------
+// 邀请群成员添加
+message InviteUserJoinGroupReq
+{
+    required string groupId = 1;               // 群ID
+    repeated string invitedUserIds = 2;        // 被邀请人IDS
+}
+
+// 邀请加入群通知系统消息，system -> 被邀请人
+message InviteUserJoinGroupSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string inviteUserId = 3;          // 邀请人
+    required string inviteUserName = 4;        // 邀请人名称
+    required uint64 timestamp = 5;             // 系统接收到消息请求的时间
+    optional string svrMsgId = 6;
+}
+
+// 邀请成功的系统通知，给所有管理员(包括群主)和所有的被邀请人
+message InviteUserJoinGroupSucceededSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    repeated string invitedUserIds = 3;        // 被邀请人IDS
+    repeated string invitedUserNames = 4;      // 被邀请人名称
+    required string inviteUserId = 5;          // 邀请人
+    required string inviteUserName = 6;        // 邀请人名称
+    required uint64 timestamp = 7;             // 系统接收到消息请求的时间
+}
+
+// 邀请成功的系统通知，给被邀请人
+message InviteUserJoinGroupSucceededToUserSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string inviteUserId = 3;          // 邀请人
+    required string inviteUserName = 4;        // 邀请人名称
+    required uint64 timestamp = 5;             // 系统接收到消息请求的时间
+}
+
+
+// 被邀请人的响应, 被邀请人 -> system
+message InviteUserJoinGroupRsp
+{
+    required string groupId = 1;         // 群ID
+    required Enable result = 2;          // 结果
+    required string inviteUserId = 3;    // 邀请人
+    required string inviteUserName = 4;  // 邀请人名称
+    required uint64 timestamp = 5;       // 系统接收到消息请求的时间
+    optional string svrMsgId = 6;
+}
+
+// 同意邀请加入群成功，system -> 管理员(包括群主)
+message AgreeInviteUserJoinGroupSucceededSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    repeated string invitedUserIds = 3;        // 被邀请人IDS
+    repeated string invitedUserNames = 4;      // 被邀请人名称
+    required string inviteUserId = 5;          // 邀请人
+    required string inviteUserName = 6;        // 邀请人名称
+    required uint64 timestamp = 7;             // 系统接收到消息请求的时间
+}
+
+// 拒绝邀请系统消息，system -> 邀请人
+message DisagreeInviteUserJoinGroupSysNty
+{
+    required string groupId = 1;           // 群ID
+    required string groupName = 2;         // 群名称
+    repeated string invitedUserIds = 3;    // 被邀请人IDS
+    repeated string invitedUserNames = 4;  // 被邀请人名称
+    required uint64 timestamp = 5;         // 系统接收到消息请求的时间
+}
+
+//--------------------删除群成员-------------------------
+// 删除群成员，管理员 -> system
+message DeleteGroupUserReq
+{
+    required string groupId = 1;               // 群ID
+    repeated string userIds = 2;               // 人ID
+}
+
+// 删除群成员响应,给群里面所有人 (除了主动删除，还要处理被动删除)
+message DeleteGroupUserRsp
+{
+    required string groupId = 1;               // 群ID
+    repeated string userIds = 2;               // 人ID
+}
+
+// 删除的系统通知  system -> 被删除的人
+message DeleteGroupUserSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群ID
+    required string srcUserId = 3;             // 操作发起人
+    required string srcUserName = 4;           // 操作发起人
+    required uint64 timestamp = 5;             // 系统接收到消息请求的时间
+}
+
+// 删除的系统通知 system -> 群主以及所有管理员
+message DeleteGroupUserToAdminSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群ID
+    required string srcUserId = 3;             // 操作发起人
+    required string srcUserName = 4;           // 操作发起人
+    required string targetUserId = 5;          // 被删除人ID
+    required string targetUserName = 6;        // 被删除人名称
+    required uint64 timestamp = 7;             // 系统接收到消息请求的时间
+}
+
+//---------------------停用群----------------------
+// 停用群请求
+message DisableGroupReq
+{
+    required string groupId = 1;               // 群ID
+}
+
+// 停用群响应，给群里面所有人
+message DisableGroupNty
+{
+    required string groupId = 1;               // 群ID
+    required string userId = 2;                // 用户Id
+}
+
+// 停用群通知，给群里面所有人
+message DisableGroupSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string addUserId = 3;             // 群主ID
+    required string addUserName = 4;           // 群主名称
+    required uint64 timestamp = 5;             // 系统接收到消息请求的时间
+}
+
+
+//-------------------------设置管理员-----------------------
+// 设置管理员，群成员的所有人
+message SetGroupAdminRsp
+{
+    required string groupId = 1;               // 群ID
+    repeated string userIds = 2;               // 用户ID
+    required Enable enable = 3;                // 启用还是禁用
+}
+
+// 设置管理员，给管理员用户
+message SetGroupAdminSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    repeated string userIds = 3;               // 用户ID
+    required Enable enable = 4;                // 启用还是禁用
+    required uint64 timestamp = 5;             // 系统接收到消息请求的时间
+}
+
+//------------------------申请加群-------------------------------------
+// 申请加入群请求, 申请人 -> system
+message JoinGroupReq
+{
+     required string groupId = 1;               // 群ID
+     required uint64 timestamp = 2;             // 系统接收到消息请求的时间
+     optional string validateMessage = 3;       // 验证消息
+}
+
+// 群设置为不需要验证，system -> 群申请人
+message JoinGroupSucceededSysNty
+{
+     required string groupId = 1;               // 群ID
+     required string groupName = 2;             // 群名称
+     required uint64 timestamp = 3;             // 系统接收到消息请求的时间
+}
+
+// 群设置为要验证，验证系统消息，system -> 所有管理员(包括群主)
+message JoinGroupValidateSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string userId = 3;                // 申请人ID
+    required string userName = 4;              // 申请人名称
+    optional string validateMessage = 5;       // 验证消息
+    required uint64 timestamp = 6;             // 系统接收到消息请求的时间
+    optional string svrMsgId = 7;
+}
+
+// 群管理员对申请的处理结果响应， 管理员 -> system (?)
+message JoinGroupRsp
+{
+    required string groupId = 1;         // 群ID
+    required string userId = 2;          // 申请人ID
+    required Enable result = 3;          // 结果
+    optional string refuseMessage = 4;   // 拒绝理由
+    required uint64 timestamp = 5;       // 系统接收到消息请求的时间
+    optional string svrMsgId = 6;
+}
+
+// 申请请求已经被他人处理过的系统通知, system -> 当前操作管理员
+message JoinGroupProcessedNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string userId = 3;                // 申请人ID
+    required string userName = 4;              // 申请人名称
+    required string operateUserId = 5;         // 管理员ID
+    required string operateUserName = 6;       // 管理员名称
+    required Enable result = 7;                // 操作结果
+    required uint64 timestamp = 8;             // 系统接收到消息请求的时间
+}
+
+// 管理员同意申请人入群的系统通知, system -> 申请人
+message AgreeJoinGroupSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string userId = 3;                // 管理员ID
+    required string userName = 4;              // 管理员名称
+    required uint64 timestamp = 5;             // 系统接收到消息请求的时间
+}
+
+// 管理员拒绝申请人入群的系统通知, system -> 申请人
+message DisagreeJoinGroupSysNty
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    required string userId = 3;                // 管理员ID
+    required string userName = 4;              // 管理员名称
+    optional string refuseMessage = 5;         // 拒绝理由
+    required uint64 timestamp = 6;             // 系统接收到消息请求的时间
+}
+
+//申请加入已停用群回复该报文 （？暂不处理）
+message GroupDisableRsp
+{
+   required string groupId = 1;               // 群ID
+}
+
+// 创建群成功信息响应
+message CreateGroupSuccessfulRsp
+{
+    required string groupId = 1;               // 群ID
+    required string groupName = 2;             // 群名称
+    optional string groupSignature = 3;        // 群签名
+    optional string groupKeyword = 4;          // 群关键字
+    optional string groupDesc = 5;             // 群描述
+    required GroupType groupType = 6;          // 群类型
+    required ValidateRule validateRule = 7;    // 群验证规则
+    required string addUserId = 8;             // 群创建人
+    required string addUserName = 9;           // 群创建人名称
+    required string groupNo = 10;              // 群号
+    required int32 limit = 11;                 // 群上限人数
+}
+
+// 创建群请求，响应 GroupInfoRsp
+message AddGroupReq
+{
+    required string groupName = 1;             // 群名称
+    optional string groupSignature = 2;        // 群签名
+    optional string groupKeyword = 3;          // 群关键字
+    optional string groupDesc = 4;             // 群描述
+    required GroupType groupType = 5;          // 群类型
+    required ValidateRule validateRule = 6;    // 群验证规则
+}
+
+// 修改群昵称设置修改请求
+message UpdateGroupNickNameSettingReq
+{
+    required string groupId = 1;             // 群名称
+    required Enable nickNameSetting = 2;        // 新的群昵称修改设置
+    required string userId = 3;              // 用户id
+}
+
+// 修改群昵称设置修改请求响应，给自己
+message UpdateGroupNickNameSettingRsp
+{
+    required string groupId = 1;              // 群名称
+    required Enable nickNameSetting = 2;      // 新的群昵称修改设置
+    required string userId = 3;              // 用户id
+}

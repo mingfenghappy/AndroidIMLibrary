@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="13dp" >
+    <TextView
+        android:id="@+id/aurora_tv_msgitem_date"
+        style="@style/chat_text_date_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" >
+        <com.facebook.drawee.view.SimpleDraweeView
+            xmlns:fresco="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/aurora_iv_msgitem_avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="5dip"
+            fresco:actualImageResource="@mipmap/ic_launcher"
+            fresco:actualImageScaleType="focusCrop"
+            fresco:placeholderImage="@mipmap/ic_launcher"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:failureImage="@mipmap/ic_launcher"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"/>
+        <RelativeLayout
+            android:id="@+id/bubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dip"
+            android:layout_toLeftOf="@id/aurora_iv_msgitem_avatar"
+            android:background="@drawable/ease_chatto_bg">
+            <TextView
+                android:id="@+id/aurora_tv_msgitem_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:layout_centerInParent="true"
+                android:gravity="center|left"
+                android:paddingRight="6dp"
+                android:paddingLeft="1dp"
+                android:minHeight="38dp"
+                android:lineSpacingExtra="2dp"
+                android:textColor="#000000"
+                android:maxWidth="225.0dip"
+                android:textSize="15sp" />
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/aurora_iv_msgitem_send_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/bubble"
+            android:clickable="true"
+            android:src="@drawable/ease_msg_state_failed_resend"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/aurora_iv_msgitem_send_progress_bar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/bubble"
+            android:visibility="gone" />
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,198 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+import "Enums.proto";
+import "User.proto";
+
+// -----------------------------用户好友分组相关报文--------------------------------------
+
+// 拉获好友分组信息
+message FriendGroupsReq
+{
+    required uint64 timestamp = 1;       // 用户资料最后更新时间戳
+}
+
+// 好友分组信息
+message FriendGroupRsp
+{
+    required string friendGroupId = 1;                                    // 好友分组ID
+    required string friendGroupName = 2;                                  // 好友分组名称
+    required FriendGroupType friendGroupType = 3 [default = DEFAULT];     // 好友分组类型
+    repeated FriendStatusRsp friends = 4;                                 // 所有好友 名字起的不合理
+}
+
+// 拉获好友分组信息响应，包含所有的好友分组信息
+message FriendGroupsRsp
+{
+    repeated FriendGroupRsp friendGroups = 1;   // 用户好友分组集合
+    required uint64 timestamp = 2;              // 用户资料最后更新时间戳
+}
+
+// 拉获好友信息详情
+message FriendsReq
+{
+    required uint64 timestamp = 1;       // 用户资料最后更新时间戳
+    optional Enable needEndRsp = 2;
+}
+
+// 好友信息响应
+message FriendInfoRsp
+{
+    required UserInfoRsp friend = 1;           // 用户ID
+    required string friendGroupId = 2;         // 好友分组ID
+    optional string remark = 3;                // 用户备注
+    optional uint64 lastChatTimestamp = 4;     // 最后聊天时间
+    optional Enable onlineRemind = 5;          // 上线提醒
+}
+
+//好友信息响应结束
+message FriendInfoEndRsp
+{
+    required uint64 timestamp = 1;
+}
+
+
+// 修改联系人备注请求
+message UpdateFriendRemarkReq
+{
+    required string friendUserId = 1;             // 好友ID
+    required string newRemark = 2;                // 新的好友备注
+}
+
+// 调整联系人分组响应
+message UpdateFriendRemarkRsp
+{
+    required string friendUserId = 1;      // 好友ID
+    required string newRemark = 2;         // 新的好友备注
+}
+
+//  修改好友上线提醒请求(不做)
+message UpdateFriendOnlineRemindReq
+{
+    required string friendUserId = 1;             // 好友ID
+    required Enable newOnlineRemind = 2;          // 新的上线提醒
+}
+
+// 修改好友上线提醒响应(不做)
+message UpdateFriendOnlineRemindRsp
+{
+    required string friendUserId = 1;             // 好友ID
+    required Enable newOnlineRemind = 2;          // 新的上线提醒
+}
+
+// -----------------------------新增联系人--------------------------------------
+// 好友信息通知
+message FriendInfoNty
+{
+    required UserInfoRsp friend = 1;          // 用户ID
+    optional string remark = 2;               // 用户备注
+    optional uint64 lastChatTimestamp = 3;    // 最后聊天时间
+    optional Enable onlineRemind = 4;         // 上线提醒
+    optional string friendGroupId = 5;        // 好友分组ID
+}
+
+// 获取规则
+message GetFriendRuleReq
+{
+    required string userId = 1;
+}
+
+message GetFriendRuleRsp
+{
+    required string userId = 1;
+    required ValidateRule friendRule = 2;
+    optional uint64  code = 3;
+}
+
+// src = A用户 target = B用户
+// 添加好友        src -> system
+message AddFriendReq
+{
+    required string targetFriendUserId = 1;           // 对方好友ID
+    required string srcFriendGroupId = 2;             // 自己的好友分组ID
+    optional string ext = 3;                          // 客户端自己的附带信息
+}
+
+// 需要验证的加好友系统通知  system -> target
+message AddFriendSysNty
+{
+    required string srcUserId = 1;                    // 来源用户ID
+    required string srcFriendGroupId = 2;             // 自己的好友分组ID
+    required string srcUserName = 3;                  // 来源用户名称
+    required uint64 timestamp = 4;       //系统接收到消息请求的时间
+    optional string ext = 5;                          // 客户端自己的附带信息
+    optional string svrMsgId = 6;
+
+}
+
+// 添加好友响应        target -> system
+message AddFriendAnswerReq
+{
+    required FriendAnswer answer = 1;              // 同意还是不同意
+    required string srcFriendUserId = 2;           // 来源好友ID
+    required string srcFriendGroupId = 3;          // 自己的好友分组ID
+    optional string selfFriendGroupId = 4;         // 把src放到自己的那个用户分组中
+    optional string ext = 5;                          // 客户端自己的附带信息
+    optional string svrMsgId = 6;
+}
+
+// 添加好友同意通知          system -> src
+message AddFriendSucceededSysNty
+{
+    required FriendAnswer answer = 1;
+    required string targetFriendUserId = 2;        // 对方好友ID
+    required string targetFriendUserName = 3;         // 对方好友姓名
+    required uint64 timestamp = 4;       //系统接收到消息请求的时间
+}
+
+// 添加好友同意并添加给target的成功通知          system -> target
+message AddAndAgreeFriendSucceededSysNty
+{
+    required string srcFriendUserId = 1;        // 对方好友ID
+    required string srcFriendUserName = 2;      // 对方好友姓名
+    required uint64 timestamp = 3;       //系统接收到消息请求的时间
+}
+
+// 不需要应答的添加好友成功通知          system -> src
+message AddFriendWithoutValidateSucceededSysNty
+{
+    required string targetFriendUserId = 1;           // 对方好友ID
+    required string targetFriendUserName = 2;         // 对方好友姓名
+    required uint64 timestamp = 3;       //系统接收到消息请求的时间
+}
+
+// 被添加为好友的成功通知          system -> target
+message AddedFriendSucceededSysNty
+{
+    required string srcFriendUserId = 1;           // 对方好友ID
+    required string srcFriendUserName = 2;         // 对方好友姓名
+    required uint64 timestamp = 3;       //系统接收到消息请求的时间
+}
+
+// 添加好友失败          system -> src
+message AddFriendFailSysNty
+{
+    required string targetFriendUserId = 1;           // 目标用户ID
+    required string targetFriendUserName = 2;         // 目标好友姓名
+    required uint64 timestamp = 3;       //系统接收到消息请求的时间
+    optional string ext = 4;                          // 额外的拒绝信息
+
+}
+
+// 删除联系人
+message DeleteFriendReq
+{
+    required string friendUserId = 1;   // 目标好友ID
+}
+
+// 删除联系人
+message DeleteFriendRsp
+{
+    required string friendUserId = 1;   // 目标好友ID
+}
+
+// 调整联系人分组响应
+message MoveFriendToRsp
+{
+    required string friendUserId = 1;             // 好友ID
+    required string newFriendGourpId = 2;         // 新的好友分组
+}

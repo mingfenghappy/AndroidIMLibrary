@@ -1,0 +1,2 @@
+-dontwarn com.renyu.**
+-keep class com.renyu.** { *; }

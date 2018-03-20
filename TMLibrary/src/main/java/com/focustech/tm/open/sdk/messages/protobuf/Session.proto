@@ -1,0 +1,70 @@
+package com.focustech.tm.open.sdk.messages.protobuf;
+
+import "Enums.proto";
+
+// -----------------------------登陆相关报文--------------------------------------
+
+// 登陆请求
+message LoginReq
+{
+    required string userName = 1;                        // 登陆用户名
+    required string userPassword = 2;                    // 登陆密码
+    optional Equipment equipment = 3 [default = PC];     // 登陆设备
+    optional string equipmentInfo = 4;                   // 设备描述（例如：PC的系统描述，移动端的系统和机型信息，WEB端的浏览器信息描述）
+}
+
+// MOBILE用户退出请求
+message MobileLogoutReq
+{
+    required string userId = 1;                          // 登陆用户名
+    optional Equipment equipment = 2 [default = PC];     // 登陆设备
+    optional string equipmentInfo = 3;                   // 设备描述（例如：PC的系统描述，移动端的系统和机型信息，WEB端的浏览器信息描述）
+}
+
+// 重新连接请求
+message MobileReconectReq
+{
+    required string userId = 1;                          // 登陆用户id
+    optional Equipment equipment = 2 [default = PC];     // 登陆设备
+    optional string equipmentInfo = 3;                   // 设备描述（例如：PC的系统描述，移动端的系统和机型信息，WEB端的浏览器信息描述）
+}
+
+// 重新连接响应报文
+message MobileReconectRsp
+{
+    optional string userId = 1;    // 用户
+    required uint32 code = 2;      // 登陆状态（非0为失败）
+    optional string message = 3;   // 登陆错误等描述信息，用户客户端显示。
+    required string token = 4;     // token 字段
+}
+
+
+// 登陆响应报文
+message LoginRsp
+{
+    optional string userId = 1;    // 用户
+    required uint32 code = 2;      // 登陆状态（非0为失败）
+    optional string message = 3;   // 登陆错误等描述信息，用户客户端显示。
+    required string token = 4;     // token 字段
+    required uint64 timestamp = 5; // 登录服务端时间戳
+}
+
+// MCU信息
+message McusRsp
+{
+    repeated McuRsp mcus = 1;       // mcus集合
+}
+
+// MCU信息
+message McuRsp
+{
+    required string ip = 1;       // mcu IP
+    required uint32 port = 2;     // mcu port
+}
+
+// 踢下线通知
+message KickoutNty
+{
+    required string userId = 1;                          // 被踢下线的用户ID
+    optional Equipment equipment = 2;                    // 被那一个登陆的设备踢下线
+}
