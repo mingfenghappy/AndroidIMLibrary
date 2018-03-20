@@ -1,9 +1,16 @@
 package com.renyu.mt;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.focustech.webtm.protocol.tm.message.HeartBeatService;
+import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
 import com.renyu.commonlibrary.params.InitParams;
@@ -15,6 +22,9 @@ import java.io.File;
  */
 
 public class MTApplication extends MultiDexApplication {
+
+    // 是否已经连接完成
+    public BroadcastBean.MTCommand connState = BroadcastBean.MTCommand.Disconn;
 
     @Override
     public void onCreate() {
@@ -45,6 +55,33 @@ public class MTApplication extends MultiDexApplication {
             InitParams.CACHE_PATH= InitParams.ROOT_PATH + File.separator + "cache";
             // fresco缓存目录
             InitParams.FRESCO_CACHE_NAME= "fresco_cache";
+
+            // 注册连接监听广播
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction().equals("MT")) {
+                        BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
+                        if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
+                            Log.d("MTApplication", "连接成功");
+                            connState = BroadcastBean.MTCommand.Conn;
+                        }
+                        if (bean.getCommand() == BroadcastBean.MTCommand.Disconn) {
+                            Log.d("MTApplication", "连接已断开");
+                            connState = BroadcastBean.MTCommand.Disconn;
+                        }
+                        if (bean.getCommand() == BroadcastBean.MTCommand.Conning) {
+                            Log.d("MTApplication", "正在连接");
+                            connState = BroadcastBean.MTCommand.Conning;
+                        }
+                    }
+                }
+            };
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("MT");
+            registerReceiver(receiver, filter);
+            // 开启心跳服务并进行连接
+            startService(new Intent(this, HeartBeatService.class));
         }
     }
 }

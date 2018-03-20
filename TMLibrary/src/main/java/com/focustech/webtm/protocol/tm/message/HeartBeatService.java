@@ -10,8 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
-import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
-import com.renyu.commonlibrary.commonutils.ACache;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -48,25 +46,33 @@ public class HeartBeatService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(null==scheduledThreadPoolExecutor){
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-            scheduledThreadPoolExecutor.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
+            scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
+                // 首次开启不算做错误
+                if (lastTime == -1) {
+                    Log.d("HeartBeatService", "开启连接");
+                    errorTime = 0;
+                    lastTime = System.currentTimeMillis();
+                    MTService.conn(HeartBeatService.this);
+                }
+                else {
                     // 超过10s秒则认为1次错误
-                    if (System.currentTimeMillis()-lastTime>20*1000) {
+                    if (System.currentTimeMillis()-lastTime>8*1000) {
                         errorTime++;
                         Log.d("HeartBeatService", "出现错误，错误次数为" + errorTime);
                     }
                     // 错误超过3次重新发起连接登录
-                    if (errorTime>3) {
-                        MTService.conn(HeartBeatService.this);
-                        Log.d("HeartBeatService", "达到错误，开始重新连接");
+                    if (errorTime >= 3) {
+                        errorTime = 0;
+                        lastTime = -1;
+                        Log.d("HeartBeatService", "达到错误，准备下次重新连接");
                     }
                     else {
                         MTService.heartbeat(HeartBeatService.this);
                         Log.d("HeartBeatService", "发送心跳包");
                     }
                 }
-            }, 5, 10, TimeUnit.SECONDS);
+
+            }, 1, 5, TimeUnit.SECONDS);
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -85,20 +91,11 @@ public class HeartBeatService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("MT")) {
                 BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
-                if (bean.getCommand()== BroadcastBean.MTCommand.Conn) {
-                    if (ACache.get(HeartBeatService.this).getAsObject("UserInfoRsp")!=null) {
-                        UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(HeartBeatService.this).getAsObject("UserInfoRsp");
-                        MTService.reqLogin(HeartBeatService.this, userInfoRsp.getLoginUserName(), userInfoRsp.getPwd());
-                    }
-                }
-                if (bean.getCommand() == BroadcastBean.MTCommand.HeartBeat) {
+                if (bean.getCommand() == BroadcastBean.MTCommand.HeartBeat ||
+                        bean.getCommand() == BroadcastBean.MTCommand.Conn) {
                     lastTime=System.currentTimeMillis();
                     errorTime=0;
                     Log.d("HeartBeatService", "收到心跳包，重置");
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.LoginRsp) {
-                    lastTime=System.currentTimeMillis();
-                    errorTime=0;
                 }
             }
         }

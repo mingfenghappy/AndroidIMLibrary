@@ -71,19 +71,12 @@ public class RequestClient {
 	 * @return
 	 */
 	public boolean startConnector() {
-		if (!isConnected()) {
-			connector.setHandler(connectConfig.getIoHandler());
-			// 配置链接服务器
-			for (String[] server : connectConfig.getServers()) {
-				connector.addServer(server[0], Integer.parseInt(server[1]));
-			}
-			return connector.connect();
+		connector.setHandler(connectConfig.getIoHandler());
+		// 配置链接服务器
+		for (String[] server : connectConfig.getServers()) {
+			connector.addServer(server[0], Integer.parseInt(server[1]));
 		}
-		else {
-			// 如果已经连接成功，则直接发送成功连接标志
-			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Conn, "");
-			return true;
-		}
+		return connector.connect();
 	}
 
 	/**

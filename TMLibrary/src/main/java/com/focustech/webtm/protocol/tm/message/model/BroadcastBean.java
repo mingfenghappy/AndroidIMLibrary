@@ -12,8 +12,9 @@ import java.io.Serializable;
 public class BroadcastBean implements Serializable {
     public enum MTCommand implements Serializable {
         HeartBeat,               // 自增，用于标志心跳包
-        Conn,
-        Disconn,
+        Conn,                    // 自增，用于已连接
+        Conning,                 // 自增，用于标志发起连接
+        Disconn,                 // 自增，用于连接失败
         LoginRsp,
         LoginRspERROR,
         UserInfoRsp,

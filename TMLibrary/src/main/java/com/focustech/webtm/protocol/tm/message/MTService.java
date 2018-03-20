@@ -254,6 +254,9 @@ public class MTService extends Service {
         Intent intent=new Intent(context, MTService.class);
         intent.putExtra("type", "conn");
         context.startService(intent);
+
+        // 发送正在连接广播
+        BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Conning, "");
     }
 
     /**
