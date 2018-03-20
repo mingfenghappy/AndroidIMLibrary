@@ -5,11 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.focustech.R;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
+import com.renyu.commonlibrary.commonutils.NotificationUtils;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +47,17 @@ public class HeartBeatService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+            NotificationUtils.getNotificationCenter(getApplicationContext()).showStartForeground(
+                    this,
+                    "提示",
+                    "Push Service",
+                    "Push Service",
+                    R.color.colorPrimary,
+                    intent.getExtras().getInt("smallIcon"),
+                    intent.getExtras().getInt("largeIcon"),
+                    1000);
+        }
         if(null==scheduledThreadPoolExecutor){
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
             scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
@@ -83,6 +97,10 @@ public class HeartBeatService extends Service {
         unregisterReceiver(registerReceiver);
         if (scheduledThreadPoolExecutor!=null) {
             scheduledThreadPoolExecutor.shutdownNow();
+        }
+        // android o 关闭后台服务
+        if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+            NotificationUtils.getNotificationCenter(getApplicationContext()).hideStartForeground(this, 1000);
         }
     }
 

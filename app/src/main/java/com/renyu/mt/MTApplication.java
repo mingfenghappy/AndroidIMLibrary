@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
@@ -81,7 +82,12 @@ public class MTApplication extends MultiDexApplication {
             filter.addAction("MT");
             registerReceiver(receiver, filter);
             // 开启心跳服务并进行连接
-            startService(new Intent(this, HeartBeatService.class));
+            if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+                startForegroundService(new Intent(this, HeartBeatService.class));
+            }
+            else {
+                startService(new Intent(this, HeartBeatService.class));
+            }
         }
     }
 }
