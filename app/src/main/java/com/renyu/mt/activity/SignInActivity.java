@@ -17,6 +17,8 @@ import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
 
+import org.jetbrains.annotations.Nullable;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -31,9 +33,11 @@ public class SignInActivity extends BaseIMActivity {
     @BindView(R.id.ed_pwd)
     EditText ed_pwd;
 
+    BroadcastReceiver receiver;
+
     @Override
     public void initParams() {
-        setCustomerReceiver(new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
@@ -56,7 +60,7 @@ public class SignInActivity extends BaseIMActivity {
                     }
                 }
             }
-        });
+        };
     }
 
     @Override
@@ -106,5 +110,11 @@ public class SignInActivity extends BaseIMActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         finish();
+    }
+
+    @Nullable
+    @Override
+    public BroadcastReceiver getReceiver() {
+        return receiver;
     }
 }

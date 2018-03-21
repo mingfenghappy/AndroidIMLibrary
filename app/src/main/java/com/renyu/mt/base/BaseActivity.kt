@@ -12,11 +12,7 @@ import com.renyu.commonlibrary.baseact.BaseActivity
  */
 abstract class BaseIMActivity: BaseActivity() {
 
-    private var receiver: BroadcastReceiver? = null
-
-    fun setCustomerReceiver(receiver: BroadcastReceiver) {
-        this.receiver = receiver
-    }
+    open var receiver: BroadcastReceiver? = null
 
     override fun onResume() {
         super.onResume()
