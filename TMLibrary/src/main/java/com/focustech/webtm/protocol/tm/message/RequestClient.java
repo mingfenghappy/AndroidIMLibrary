@@ -100,6 +100,9 @@ public class RequestClient {
 		return null != connector && connector.isConnected();
 	}
 
+	/**
+	 * 发送心跳包
+	 */
 	public void heartbeat() {
 		TMConnection.getInstance(context).send(this.connectConfig.getHeartbeatMsg());
 	}
