@@ -9,10 +9,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.FileUtils;
 import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
+import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
@@ -37,6 +39,13 @@ public class SignInActivity extends BaseIMActivity {
 
     @Override
     public void initParams() {
+        // 初始化文件夹
+        FileUtils.createOrExistsDir(InitParams.IMAGE_PATH);
+        FileUtils.createOrExistsDir(InitParams.HOTFIX_PATH);
+        FileUtils.createOrExistsDir(InitParams.FILE_PATH);
+        FileUtils.createOrExistsDir(InitParams.LOG_PATH);
+        FileUtils.createOrExistsDir(InitParams.CACHE_PATH);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
