@@ -86,13 +86,13 @@ public class TMConnection {
                 try {
                     // 发送
                     WriteFuture future = session.write(message);
-                    future.awaitUninterruptibly(15, TimeUnit.SECONDS);
+                    future.awaitUninterruptibly(3, TimeUnit.SECONDS);
                     if(!future.isWritten()) {
-                        setIo(null);
-                    }
+                        // 数据发送失败
+						Log.d("TMConnection", "发送失败");
+					}
                 } catch (Exception e) {
                     e.printStackTrace();
-                    setIo(null);
                 }
             }
         });

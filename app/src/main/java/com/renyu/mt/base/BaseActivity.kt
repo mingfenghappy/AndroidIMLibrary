@@ -17,6 +17,7 @@ import com.focustech.webtm.protocol.tm.message.model.MessageBean
 import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean
 import com.renyu.commonlibrary.baseact.BaseActivity
 import com.renyu.mt.MTApplication
+import com.renyu.mt.R
 
 /**
  * Created by Administrator on 2018/3/20 0020.
@@ -119,7 +120,10 @@ abstract class BaseIMActivity: BaseActivity() {
         registerReceiver((application as MTApplication).baseReceiver, filter)
         // 开启心跳服务并进行连接
         if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
-            startForegroundService(Intent(this, HeartBeatService::class.java))
+            val intent = Intent(this, HeartBeatService::class.java)
+            intent.putExtra("smallIcon", R.mipmap.ic_launcher)
+            intent.putExtra("largeIcon", R.mipmap.ic_launcher)
+            startForegroundService(intent)
         }
         else {
             startService(Intent(this, HeartBeatService::class.java))
