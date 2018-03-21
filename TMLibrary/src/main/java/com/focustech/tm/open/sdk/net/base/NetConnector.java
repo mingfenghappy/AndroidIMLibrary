@@ -3,6 +3,7 @@ package com.focustech.tm.open.sdk.net.base;
 import android.content.Context;
 import android.util.Log;
 
+import com.focustech.tm.open.sdk.params.ConnectConfig;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 
 import org.apache.mina.core.future.ConnectFuture;

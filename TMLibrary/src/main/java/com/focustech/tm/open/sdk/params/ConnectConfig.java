@@ -1,4 +1,4 @@
-package com.focustech.tm.open.sdk.net.base;
+package com.focustech.tm.open.sdk.params;
 
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
@@ -19,22 +19,6 @@ public class ConnectConfig {
      */
     private long connectTimeout = 25000;
     /**
-     * 连接失败错误尝试次数
-     */
-    private int failedRetryTimes = 3;
-    /**
-     * 是否启用心跳
-     */
-    private boolean activeHeartbeat = false;
-    /**
-     * 连接失败错误尝试间隔时间，单位毫秒
-     */
-    private long failedRetryInterval = 3000;
-    /**
-     * 心跳间隔，单位毫秒
-     */
-    private long heartbeatInterval = 90000;
-    /**
      * 通信平台
      */
     private List<String[]> servers = new ArrayList<>();
@@ -53,10 +37,6 @@ public class ConnectConfig {
 
     public int getIoProcessCount() {
         return ioProcessCount;
-    }
-
-    public void setIoProcessCount(int ioProcessCount) {
-        this.ioProcessCount = ioProcessCount;
     }
 
     public ProtocolCodecFactory getCodecFactory() {
@@ -87,34 +67,6 @@ public class ConnectConfig {
         return connectTimeout;
     }
 
-    public void setConnectTimeout(long connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public int getFailedRetryTimes() {
-        return failedRetryTimes;
-    }
-
-    public void setFailedRetryTimes(int failedRetryTimes) {
-        this.failedRetryTimes = failedRetryTimes;
-    }
-
-    public long getFailedRetryInterval() {
-        return failedRetryInterval;
-    }
-
-    public void setFailedRetryInterval(long failedRetryInterval) {
-        this.failedRetryInterval = failedRetryInterval;
-    }
-
-    public long getHeartbeatInterval() {
-        return heartbeatInterval;
-    }
-
-    public void setHeartbeatInterval(long heartbeatInterval) {
-        this.heartbeatInterval = heartbeatInterval;
-    }
-
     public List<String[]> getServers() {
         return servers;
     }
@@ -125,13 +77,5 @@ public class ConnectConfig {
 
     public void addServer(String ip, int port) {
         this.servers.add(new String[]{ip, String.valueOf(port)});
-    }
-
-    public boolean isActiveHeartbeat() {
-        return activeHeartbeat;
-    }
-
-    public void setActiveHeartbeat(boolean activeHeartbeat) {
-        this.activeHeartbeat = activeHeartbeat;
     }
 }

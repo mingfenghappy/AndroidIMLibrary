@@ -1,11 +1,8 @@
 package com.focustech.webtm.protocol.tm.message;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.focustech.common.Utils;
-import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
-import com.focustech.tm.open.sdk.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Contacts;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums.Enable;
@@ -17,14 +14,15 @@ import com.focustech.tm.open.sdk.messages.protobuf.Messages.Message;
 import com.focustech.tm.open.sdk.messages.protobuf.Session.LoginReq;
 import com.focustech.tm.open.sdk.messages.protobuf.Session.MobileLogoutReq;
 import com.focustech.tm.open.sdk.messages.protobuf.User;
-import com.focustech.tm.open.sdk.net.base.ConnectConfig;
 import com.focustech.tm.open.sdk.net.base.NetConnector;
 import com.focustech.tm.open.sdk.net.base.TMConnection;
 import com.focustech.tm.open.sdk.net.base.TMMessageProcessorAdapter;
 import com.focustech.tm.open.sdk.net.codec.TMMessageCodecFactory;
-import com.focustech.webtm.protocol.tm.message.msg.TMMessage;
+import com.focustech.tm.open.sdk.params.ConnectConfig;
+import com.focustech.tm.open.sdk.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.group.GroupMsgRequest;
 import com.focustech.webtm.protocol.tm.message.msg.MessageResponse;
+import com.focustech.webtm.protocol.tm.message.msg.TMMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +56,6 @@ public class RequestClient {
 		connectConfig = new ConnectConfig();
 		connectConfig.addServers(servers);
 		connectConfig.setIoHandler(new TMMessageProcessorAdapter(context));
-		// 开启心跳包发送
-		connectConfig.setActiveHeartbeat(true);
 		// 设置心跳包发送字节
 		connectConfig.setHeartbeatMsg(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
 		connectConfig.setCodecFactory(new TMMessageCodecFactory());
@@ -105,14 +101,7 @@ public class RequestClient {
 	}
 
 	public void heartbeat() {
-		try {
-			if (this.connectConfig.isActiveHeartbeat()) {
-				TMConnection.getInstance(context).send(this.connectConfig.getHeartbeatMsg());
-			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-			Log.d("NetConnector", "心跳包发送失败");
-		}
+		TMConnection.getInstance(context).send(this.connectConfig.getHeartbeatMsg());
 	}
 
 	public Head.TMHeadMessage getHead(String cmd) {
