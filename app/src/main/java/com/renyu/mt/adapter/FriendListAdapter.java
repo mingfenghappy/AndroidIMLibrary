@@ -26,10 +26,8 @@ import com.focustech.webtm.protocol.tm.message.model.FriendStatusRsp;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
-import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
-import com.renyu.mt.activity.ConversationActivity;
-import com.renyu.mt.activity.IndexActivity;
+import com.renyu.mt.activity.ChatListActivity;
 import com.renyu.mt.utils.AvatarUtils;
 
 import java.util.List;
@@ -106,7 +104,7 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
                 PlainTextDBHelper.getInstance().updateRead(beans.get(position_).getFriendUserId());
                 BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, beans.get(position_).getFriendUserId());
 
-                Intent intent=new Intent(context, ConversationActivity.class);
+                Intent intent=new Intent(context, ChatListActivity.class);
                 intent.putExtra("UserInfoRsp", beans.get(position_).getFriendInfoRsp().getFriend());
                 intent.putExtra("UserId", beans.get(position_).getFriendUserId());
                 context.startActivity(intent);

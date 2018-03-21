@@ -1,35 +1,36 @@
 package com.renyu.mt.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
+import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
+import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 import com.focustech.webtm.protocol.tm.message.model.UpdateUserStatusNty;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
+import com.renyu.commonlibrary.basefrag.BaseFragment;
+import com.renyu.commonlibrary.commonutils.ACache;
+import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.mt.R;
-import com.renyu.mt.activity.IndexActivity;
 import com.renyu.mt.adapter.ConversationListAdapter;
+import com.renyu.mt.impl.RetrofitImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Administrator on 2017/7/20.
  */
 
-public class ConversationFragment extends Fragment {
+public class ConversationFragment extends BaseFragment {
 
     @BindView(R.id.swipe_conversationlist)
     SwipeRefreshLayout swipe_conversationlist;
@@ -37,52 +38,51 @@ public class ConversationFragment extends Fragment {
     RecyclerView rv_conversationlist;
     ConversationListAdapter adapter;
 
+    // 当前用户信息
+    UserInfoRsp currentUserInfo;
     // 离线消息
-    ArrayList<MessageBean> offlineMessages;
+    ArrayList<OfflineIMResponse> offlineMessages;
     // 用户信息
     HashMap<String, UserInfoRsp> userInfoRsps;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_conversation, container, false);
-        ButterKnife.bind(this, view);
-        return view;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void initParams() {
+        currentUserInfo = (UserInfoRsp) ACache.get(getActivity()).getAsObject("UserInfoRsp");
 
         offlineMessages=new ArrayList<>();
+
         userInfoRsps= PlainTextDBHelper.getInstance().getFriendsInfo();
 
         rv_conversationlist.setHasFixedSize(true);
         rv_conversationlist.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter=new ConversationListAdapter(getActivity(), offlineMessages);
         rv_conversationlist.setAdapter(adapter);
-        swipe_conversationlist.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (!((IndexActivity) getActivity()).isLoadOfflineData) {
-                    ((IndexActivity) getActivity()).needReqGetOfflineMessage();
-                }
-                else {
-                    swipe_conversationlist.setRefreshing(false);
-                }
-            }
+        swipe_conversationlist.setOnRefreshListener(() -> {
+            // TODO: 2018/3/21 0021 刷新列表
         });
-        refreshOfflineMessageData();
+    }
+
+    @Override
+    public int initViews() {
+        return R.layout.fragment_conversation;
+    }
+
+    @Override
+    public void loadData() {
+        getOfflineIMFromLocal();
+        getOfflineIMFromRemote();
     }
 
     /**
-     * 收到新的消息之后进行刷新
+     * 加载本地会话列表
      */
-    public ArrayList<MessageBean> refreshOfflineMessageData() {
-        ArrayList<MessageBean> temp = PlainTextDBHelper.getInstance().getConversationList();
-        for (MessageBean offlineMessage : temp) {
-            if (userInfoRsps.containsKey(offlineMessage.getUserId())) {
-                offlineMessage.setUserInfoRsp(userInfoRsps.get(offlineMessage.getUserId()));
+    public ArrayList<OfflineIMResponse> getOfflineIMFromLocal() {
+        ArrayList<OfflineIMResponse> temp = PlainTextDBHelper.getInstance().getConversationList();
+        for (OfflineIMResponse offlineMessage : temp) {
+            if (userInfoRsps.containsKey(offlineMessage.getFromUserId())) {
+                offlineMessage.setUserNickName(userInfoRsps.get(offlineMessage.getFromUserId()).getUserNickName());
+                offlineMessage.setUserHeadType(userInfoRsps.get(offlineMessage.getFromUserId()).getUserHeadType().getNumber());
+                offlineMessage.setUserHeadId(userInfoRsps.get(offlineMessage.getFromUserId()).getUserHeadId());
             }
         }
         this.offlineMessages.clear();
@@ -92,22 +92,154 @@ public class ConversationFragment extends Fragment {
     }
 
     /**
+     * 加载远程会话列表
+     */
+    public void getOfflineIMFromRemote() {
+        retrofit.create(RetrofitImpl.class).getOfflineIMList(currentUserInfo.getUserId())
+                .compose(Retrofit2Utils.backgroundList())
+                .subscribe(new Observer<List<OfflineIMResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<OfflineIMResponse> temp) {
+                        // 没有找到的数据列表
+                        ArrayList<OfflineIMResponse> newAdd = new ArrayList<>();
+                        // 对新消息进行遍历
+                        for (OfflineIMResponse temp_ : temp) {
+                            // 对老消息进行遍历
+                            boolean find = false;
+                            for (OfflineIMResponse offlineMessage : offlineMessages) {
+                                if (temp_.getFromUserId().equals(offlineMessage.getFromUserId())) {
+                                    // 找到该条消息，公共参数进行替换
+                                    offlineMessage.setUserHeadId(temp_.getUserHeadId());
+                                    offlineMessage.setUserHeadType(temp_.getUserHeadType());
+                                    offlineMessage.setUserNickName(temp_.getUserNickName());
+                                    // 如果接口消息时间比列表消息时间更新,则进行更新
+                                    if (temp_.getAddTime()>offlineMessage.getAddTime()) {
+                                        offlineMessage.setAddTime(temp_.getAddTime());
+                                        offlineMessage.setLastMsg(temp_.getLastMsg());
+                                        offlineMessage.setType(temp_.getType());
+                                        offlineMessage.setUnloadCount(temp_.getUnloadCount());
+                                    }
+                                    find = true;
+                                    break;
+                                }
+                            }
+                            // 没有找到则为新增补充入列表
+                            if (!find) {
+                                newAdd.add(temp_);
+                            }
+                        }
+                        // 进行数据整合
+                        newAdd.addAll(offlineMessages);
+                        // 进行排序
+                        long[] arr = new long[newAdd.size()];
+                        for (int i = 0; i < newAdd.size(); i++) {
+                            arr[i] = newAdd.get(i).getAddTime();
+                        }
+                        for(int i=0;i<arr.length-1;i++){
+                            for(int j=0;j<arr.length-1-i;j++){
+                                if(arr[j]<arr[j+1]){
+                                    long a=arr[j];
+                                    arr[j]=arr[j+1];
+                                    arr[j+1]=a;
+                                }
+                            }
+                        }
+                        // 填充数据
+                        offlineMessages.clear();
+                        for (long l : arr) {
+                            for (OfflineIMResponse offlineIMResponse : newAdd) {
+                                if (offlineIMResponse.getAddTime() == l) {
+                                    offlineMessages.add(offlineIMResponse);
+                                }
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+
+                        // 首次加载，开始获取好友关系数据
+                        MTService.reqFriendInfo(getActivity());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+
+                        // 首次加载，开始获取好友关系数据
+                        MTService.reqFriendInfo(getActivity());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    /**
+     * 刷新单条消息
+     * @param messageBean
+     */
+    public void refreshOneMessage(MessageBean messageBean) {
+        OfflineIMResponse find = null;
+        int findPosition = -1;
+        for (int i = 0; i < offlineMessages.size(); i++) {
+            // 找到IM列表中该联系人的消息
+            OfflineIMResponse offlineMessage = offlineMessages.get(i);
+            if (offlineMessage.getFromUserId().equals(messageBean.getUserId())) {
+                offlineMessage.setAddTime(messageBean.getTimestamp());
+                offlineMessage.setLastMsg(messageBean.getMsg());
+                offlineMessage.setType(Integer.parseInt(messageBean.getMessageType()));
+                offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
+
+                find = offlineMessage;
+                findPosition = i;
+
+                break;
+            }
+        }
+        if (find == null || findPosition == -1) {
+            OfflineIMResponse offlineMessage = new OfflineIMResponse();
+            offlineMessage.setAddTime(messageBean.getTimestamp());
+            offlineMessage.setLastMsg(messageBean.getMsg());
+            offlineMessage.setType(Integer.parseInt(messageBean.getMessageType()));
+            offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
+            offlineMessages.add(0, offlineMessage);
+        }
+        else {
+            offlineMessages.add(0, offlineMessages.remove(findPosition));
+        }
+
+        // 不是首次加载的话，如果离线消息中的人不在好友列表中，则获取好友信息
+        if (!userInfoRsps.containsKey(messageBean.getUserId())) {
+            MTService.getUserInfo(getActivity().getApplicationContext(), messageBean.getUserId());
+        }
+    }
+
+    /**
      * 刷新用户信息
      * @param userInfoRsp
      */
     public void refreshOfflineUser(UserInfoRsp userInfoRsp) {
-        for (MessageBean offlineMessage : offlineMessages) {
-            if (offlineMessage.getUserId().equals(userInfoRsp.getUserId())) {
-                offlineMessage.setUserInfoRsp(userInfoRsp);
+        boolean find = false;
+        for (OfflineIMResponse offlineMessage : offlineMessages) {
+            if (offlineMessage.getFromUserId().equals(userInfoRsp.getUserId())) {
+                offlineMessage.setUserHeadId(userInfoRsp.getUserHeadId());
+                offlineMessage.setUserHeadType(userInfoRsp.getUserHeadType().getNumber());
+                offlineMessage.setUserNickName(userInfoRsp.getUserNickName());
+
+                find = true;
+                break;
             }
         }
-        adapter.notifyDataSetChanged();
+        if (find) {
+            adapter.notifyDataSetChanged();
+        }
         // 更新缓存好友信息数据
         userInfoRsps.put(userInfoRsp.getUserId(), userInfoRsp);
-    }
-
-    public void endRefresh() {
-        swipe_conversationlist.setRefreshing(false);
     }
 
     /**
@@ -115,15 +247,13 @@ public class ConversationFragment extends Fragment {
      * @param updateUserStatusNty
      */
     public void refreshUserState(UpdateUserStatusNty updateUserStatusNty) {
-        for (MessageBean offlineMessage : offlineMessages) {
-            if (offlineMessage.getUserId().equals(updateUserStatusNty.getUserId())) {
+        for (OfflineIMResponse offlineMessage : offlineMessages) {
+            if (offlineMessage.getFromUserId().equals(updateUserStatusNty.getUserId())) {
                 ArrayList<Enums.EquipmentStatus> equipmentStatuses=new ArrayList<>();
                 equipmentStatuses.add(updateUserStatusNty.getStatus());
                 // TODO: 2017/7/28 这里仅仅做了好友上线下线判断，并未对陌生人进行判断
-                if (offlineMessage.getUserInfoRsp()!=null) {
-                    offlineMessage.getUserInfoRsp().setEquipments(equipmentStatuses);
-                    adapter.notifyDataSetChanged();
-                }
+                offlineMessage.setEquipments(equipmentStatuses);
+                adapter.notifyDataSetChanged();
                 break;
             }
         }
@@ -134,9 +264,9 @@ public class ConversationFragment extends Fragment {
      * @param userId
      */
     public void updateRead(String userId) {
-        for (MessageBean offlineMessage : offlineMessages) {
-            if (offlineMessage.getUserId().equals(userId)) {
-                offlineMessage.setCount(0);
+        for (OfflineIMResponse offlineMessage : offlineMessages) {
+            if (offlineMessage.getFromUserId().equals(userId)) {
+                offlineMessage.setUnloadCount(0);
             }
         }
         adapter.notifyDataSetChanged();

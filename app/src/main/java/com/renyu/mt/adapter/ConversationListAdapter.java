@@ -22,11 +22,11 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
-import com.focustech.webtm.protocol.tm.message.model.MessageBean;
+import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
-import com.renyu.mt.activity.ConversationActivity;
+import com.renyu.mt.activity.ChatListActivity;
 import com.renyu.mt.activity.SystemMessageActivity;
 import com.renyu.mt.utils.AvatarUtils;
 
@@ -46,9 +46,9 @@ import jp.wasabeef.fresco.processors.GrayscalePostprocessor;
 public class ConversationListAdapter extends RecyclerView.Adapter<ConversationListAdapter.ConversationListHolder> {
 
     Context context;
-    ArrayList<MessageBean> offlineMessages;
+    ArrayList<OfflineIMResponse> offlineMessages;
 
-    public ConversationListAdapter(Context context, ArrayList<MessageBean> offlineMessages) {
+    public ConversationListAdapter(Context context, ArrayList<OfflineIMResponse> offlineMessages) {
         this.context = context;
         this.offlineMessages = offlineMessages;
     }
@@ -65,48 +65,50 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         ImageRequest request;
         DraweeController draweeController;
         // 系统消息
-        if (offlineMessages.get(position).getUserId().equals("-1")) {
+        if (offlineMessages.get(position).getFromUserId().equals("-1")) {
             holder.tv_adapter_conversationlist_name.setText("系统消息");
             request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("res:///"+R.drawable.default_avatar0))
                     .setPostprocessor(new GrayscalePostprocessor())
                     .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
-            holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getMsg());
-            holder.layout_adapter_conversationlist.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    context.startActivity(new Intent(context, SystemMessageActivity.class));
-                }
-            });
+            holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getLastMsg());
+            holder.layout_adapter_conversationlist.setOnClickListener(view -> context.startActivity(new Intent(context, SystemMessageActivity.class)));
         }
         // 普通好友消息
         else {
-            holder.tv_adapter_conversationlist_name.setText(offlineMessages.get(position).getUserInfoRsp()==null?
-                    offlineMessages.get(position).getUserId():
-                    offlineMessages.get(position).getUserInfoRsp().getUserName());
-            if (offlineMessages.get(position).getMessageType().equals("0")) {
-                holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getMsg());
+            holder.tv_adapter_conversationlist_name.setText(offlineMessages.get(position).getUserNickName()==null?
+                    offlineMessages.get(position).getFromUserId():
+                    offlineMessages.get(position).getUserNickName());
+            if (offlineMessages.get(position).getType()==0) {
+                holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getLastMsg());
             }
-            else if (offlineMessages.get(position).getMessageType().equals("9")) {
-                holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getMsg());
+            else if (offlineMessages.get(position).getType()==9) {
+                holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getLastMsg());
             }
-            else if (offlineMessages.get(position).getMessageType().equals("8")) {
+            else if (offlineMessages.get(position).getType()==8) {
                 holder.tv_adapter_conversationlist_msg.setText("[图片]");
             }
-            else if (offlineMessages.get(position).getMessageType().equals("7")) {
+            else if (offlineMessages.get(position).getType()==7) {
                 holder.tv_adapter_conversationlist_msg.setText("[语音]");
             }
-            if (offlineMessages.get(position).getUserInfoRsp()!=null) {
-                String faceCode = String.valueOf(offlineMessages.get(position).getUserInfoRsp().getUserHeadType().getNumber());
-                String fileId = offlineMessages.get(position).getUserInfoRsp().getUserHeadId();
+            if (offlineMessages.get(position).getUserHeadType() != 0 &&
+                    offlineMessages.get(position).getUserHeadId() != null) {
+                String faceCode = String.valueOf(offlineMessages.get(position).getUserHeadType());
+                String fileId = offlineMessages.get(position).getUserHeadId();
                 UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
                 String token=userInfoRsp.getToken();
                 Object avatar= AvatarUtils.displayImg(faceCode, fileId, token);
-                Enums.EquipmentStatus showStatus = UserInfoRsp.getShowStatus(offlineMessages.get(position).getUserInfoRsp().getEquipments());
-                // TODO: 2017/7/19 所有用户都是离线的？
-                if (!UserInfoRsp.isOnline(showStatus.getStatus().getNumber())) {
-                    request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                            .setPostprocessor(new GrayscalePostprocessor())
-                            .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
+                if (offlineMessages.get(position).getEquipments() != null) {
+                    Enums.EquipmentStatus showStatus = UserInfoRsp.getShowStatus(offlineMessages.get(position).getEquipments());
+                    // TODO: 2017/7/19 所有用户都是离线的？
+                    if (!UserInfoRsp.isOnline(showStatus.getStatus().getNumber())) {
+                        request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
+                                .setPostprocessor(new GrayscalePostprocessor())
+                                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
+                    }
+                    else {
+                        request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
+                                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
+                    }
                 }
                 else {
                     request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
@@ -118,30 +120,26 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                         .setPostprocessor(new GrayscalePostprocessor())
                         .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             }
-            if (offlineMessages.get(position).getCount()>0) {
-                holder.tv_adapter_conversationlist_message.setText(""+offlineMessages.get(position).getCount());
+            if (offlineMessages.get(position).getUnloadCount()>0) {
+                holder.tv_adapter_conversationlist_message.setText(""+offlineMessages.get(position).getUnloadCount());
                 holder.tv_adapter_conversationlist_message.setVisibility(View.VISIBLE);
             }
             else {
                 holder.tv_adapter_conversationlist_message.setVisibility(View.INVISIBLE);
             }
-            holder.layout_adapter_conversationlist.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    PlainTextDBHelper.getInstance().updateRead(offlineMessages.get(position_).getUserId());
-                    BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getUserId());
+            holder.layout_adapter_conversationlist.setOnClickListener(view -> {
+                PlainTextDBHelper.getInstance().updateRead(offlineMessages.get(position_).getFromUserId());
+                BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());
 
-                    Intent intent=new Intent(context, ConversationActivity.class);
-                    intent.putExtra("UserInfoRsp", offlineMessages.get(position_).getUserInfoRsp());
-                    intent.putExtra("UserId", offlineMessages.get(position_).getUserId());
-                    context.startActivity(intent);
-                }
+                Intent intent=new Intent(context, ChatListActivity.class);
+                intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
+                context.startActivity(intent);
             });
         }
         draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         holder.iv_adapter_conversationlist.setController(draweeController);
-        holder.tv_adapter_conversationlist_time.setText(getFriendlyTimeSpanByNow(offlineMessages.get(position).getTimestamp()));
+        holder.tv_adapter_conversationlist_time.setText(getFriendlyTimeSpanByNow(offlineMessages.get(position).getAddTime()));
     }
 
     @Override

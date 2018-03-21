@@ -8,9 +8,15 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
+import com.renyu.commonlibrary.network.HttpsUtils;
+import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
+import com.renyu.mt.params.CommonParams;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by Administrator on 2017/7/7.
@@ -51,6 +57,24 @@ public class MTApplication extends MultiDexApplication {
             InitParams.CACHE_PATH= InitParams.ROOT_PATH + File.separator + "cache";
             // fresco缓存目录
             InitParams.FRESCO_CACHE_NAME= "fresco_cache";
+
+            // 初始化网络请求
+            Retrofit2Utils retrofit2Utils = Retrofit2Utils.getInstance(CommonParams.HTTPURL);
+            OkHttpClient.Builder baseBuilder = new OkHttpClient.Builder()
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS)
+                    .connectTimeout(10, TimeUnit.SECONDS);
+            //https默认信任全部证书
+            HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory(null, null, null);
+            baseBuilder.hostnameVerifier((s, sslSession) -> true).sslSocketFactory(sslParams.sSLSocketFactory, sslParams.trustManager);
+            retrofit2Utils.addBaseOKHttpClient(baseBuilder.build());
+            retrofit2Utils.baseBuild();
+            OkHttpClient.Builder imageUploadOkBuilder = new OkHttpClient.Builder()
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS);
+            retrofit2Utils.addImageOKHttpClient(imageUploadOkBuilder.build());
+            retrofit2Utils.imageBuild();
         }
     }
 }

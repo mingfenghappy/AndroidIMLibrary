@@ -10,6 +10,7 @@ import com.focustech.webtm.protocol.tm.message.model.FriendGroupRsp;
 import com.focustech.webtm.protocol.tm.message.model.FriendInfoRsp;
 import com.focustech.webtm.protocol.tm.message.model.FriendStatusRsp;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
+import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.tencent.wcdb.Cursor;
@@ -426,8 +427,8 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 获取会话列表消息
      * @return
      */
-    public ArrayList<MessageBean> getConversationList() {
-        ArrayList<MessageBean> messageBeens=new ArrayList<>();
+    public ArrayList<OfflineIMResponse> getConversationList() {
+        ArrayList<OfflineIMResponse> messageBeens=new ArrayList<>();
 
         String sql="select * from ((select *, max("+timestamp+") from "+MessageTable+" group by "+userId+" order by "+timestamp+" desc) as k1 " +
                 "left join " +
@@ -438,38 +439,18 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         for (int i=0;i<cs.getCount();i++) {
             cs.moveToPosition(i);
             String msg=cs.getString(cs.getColumnIndex("msg"));
-            String msgMeta=cs.getString(cs.getColumnIndex("msgMeta"));
-            String msgType=cs.getString(cs.getColumnIndex("msgType"));
             String userId=cs.getString(cs.getColumnIndex("userId"));
-            String isSend=cs.getString(cs.getColumnIndex("isSend"));
             String timestamp=cs.getString(cs.getColumnIndex("timestamp"));
-            String svrMsgId=cs.getString(cs.getColumnIndex("svrMsgId"));
-            String fromSvrMsgId=cs.getString(cs.getColumnIndex("fromSvrMsgId"));
-            String sync=cs.getString(cs.getColumnIndex("sync"));
-            String resend=cs.getString(cs.getColumnIndex("resend"));
             String messageType=cs.getString(cs.getColumnIndex("messageType"));
-            String localFileName=cs.getString(cs.getColumnIndex("localFileName"));
-            String isRead=cs.getString(cs.getColumnIndex("isRead"));
-            String isVoicePlay=cs.getString(cs.getColumnIndex("isVoicePlay"));
             String count=cs.getString(cs.getColumnIndex("count("+PlainTextDBHelper.this.isRead+")"));
 
             // 组合数据
-            MessageBean messageBean=new MessageBean();
-            messageBean.setMsg(msg);
-            messageBean.setMsgMeta(msgMeta);
-            messageBean.setMsgType(Enums.MessageType.valueOf(Integer.parseInt(msgType)));
-            messageBean.setIsSend(isSend);
-            messageBean.setUserId(userId);
-            messageBean.setTimestamp(Long.parseLong(timestamp));
-            messageBean.setSvrMsgId(svrMsgId);
-            messageBean.setFromSvrMsgId(fromSvrMsgId);
-            messageBean.setSync(Enums.Enable.valueOf(Integer.parseInt(sync)));
-            messageBean.setResend(Enums.Enable.valueOf(Integer.parseInt(resend)));
-            messageBean.setMessageType(messageType);
-            messageBean.setLocalFileName(localFileName);
-            messageBean.setIsRead(isRead);
-            messageBean.setIsVoicePlay(isVoicePlay);
-            messageBean.setCount(TextUtils.isEmpty(count)?0:Integer.parseInt(count));
+            OfflineIMResponse messageBean=new OfflineIMResponse();
+            messageBean.setAddTime(Long.parseLong(timestamp));
+            messageBean.setFromUserId(userId);
+            messageBean.setLastMsg(msg);
+            messageBean.setType(Integer.parseInt(messageType));
+            messageBean.setUnloadCount(TextUtils.isEmpty(count)?0:Integer.parseInt(count));
             messageBeens.add(messageBean);
         }
         cs.close();
@@ -479,13 +460,13 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         if (systemMessageBean==null) {
             return messageBeens;
         }
-        MessageBean messageBean=null;
+        OfflineIMResponse messageBean=null;
         for (int i = 0; i < messageBeens.size(); i++) {
-            if (Long.parseLong(systemMessageBean.getTimestamp())>messageBeens.get(i).getTimestamp()) {
-                messageBean=new MessageBean();
-                messageBean.setUserId("-1");
-                messageBean.setMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
-                messageBean.setTimestamp(Long.parseLong(systemMessageBean.getTimestamp()));
+            if (Long.parseLong(systemMessageBean.getTimestamp())>messageBeens.get(i).getAddTime()) {
+                messageBean=new OfflineIMResponse();
+                messageBean.setFromUserId("-1");
+                messageBean.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
+                messageBean.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
                 // 插入系统消息到相应的位置
                 messageBeens.add(i, messageBean);
                 break;
@@ -493,10 +474,10 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         }
         // 如果系统消息发生时间最早，就添加到最后
         if (messageBean==null) {
-            messageBean=new MessageBean();
-            messageBean.setUserId("-1");
-            messageBean.setMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
-            messageBean.setTimestamp(Long.parseLong(systemMessageBean.getTimestamp()));
+            messageBean=new OfflineIMResponse();
+            messageBean.setFromUserId("-1");
+            messageBean.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
+            messageBean.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
             messageBeens.add(messageBean);
         }
         return messageBeens;

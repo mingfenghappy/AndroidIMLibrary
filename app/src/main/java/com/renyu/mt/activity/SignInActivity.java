@@ -35,7 +35,7 @@ public class SignInActivity extends BaseIMActivity {
     @BindView(R.id.ed_pwd)
     EditText ed_pwd;
 
-    BroadcastReceiver receiver;
+    BroadcastReceiver mReceiver;
 
     @Override
     public void initParams() {
@@ -46,7 +46,7 @@ public class SignInActivity extends BaseIMActivity {
         FileUtils.createOrExistsDir(InitParams.LOG_PATH);
         FileUtils.createOrExistsDir(InitParams.CACHE_PATH);
 
-        receiver = new BroadcastReceiver() {
+        mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
@@ -62,7 +62,7 @@ public class SignInActivity extends BaseIMActivity {
                         userInfoRsp.setPwd(ed_pwd.getText().toString());
                         ACache.get(SignInActivity.this).put("UserInfoRsp", userInfoRsp);
                         // 登录成功跳转首页
-                        startActivity(new Intent(SignInActivity.this, IndexActivity.class));
+                        startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
                     }
                     if (bean.getCommand()== BroadcastBean.MTCommand.LoginRspERROR) {
                         Toast.makeText(SignInActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
@@ -70,6 +70,8 @@ public class SignInActivity extends BaseIMActivity {
                 }
             }
         };
+
+        super.initParams();
     }
 
     @Override
@@ -124,6 +126,6 @@ public class SignInActivity extends BaseIMActivity {
     @Nullable
     @Override
     public BroadcastReceiver getReceiver() {
-        return receiver;
+        return mReceiver;
     }
 }

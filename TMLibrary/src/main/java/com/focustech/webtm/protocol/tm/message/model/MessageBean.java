@@ -27,7 +27,6 @@ public class MessageBean implements Serializable {
     // 临时使用的数据
     String messageType;              // 消息类型（文本、音频、图片）
     String localFileName;            // 文件路径
-    UserInfoRsp userInfoRsp;         // 消息关联好友信息
     String isSend;                   // 1:发送方 0:接收方
     String isRead;                   // 消息是否已读  1:已读 0:未读
     String isVoicePlay;              // 语音消息是否已读  1:已读 0:未读
@@ -128,14 +127,6 @@ public class MessageBean implements Serializable {
 
     public void setLocalFileName(String localFileName) {
         this.localFileName = localFileName;
-    }
-
-    public UserInfoRsp getUserInfoRsp() {
-        return userInfoRsp;
-    }
-
-    public void setUserInfoRsp(UserInfoRsp userInfoRsp) {
-        this.userInfoRsp = userInfoRsp;
     }
 
     public int getCount() {

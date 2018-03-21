@@ -63,7 +63,7 @@ public class HeartBeatService extends Service {
             scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
                 // 首次开启不算做错误
                 if (lastTime == -1) {
-                    Log.d("HeartBeatService", "开启连接");
+//                    Log.d("HeartBeatService", "开启连接");
                     errorTime = 0;
                     lastTime = System.currentTimeMillis();
                     MTService.conn(HeartBeatService.this);
@@ -72,17 +72,17 @@ public class HeartBeatService extends Service {
                     // 超过10s秒则认为1次错误
                     if (System.currentTimeMillis()-lastTime>8*1000) {
                         errorTime++;
-                        Log.d("HeartBeatService", "出现错误，错误次数为" + errorTime);
+//                        Log.d("HeartBeatService", "出现错误，错误次数为" + errorTime);
                     }
                     // 错误超过3次重新发起连接登录
                     if (errorTime >= 3) {
                         errorTime = 0;
                         lastTime = -1;
-                        Log.d("HeartBeatService", "达到错误，准备下次重新连接");
+//                        Log.d("HeartBeatService", "达到错误，准备下次重新连接");
                     }
                     else {
                         MTService.heartbeat(HeartBeatService.this);
-                        Log.d("HeartBeatService", "发送心跳包");
+//                        Log.d("HeartBeatService", "发送心跳包");
                     }
                 }
 
@@ -113,7 +113,7 @@ public class HeartBeatService extends Service {
                         bean.getCommand() == BroadcastBean.MTCommand.Conn) {
                     lastTime=System.currentTimeMillis();
                     errorTime=0;
-                    Log.d("HeartBeatService", "收到心跳包，重置");
+//                    Log.d("HeartBeatService", "收到心跳包，重置");
                 }
             }
         }
