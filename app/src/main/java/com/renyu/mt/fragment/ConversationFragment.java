@@ -201,6 +201,7 @@ public class ConversationFragment extends BaseFragment {
                 break;
             }
         }
+        // 没有找到的话直接新增一条数据
         if (find == null || findPosition == -1) {
             OfflineIMResponse offlineMessage = new OfflineIMResponse();
             offlineMessage.setAddTime(messageBean.getTimestamp());
@@ -209,9 +210,11 @@ public class ConversationFragment extends BaseFragment {
             offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
             offlineMessages.add(0, offlineMessage);
         }
+        // 找到就前置
         else {
             offlineMessages.add(0, offlineMessages.remove(findPosition));
         }
+        adapter.notifyDataSetChanged();
 
         // 不是首次加载的话，如果离线消息中的人不在好友列表中，则获取好友信息
         if (!userInfoRsps.containsKey(messageBean.getUserId())) {
