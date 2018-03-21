@@ -25,10 +25,7 @@ class ChatListActivity : BaseIMActivity() {
 
     // 当前登录用户
     var userInfoRsp: UserInfoRsp? = null
-    // 获取所有好友信息
-    val userInfoRsps: HashMap<String, UserInfoRsp> by lazy {
-        HashMap<String, UserInfoRsp>()
-    }
+
     // 是否第一次获取离线消息
     var isFirst = false
 
@@ -89,26 +86,34 @@ class ChatListActivity : BaseIMActivity() {
                     // 好友信息刷新（好友信息数据会单条多次返回，所以更新比较频繁。没有采用结束标志位，怕中断）
                     if (bean.command == BroadcastBean.MTCommand.FriendInfoRsp) {
                         val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as FriendInfoRsp
-                        // 更新缓存好友信息数据
-                        userInfoRsps[temp.friend.userId] = temp.friend
                         // 插入或更新好友信息
                         PlainTextDBHelper.getInstance().insertFriendList(temp)
                         // 通知会话列表刷新
                         conversationFragment?.refreshOfflineUser(temp.friend)
                     }
+                    // 未知用户个人信息刷新
+                    if (bean.command == BroadcastBean.MTCommand.UserInfoRsp) {
+                        val userInfoRsp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as UserInfoRsp
+                        // 通知会话列表刷新
+                        conversationFragment?.refreshOfflineUser(userInfoRsp)
+                    }
                 }
             }
         }
         receiver = mReceiver
+        openCurrentReceiver()
 
         conversationFragment = ConversationFragment()
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
                 .commitAllowingStateLoss()
-
-        super.initParams()
     }
 
     override fun initViews() = R.layout.activity_chatlist
+
+    override fun onDestroy() {
+        super.onDestroy()
+        closeCurrentReceiver()
+    }
 }

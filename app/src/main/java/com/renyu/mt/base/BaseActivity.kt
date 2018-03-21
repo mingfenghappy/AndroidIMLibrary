@@ -34,7 +34,7 @@ abstract class BaseIMActivity: BaseActivity() {
         }
     }
 
-    override fun initParams() {
+    fun openCurrentReceiver() {
         if (receiver != null) {
             val filter = IntentFilter()
             filter.addAction("MT")
@@ -42,8 +42,7 @@ abstract class BaseIMActivity: BaseActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    fun closeCurrentReceiver() {
         if (receiver != null) {
             unregisterReceiver(receiver)
         }

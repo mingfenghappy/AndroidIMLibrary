@@ -26,7 +26,7 @@ import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
-import com.renyu.mt.activity.ChatListActivity;
+import com.renyu.mt.activity.ConversationActivity;
 import com.renyu.mt.activity.SystemMessageActivity;
 import com.renyu.mt.utils.AvatarUtils;
 
@@ -131,7 +131,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                 PlainTextDBHelper.getInstance().updateRead(offlineMessages.get(position_).getFromUserId());
                 BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());
 
-                Intent intent=new Intent(context, ChatListActivity.class);
+                Intent intent=new Intent(context, ConversationActivity.class);
                 intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
                 context.startActivity(intent);
             });

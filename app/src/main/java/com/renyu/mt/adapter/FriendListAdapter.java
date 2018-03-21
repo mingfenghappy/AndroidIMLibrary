@@ -21,13 +21,13 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.focustech.dbhelper.PlainTextDBHelper;
+import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.FriendStatusRsp;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
-import com.renyu.mt.activity.ChatListActivity;
+import com.renyu.mt.activity.ConversationActivity;
 import com.renyu.mt.utils.AvatarUtils;
 
 import java.util.List;
@@ -104,7 +104,7 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
                 PlainTextDBHelper.getInstance().updateRead(beans.get(position_).getFriendUserId());
                 BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, beans.get(position_).getFriendUserId());
 
-                Intent intent=new Intent(context, ChatListActivity.class);
+                Intent intent=new Intent(context, ConversationActivity.class);
                 intent.putExtra("UserInfoRsp", beans.get(position_).getFriendInfoRsp().getFriend());
                 intent.putExtra("UserId", beans.get(position_).getFriendUserId());
                 context.startActivity(intent);

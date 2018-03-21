@@ -70,8 +70,6 @@ public class SignInActivity extends BaseIMActivity {
                 }
             }
         };
-
-        super.initParams();
     }
 
     @Override
@@ -96,6 +94,18 @@ public class SignInActivity extends BaseIMActivity {
     @Override
     public int setStatusBarTranslucent() {
         return 0;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        openCurrentReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        closeCurrentReceiver();
     }
 
     @Override
