@@ -8,8 +8,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import com.blankj.utilcode.util.ServiceUtils
-import com.focustech.common.IDownloadFile
+import com.focustech.common.DownloadTool
 import com.focustech.dbhelper.PlainTextDBHelper
+import com.focustech.tm.open.sdk.messages.protobuf.Enums
 import com.focustech.webtm.protocol.tm.message.HeartBeatService
 import com.focustech.webtm.protocol.tm.message.MTService
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean
@@ -99,17 +100,28 @@ abstract class BaseIMActivity: BaseActivity() {
                         // 下载语音文件
                         if (messageBean.messageType == "7") {
                             // 下载完成语音文件之后，方可同步数据库与刷新页面
-                            IDownloadFile.addFileAndDb(this@BaseIMActivity, messageBean)
+                            DownloadTool.addFileAndDb(this@BaseIMActivity, messageBean)
                         } else {
                             PlainTextDBHelper.getInstance().insertMessage(messageBean)
                             // 通知会话列表刷新以及会话详情刷新
                             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean)
                         }
                     }
-                    // 语音消息下载完成或者发出的消息发送完成
-                    if (bean.command == BroadcastBean.MTCommand.MessageVoiceDownload || bean.command == BroadcastBean.MTCommand.MessageSend) {
+                    // 语音、图片上传完成之后更新表字段
+                    if (bean.command == BroadcastBean.MTCommand.MessageUploadComp) {
+                        // 语音、图片上传完成之后更新表字段
+                        val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean
+                        PlainTextDBHelper.getInstance().updateSendState(temp.svrMsgId, Enums.Enable.DISABLE, Enums.Enable.ENABLE)
+                    }
+                    // 语音、图片上传失败之后更新表字段
+                    if (bean.command == BroadcastBean.MTCommand.MessageUploadFail) {
+                        val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean
+                        PlainTextDBHelper.getInstance().updateSendState(temp.svrMsgId, Enums.Enable.ENABLE, Enums.Enable.ENABLE)
+                    }
+                    // 语音消息下载完成
+                    if (bean.command == BroadcastBean.MTCommand.MessageVoiceDownload) {
                         // 通知会话列表刷新以及会话详情刷新
-                        // TODO: 2018/3/21 0021  需要重新测试语音文件下载与发送消息功能
+                        // TODO: 2018/3/21 0021  需要重新测试语音文件下载完成
                     }
                 }
             }

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import com.focustech.common.IDownloadFile
+import com.focustech.common.DownloadTool
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.tm.open.sdk.params.FusionField
 import com.focustech.webtm.protocol.tm.message.MTService
@@ -66,7 +66,7 @@ class ChatListActivity : BaseIMActivity() {
                                 val fileId = tempOffline[i].localFileName
                                 val sb = StringBuilder(FusionField.downloadUrl)
                                 sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token)
-                                IDownloadFile.addFile(sb.toString(), fileId)
+                                DownloadTool.addFile(sb.toString(), fileId)
                             }
                         }
                         // 更新数据库

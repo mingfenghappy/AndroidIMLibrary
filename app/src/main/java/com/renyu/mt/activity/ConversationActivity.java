@@ -249,7 +249,7 @@ public class ConversationActivity extends BaseIMActivity {
                             }
                         }
                     }
-                    // 当前用户发送消息之后立即更新
+                    // 当前用户发送消息之后刷新列表
                     if (bean.getCommand()== BroadcastBean.MTCommand.MessageSend) {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
                         messageBeens.add(messageBean);
@@ -258,10 +258,10 @@ public class ConversationActivity extends BaseIMActivity {
                             rv_conversation.scrollToPosition(messageBeens.size()-1);
                         }
                     }
+                    // 语音、图片上传完成之后刷新列表
                     if (bean.getCommand()== BroadcastBean.MTCommand.MessageUploadComp) {
-                        // 语音、图片上传完成之后更新表字段，同时刷新列表
+                        // 语音、图片上传完成之后刷新列表
                         MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        PlainTextDBHelper.getInstance().updateSendState(temp.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE);
                         for (MessageBean messageBeen : messageBeens) {
                             if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
                                 messageBeen.setSync(Enums.Enable.ENABLE);
@@ -273,10 +273,9 @@ public class ConversationActivity extends BaseIMActivity {
                             pb.setVisibility(View.GONE);
                         }
                     }
+                    // 语音、图片上传失败之后刷新列表
                     if (bean.getCommand()== BroadcastBean.MTCommand.MessageUploadFail) {
-                        // 语音、图片上传完成之后更新表字段，同时刷新列表
                         MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        PlainTextDBHelper.getInstance().updateSendState(temp.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
                         for (MessageBean messageBeen : messageBeens) {
                             if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
                                 messageBeen.setSync(Enums.Enable.ENABLE);

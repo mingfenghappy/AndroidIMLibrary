@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.focustech.common.IDownloadFile;
+import com.focustech.common.DownloadTool;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
@@ -133,7 +133,7 @@ public class IndexActivity extends BaseIMActivity {
                         // 下载语音文件
                         if (messageBean.getMessageType().equals("7")) {
                             // 下载完成语音文件之后，方可同步数据库与刷新页面
-                            IDownloadFile.addFileAndDb(IndexActivity.this, messageBean);
+                            DownloadTool.addFileAndDb(IndexActivity.this, messageBean);
                         }
                         else {
                             PlainTextDBHelper.getInstance().insertMessage(messageBean);
@@ -166,7 +166,7 @@ public class IndexActivity extends BaseIMActivity {
                                 final String fileId_ = tempOffline.get(i).getLocalFileName();
                                 StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
                                 sb.append("fileid=").append(fileId_).append("&type=").append("voice").append("&token=").append(token);
-                                IDownloadFile.addFile(sb.toString(), fileId_);
+                                DownloadTool.addFile(sb.toString(), fileId_);
                             }
                         }
                         // 更新数据库

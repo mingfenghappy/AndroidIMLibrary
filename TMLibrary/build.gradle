@@ -46,7 +46,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-        force "com.github.renyu:AndroidCommonLibrary:1.11.5"
+        force "com.github.renyu:AndroidCommonLibrary:1.11.6"
     }
 }
 
@@ -60,6 +60,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.google.protobuf:protobuf-java:2.4.1'
     compile 'com.alibaba:fastjson:1.2.34'
-    compile "com.github.renyu:AndroidCommonLibrary:1.11.5"
+    compile "com.github.renyu:AndroidCommonLibrary:1.11.6"
     compile "com.github.renyu:AndroidImageLibrary:1.4.2"
 }

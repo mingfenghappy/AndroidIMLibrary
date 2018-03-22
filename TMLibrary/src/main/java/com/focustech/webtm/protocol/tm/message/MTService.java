@@ -5,16 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
+import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.focustech.common.IUpdateFile;
-import com.focustech.common.UploadPictureTool;
-import com.focustech.common.UploadTool;
-import com.focustech.common.UploadVoiceTool;
+import com.renyu.commonlibrary.network.OKHttpHelper;
+import com.renyu.commonlibrary.network.OKHttpUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -86,46 +90,10 @@ public class MTService extends Service {
                         client.sendTextMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("msg"), intent.getStringExtra("userName"));
                     }
                     if (intent.getStringExtra("type").equals("sendPicMessage")) {
-                        UploadTool tool = new UploadPictureTool();
-                        tool.setOnUpdataListener(new IUpdateFile() {
-                            @Override
-                            public void updateFile() {
-
-                            }
-
-                            @Override
-                            public void onUploadFinish(String str) {
-                                client.sendPicMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), str);
-                                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadComp, intent.getSerializableExtra("messageBean"));
-                            }
-
-                            @Override
-                            public void onUploadError() {
-                                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
-                            }
-                        });
-                        tool.upload(intent.getStringExtra("filePath"));
+                        uploadFile(intent, "picture");
                     }
                     if (intent.getStringExtra("type").equals("sendVoiceMessage")) {
-                        UploadTool tool = new UploadVoiceTool();
-                        tool.setOnUpdataListener(new IUpdateFile() {
-                            @Override
-                            public void updateFile() {
-
-                            }
-
-                            @Override
-                            public void onUploadFinish(String str) {
-                                client.sendVoiceMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), str);
-                                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadComp, intent.getSerializableExtra("messageBean"));
-                            }
-
-                            @Override
-                            public void onUploadError() {
-                                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
-                            }
-                        });
-                        tool.upload(intent.getStringExtra("filePath"));
+                        uploadFile(intent, "voice");
                     }
                     // 获取系统消息
                     if (intent.getStringExtra("type").equals("getSysNtyReq")) {
@@ -175,47 +143,12 @@ public class MTService extends Service {
                         userIds.add("2Tj0laQY-KU");
                         client.createGroup("任groupName", "任groupSignature", "任groupKeyword", "任groupDesc", Enums.GroupType.OTHER, Enums.ValidateRule.ALLOW_WITHOUT_VALIDATE);
                     }
+                    // TODO: 2018/3/22 0022 群聊没有测试
                     if (intent.getStringExtra("type").equals("groupchatpic")) {
-                        final String picPath = "/storage/emulated/0/Pictures/rBEBYFlRuDeADZnqAACxZbaFEtI819.jpeg";
-                        UploadTool tool = new UploadPictureTool();
-                        tool.setOnUpdataListener(new IUpdateFile() {
-                            @Override
-                            public void updateFile() {
-
-                            }
-
-                            @Override
-                            public void onUploadFinish(String str) {
-                                client.sendGroupPicMessage("ttxPdzMAHf4", "KfqHpbiMBXg", picPath, "365房博士-武汉", str);
-                            }
-
-                            @Override
-                            public void onUploadError() {
-
-                            }
-                        });
-                        tool.upload(picPath);
+                        // client.sendGroupPicMessage("ttxPdzMAHf4", "KfqHpbiMBXg", picPath, "365房博士-武汉", str);
                     }
                     if (intent.getStringExtra("type").equals("groupchatvoice")) {
-                        final String voicePath = "/storage/emulated/0/bubugao.amr";
-                        UploadTool tool = new UploadVoiceTool();
-                        tool.setOnUpdataListener(new IUpdateFile() {
-                            @Override
-                            public void updateFile() {
-
-                            }
-
-                            @Override
-                            public void onUploadFinish(String str) {
-                                client.sendGroupVoiceMessage("ttxPdzMAHf4", "KfqHpbiMBXg", voicePath, "365房博士-武汉", str);
-                            }
-
-                            @Override
-                            public void onUploadError() {
-
-                            }
-                        });
-                        tool.upload(voicePath);
+                        // client.sendGroupVoiceMessage("ttxPdzMAHf4", "KfqHpbiMBXg", voicePath, "365房博士-武汉", str);
                     }
                     // 添加好友
                     if (intent.getStringExtra("type").equals("addFriendReq")) {
@@ -238,6 +171,58 @@ public class MTService extends Service {
         };
         service.execute(runnable);
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    /**
+     * 上传语音跟图片
+     * @param intent
+     * @param type
+     */
+    private void uploadFile(Intent intent, String type) {
+        File file = new File(intent.getStringExtra("filePath"));
+        HashMap<String, File> fileHashMap = new HashMap<>();
+        fileHashMap.put("file", file);
+        HashMap<String, String> paramsHashmap = new HashMap<>();
+        paramsHashmap.put("type", type);
+        paramsHashmap.put("token", "qEWY3kh6WZ6NTVdTX5s4rhTh-lF6JwaJzXyaeiF7qYOKa7vCCHMccqEfjjHFF6-gPaXxYPrgUjkmzNwUygwGl3ORAqWmqemBbnP_cGTY1ZQeLjkm6GS0KjGlY3hzbS0o");
+        HashMap<String, String> heads = new HashMap<>();
+        heads.put("Data-Range", "0-"+(file.length()-1));
+        heads.put("Data-Length", ""+file.length());
+        OKHttpHelper.getInstance().getOkHttpUtils().asyncUpload("http://webim.house365.com/tm/file/upload", paramsHashmap, fileHashMap, heads, new OKHttpUtils.RequestListener() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(String string) {
+                try {
+                    JSONObject jsonObject = new JSONObject(string);
+                    if (!TextUtils.isEmpty(jsonObject.getString("fileId"))) {
+                        if (type.equals("picture")) {
+                            client.sendPicMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"));
+                        }
+                        else if (type.equals("voice")) {
+                            client.sendVoiceMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"));
+                        }
+                        BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadComp, intent.getSerializableExtra("messageBean"));
+                    }
+                    else {
+                        BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
+                }
+            }
+
+            @Override
+            public void onError() {
+                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
+            }
+        }, (currentBytesCount, totalBytesCount) -> {
+
+        });
     }
 
     @Override

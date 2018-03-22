@@ -542,7 +542,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * @param resendEnable 重发状态
      * @param syncEnable 同步状态
      */
-    public static void updateSendState(String svrMsgId_, Enums.Enable resendEnable, Enums.Enable syncEnable) {
+    public void updateSendState(String svrMsgId_, Enums.Enable resendEnable, Enums.Enable syncEnable) {
         ContentValues cv=new ContentValues();
         cv.put(resend, ""+resendEnable.getNumber());
         cv.put(sync, ""+syncEnable.getNumber());
@@ -553,7 +553,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 更新总消息已读状态
      * @param userId_
      */
-    public static void updateRead(String userId_) {
+    public void updateRead(String userId_) {
         ContentValues cv=new ContentValues();
         cv.put(isRead, "1");
         db.update(MessageTable, cv, userId+"=?", new String[]{userId_});
@@ -563,7 +563,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 更新语音已读状态
      * @param svrMsgId_
      */
-    public static void updateVoiceRead(String svrMsgId_) {
+    public void updateVoiceRead(String svrMsgId_) {
         ContentValues cv=new ContentValues();
         cv.put(isVoicePlay, "1");
         db.update(MessageTable, cv, svrMsgId+"=?", new String[]{svrMsgId_});
@@ -573,7 +573,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 删除好友关系
      * @param userId_
      */
-    public static void deleteFriendsRelation(String userId_) {
+    public void deleteFriendsRelation(String userId_) {
         db.delete(FriendInfoRspTable, userId+"=?", new String[]{userId_});
     }
 
@@ -581,7 +581,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 添加好友关系
      * @param userId_
      */
-    public static void addFriendsRelation(String userId_) {
+    public void addFriendsRelation(String userId_) {
         Cursor cs= db.query(FriendInfoRspTable, null, friendGroupName+"=? and "+userId+"=?", new String[] {"default", userId_}, null, null, null);
         cs.moveToFirst();
         int count=cs.getCount();
