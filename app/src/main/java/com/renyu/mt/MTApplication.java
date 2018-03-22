@@ -5,7 +5,6 @@ import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
 import com.renyu.commonlibrary.network.HttpsUtils;
@@ -23,9 +22,7 @@ import okhttp3.OkHttpClient;
  */
 
 public class MTApplication extends MultiDexApplication {
-    // 是否已经连接完成
-    public BroadcastBean.MTCommand connState = BroadcastBean.MTCommand.Disconn;
-
+    // 基础广播
     public BroadcastReceiver baseReceiver = null;
 
     @Override

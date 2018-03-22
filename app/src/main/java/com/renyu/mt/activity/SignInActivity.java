@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.FileUtils;
+import com.focustech.tm.open.sdk.params.ConnectConfig;
 import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
@@ -120,7 +121,9 @@ public class SignInActivity extends BaseIMActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_signin:
-                if (((MTApplication) getApplication()).connState == BroadcastBean.MTCommand.Conn && !TextUtils.isEmpty(ed_username.getText().toString()) && !TextUtils.isEmpty(ed_pwd.getText().toString())) {
+                if (ConnectConfig.connState == BroadcastBean.MTCommand.Conn &&
+                        !TextUtils.isEmpty(ed_username.getText().toString()) &&
+                        !TextUtils.isEmpty(ed_pwd.getText().toString())) {
                     MTService.reqLogin(SignInActivity.this, ed_username.getText().toString(), ed_pwd.getText().toString());
                 }
                 break;

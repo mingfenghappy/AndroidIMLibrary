@@ -1,5 +1,7 @@
 package com.focustech.tm.open.sdk.params;
 
+import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
+
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 
@@ -78,4 +80,7 @@ public class ConnectConfig {
     public void addServer(String ip, int port) {
         this.servers.add(new String[]{ip, String.valueOf(port)});
     }
+
+    // 连接状态
+    public static BroadcastBean.MTCommand connState = BroadcastBean.MTCommand.Disconn;
 }

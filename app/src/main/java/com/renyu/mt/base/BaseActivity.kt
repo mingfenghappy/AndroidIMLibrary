@@ -11,14 +11,15 @@ import com.blankj.utilcode.util.ServiceUtils
 import com.focustech.common.DownloadTool
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.tm.open.sdk.messages.protobuf.Enums
-import com.focustech.webtm.protocol.tm.message.HeartBeatService
 import com.focustech.webtm.protocol.tm.message.MTService
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean
 import com.focustech.webtm.protocol.tm.message.model.MessageBean
 import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean
 import com.renyu.commonlibrary.baseact.BaseActivity
+import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.MTApplication
 import com.renyu.mt.R
+import com.renyu.mt.service.HeartBeatService
 
 /**
  * Created by Administrator on 2018/3/20 0020.
@@ -30,9 +31,28 @@ abstract class BaseIMActivity: BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!ServiceUtils.isServiceRunning("com.focustech.webtm.protocol.tm.message.HeartBeatService")) {
+        if ((application as MTApplication).baseReceiver == null) {
             Log.d("BaseIMActivity", "注册基础广播")
             openBaseReceiver()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 不在登录页，说明已经完成登录
+        if (localClassName != "activity.SignInActivity") {
+            ACache.get(application).put("isSignIn", true)
+        }
+        else {
+            ACache.get(application).put("isSignIn", false)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // 登录页被关闭
+        if (localClassName == "activity.SignInActivity") {
+            ACache.get(application).put("isSignIn", false)
         }
     }
 
@@ -70,15 +90,12 @@ abstract class BaseIMActivity: BaseActivity() {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
                     if (bean.command == BroadcastBean.MTCommand.Conn) {
                         Log.d("MTApplication", "连接成功")
-                        (application as MTApplication).connState = BroadcastBean.MTCommand.Conn
                     }
                     if (bean.command == BroadcastBean.MTCommand.Disconn) {
                         Log.d("MTApplication", "连接已断开")
-                        (application as MTApplication).connState = BroadcastBean.MTCommand.Disconn
                     }
                     if (bean.command == BroadcastBean.MTCommand.Conning) {
                         Log.d("MTApplication", "正在连接")
-                        (application as MTApplication).connState = BroadcastBean.MTCommand.Conning
                     }
                     // 收到系统消息
                     if (bean.command == BroadcastBean.MTCommand.NewSysNty) {
@@ -125,14 +142,16 @@ abstract class BaseIMActivity: BaseActivity() {
         filter.addAction("MT")
         registerReceiver((application as MTApplication).baseReceiver, filter)
         // 开启心跳服务并进行连接
-        if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
-            val intent = Intent(this, HeartBeatService::class.java)
-            intent.putExtra("smallIcon", R.mipmap.ic_launcher)
-            intent.putExtra("largeIcon", R.mipmap.ic_launcher)
-            startForegroundService(intent)
-        }
-        else {
-            startService(Intent(this, HeartBeatService::class.java))
+        if (!ServiceUtils.isServiceRunning("com.renyu.mt.service.HeartBeatService")) {
+            if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+                val intent = Intent(this, HeartBeatService::class.java)
+                intent.putExtra("smallIcon", R.mipmap.ic_launcher)
+                intent.putExtra("largeIcon", R.mipmap.ic_launcher)
+                startForegroundService(intent)
+            }
+            else {
+                startService(Intent(this, HeartBeatService::class.java))
+            }
         }
     }
 

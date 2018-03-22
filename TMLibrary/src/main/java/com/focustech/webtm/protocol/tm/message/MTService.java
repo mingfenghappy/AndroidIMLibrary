@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
+import com.focustech.tm.open.sdk.params.ConnectConfig;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
 import com.renyu.commonlibrary.network.OKHttpHelper;
@@ -239,6 +240,7 @@ public class MTService extends Service {
 
         // 发送正在连接广播
         BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Conning, "");
+        ConnectConfig.connState = BroadcastBean.MTCommand.Conning;
     }
 
     /**

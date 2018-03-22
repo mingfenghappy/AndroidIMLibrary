@@ -1,4 +1,4 @@
-package com.focustech.webtm.protocol.tm.message;
+package com.renyu.mt.service;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -11,8 +11,12 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.focustech.R;
+import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
+import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
+import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.NotificationUtils;
+import com.renyu.mt.MTApplication;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +70,7 @@ public class HeartBeatService extends Service {
 //                    Log.d("HeartBeatService", "开启连接");
                     errorTime = 0;
                     lastTime = System.currentTimeMillis();
-                    MTService.conn(HeartBeatService.this);
+                    MTService.conn(getApplicationContext());
                 }
                 else {
                     // 超过10s秒则认为1次错误
@@ -81,7 +85,7 @@ public class HeartBeatService extends Service {
 //                        Log.d("HeartBeatService", "达到错误，准备下次重新连接");
                     }
                     else {
-                        MTService.heartbeat(HeartBeatService.this);
+                        MTService.heartbeat(getApplicationContext());
 //                        Log.d("HeartBeatService", "发送心跳包");
                     }
                 }
@@ -114,6 +118,17 @@ public class HeartBeatService extends Service {
                     lastTime=System.currentTimeMillis();
                     errorTime=0;
 //                    Log.d("HeartBeatService", "收到心跳包，重置");
+                }
+                if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
+                    // 如果是因为App被回收导致页面新建，则执行自动登录
+                    // 如果是因为App使用过程中掉线，则连接成功后执行自动登录
+                    if (ACache.get(getApplication()).getAsObject("isSignIn") != null &&
+                            (Boolean) (ACache.get(getApplication()).getAsObject("isSignIn")) &&
+                            ACache.get(getApplication()).getAsObject("UserInfoRsp") != null) {
+                        UserInfoRsp userInfoRsp = (UserInfoRsp) ACache.get(getApplication()).getAsObject("UserInfoRsp");
+                        MTService.reqLogin(getApplicationContext(), userInfoRsp.getLoginUserName(), userInfoRsp.getPwd());
+                        Log.d("MTApplication", "二次登录成功");
+                    }
                 }
             }
         }

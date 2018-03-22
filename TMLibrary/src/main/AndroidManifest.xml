@@ -9,6 +9,5 @@
 
     <application>
         <service android:name=".webtm.protocol.tm.message.MTService"></service>
-        <service android:name=".webtm.protocol.tm.message.HeartBeatService"></service>
     </application>
 </manifest>
