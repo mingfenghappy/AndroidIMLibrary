@@ -3,12 +3,9 @@ package com.renyu.mt.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -25,6 +22,7 @@ import com.focustech.common.MD5Util;
 import com.focustech.common.RecordTool;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
+import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
@@ -32,14 +30,15 @@ import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ConversationAdapter;
-import com.focustech.webtm.protocol.tm.message.MTService;
+import com.renyu.mt.base.BaseIMActivity;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.dreamtobe.kpswitch.util.KPSwitchConflictUtil;
 import cn.dreamtobe.kpswitch.util.KeyboardUtil;
@@ -49,7 +48,7 @@ import cn.dreamtobe.kpswitch.widget.KPSwitchPanelRelativeLayout;
  * Created by Administrator on 2017/7/24.
  */
 
-public class ConversationActivity extends AppCompatActivity {
+public class ConversationActivity extends BaseIMActivity {
 
     @BindView(R.id.layout_nav_right)
     LinearLayout layout_nav_right;
@@ -76,6 +75,13 @@ public class ConversationActivity extends AppCompatActivity {
 
     ArrayList<MessageBean> messageBeens;
 
+    BroadcastReceiver registerReceiver;
+
+    // 当前用户信息
+    UserInfoRsp currentUserInfo;
+    // 聊天对方用户ID
+    String chatUserId;
+
     // 页码
     int page=0;
     int pageSize=20;
@@ -85,141 +91,28 @@ public class ConversationActivity extends AppCompatActivity {
     MediaPlayer mediaPlayer;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conversation);
-        ButterKnife.bind(this);
-
+    public void initParams() {
         TextView textView=new TextView(ConversationActivity.this);
         textView.setText("个人信息");
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(ConversationActivity.this, UserDetailActivity.class);
-                intent.putExtra("UserId", getIntent().getStringExtra("UserId"));
-                startActivity(intent);
-            }
+        textView.setOnClickListener(view -> {
+            Intent intent=new Intent(ConversationActivity.this, UserDetailActivity.class);
+            intent.putExtra("UserId", chatUserId);
+            startActivity(intent);
         });
         layout_nav_right.addView(textView);
 
-        IntentFilter filter=new IntentFilter();
-        filter.addAction("MT");
-        registerReceiver(registerReceiver, filter);
+        currentUserInfo = (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
+        chatUserId = getIntent().getStringExtra("UserId");
 
-        initParams();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(registerReceiver);
-
-        // 设置当前会话列表消息均已读
-        PlainTextDBHelper.getInstance().updateRead(getIntent().getStringExtra("UserId"));
-        BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.UpdateRead, getIntent().getStringExtra("UserId"));
-
-        // 关闭音频播放
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
-    BroadcastReceiver registerReceiver=new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("MT")) {
-                BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
-                if (bean.getCommand()== BroadcastBean.MTCommand.Conn) {
-
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.Disconn) {
-
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.Message) {
-                    MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                    if (messageBean.getUserId().equals(getIntent().getStringExtra("UserId"))) {
-                        if (!messageBean.getMessageType().equals("7")) {
-                            // 收到图片文字消息之后立即更新，语音消息等下载完成之后再更新
-                            messageBeens.add(messageBean);
-                            adapter.notifyItemInserted(messageBeens.size()-1);
-                            if (!rv_conversation.canScrollVertically(1)) {
-                                rv_conversation.scrollToPosition(messageBeens.size()-1);
-                            }
-                        }
-                    }
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload ||
-                        bean.getCommand()== BroadcastBean.MTCommand.MessageSend) {
-                    // 收到语音消息下载完成消息之后立即更新
-                    MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                    if (messageBean.getUserId().equals(getIntent().getStringExtra("UserId")) && bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload) {
-                        messageBeens.add(messageBean);
-                        adapter.notifyItemInserted(messageBeens.size()-1);
-                        if (!rv_conversation.canScrollVertically(1)) {
-                            rv_conversation.scrollToPosition(messageBeens.size()-1);
-                        }
-                    }
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.MessageSend) {
-                    // 当前用户发送的消息之后立即更新
-                    MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                    messageBeens.add(messageBean);
-                    adapter.notifyItemInserted(messageBeens.size()-1);
-                    if (!rv_conversation.canScrollVertically(1)) {
-                        rv_conversation.scrollToPosition(messageBeens.size()-1);
-                    }
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.MessageUploadComp) {
-                    // 语音、图片上传完成之后更新表字段，同时刷新列表
-                    MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                    PlainTextDBHelper.getInstance().updateSendState(temp.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE);
-                    for (MessageBean messageBeen : messageBeens) {
-                        if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
-                            messageBeen.setSync(Enums.Enable.ENABLE);
-                            break;
-                        }
-                    }
-                    ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
-                    if (pb!=null) {
-                        pb.setVisibility(View.GONE);
-                    }
-                }
-                if (bean.getCommand()== BroadcastBean.MTCommand.MessageUploadFail) {
-                    // 语音、图片上传完成之后更新表字段，同时刷新列表
-                    MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                    PlainTextDBHelper.getInstance().updateSendState(temp.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
-                    for (MessageBean messageBeen : messageBeens) {
-                        if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
-                            messageBeen.setSync(Enums.Enable.ENABLE);
-                            messageBeen.setResend(Enums.Enable.ENABLE);
-                            break;
-                        }
-                    }
-                    ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
-                    if (pb!=null) {
-                        pb.setVisibility(View.GONE);
-                    }
-                    ImageView imageView=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_status");
-                    if (imageView!=null) {
-                        imageView.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-        }
-    };
-
-    private void initParams() {
         messageBeens=new ArrayList<>();
-        ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance().getConversationByUser(getIntent().getStringExtra("UserId"), page, pageSize);
+        ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance().getConversationByUser(chatUserId, page, pageSize);
         page++;
         messageBeens.addAll(temp);
 
         rv_conversation.setHasFixedSize(true);
         LinearLayoutManager manager=new LinearLayoutManager(this);
         rv_conversation.setLayoutManager(manager);
-        adapter=new ConversationAdapter(this, messageBeens, getIntent().getBooleanExtra("isGroup", false), getIntent().getStringExtra("UserId"));
+        adapter=new ConversationAdapter(this, messageBeens, getIntent().getBooleanExtra("isGroup", false), chatUserId);
         rv_conversation.setAdapter(adapter);
         rv_conversation.post(new Runnable() {
             @Override
@@ -237,7 +130,7 @@ public class ConversationActivity extends AppCompatActivity {
                         // 上拉加载更多
                         boolean canScrollDown=rv_conversation.canScrollVertically(-1);
                         if (!canScrollDown) {
-                            ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance().getConversationByUser(getIntent().getStringExtra("UserId"), page, pageSize);
+                            ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance().getConversationByUser(chatUserId, page, pageSize);
                             page++;
                             messageBeens.addAll(0, temp);
                             adapter.notifyItemRangeInserted(0, temp.size());
@@ -251,101 +144,200 @@ public class ConversationActivity extends AppCompatActivity {
         final ImageView iv_record_click = layout_voicechoice.findViewById( R.id.iv_record_click );
         final ImageView iv_record_bg1 = layout_voicechoice.findViewById( R.id.iv_record_bg1 );
         final ImageView iv_record_bg2 = layout_voicechoice.findViewById( R.id.iv_record_bg2 );
-        layout_voicechoice.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        iv_record_click.setBackgroundResource(R.mipmap.click_pressed);
-                        iv_record_bg1.setBackgroundResource(R.mipmap.click_voice_pressed);
-                        iv_record_bg2.setBackgroundResource(R.mipmap.click_voice_pressed);
-                        mVibrator.vibrate(new long[]{ 100 , 50 }, -1);
-                        layout_record.setVisibility(View.VISIBLE);
+        layout_voicechoice.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    iv_record_click.setBackgroundResource(R.mipmap.click_pressed);
+                    iv_record_bg1.setBackgroundResource(R.mipmap.click_voice_pressed);
+                    iv_record_bg2.setBackgroundResource(R.mipmap.click_voice_pressed);
+                    mVibrator.vibrate(new long[]{ 100 , 50 }, -1);
+                    layout_record.setVisibility(View.VISIBLE);
+                    iv_record.setImageResource(R.mipmap.record_microphone);
+                    tv_record.setText("取消");
+                    recordTool.start();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (motionEvent.getY()<0) {
+                        iv_record.setImageResource(R.mipmap.record_cancel);
+                        tv_record.setText("松开手指，取消发送");
+                    }
+                    else {
                         iv_record.setImageResource(R.mipmap.record_microphone);
-                        tv_record.setText("取消");
-                        recordTool.start();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        if (motionEvent.getY()<0) {
-                            iv_record.setImageResource(R.mipmap.record_cancel);
-                            tv_record.setText("松开手指，取消发送");
-                        }
-                        else {
-                            iv_record.setImageResource(R.mipmap.record_microphone);
-                            tv_record.setText("手指上滑，取消发送");
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        iv_record_click.setBackgroundResource(R.mipmap.click_normal);
-                        iv_record_bg1.setBackgroundResource(R.mipmap.click_voice_normal);
-                        iv_record_bg2.setBackgroundResource(R.mipmap.click_voice_normal);
-                        layout_record.setVisibility(View.GONE);
-                        if (motionEvent.getY()<0) {
-                            recordTool.stopRecorder(true);
-                        }
-                        else {
-                            recordTool.stopRecorder( false );
-                            mVibrator.cancel();
-                        }
-                        break;
-                }
-                return true;
+                        tv_record.setText("手指上滑，取消发送");
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    iv_record_click.setBackgroundResource(R.mipmap.click_normal);
+                    iv_record_bg1.setBackgroundResource(R.mipmap.click_voice_normal);
+                    iv_record_bg2.setBackgroundResource(R.mipmap.click_voice_normal);
+                    layout_record.setVisibility(View.GONE);
+                    if (motionEvent.getY()<0) {
+                        recordTool.stopRecorder(true);
+                    }
+                    else {
+                        recordTool.stopRecorder( false );
+                        mVibrator.cancel();
+                    }
+                    break;
             }
+            return true;
         });
         layout_emojichoice=kp_panel_root.findViewById(R.id.layout_emojichoice);
-        KeyboardUtil.attach(this, kp_panel_root, new KeyboardUtil.OnKeyboardShowingListener() {
-            @Override
-            public void onKeyboardShowing(boolean isShowing) {
-                if (isShowing) {
-                    rv_conversation.scrollToPosition(messageBeens.size()-1);
-                }
-            }
-        });
-        KPSwitchConflictUtil.attach(kp_panel_root, edit_conversation, new KPSwitchConflictUtil.SwitchClickListener() {
-            @Override
-            public void onClickSwitch(boolean switchToPanel) {
-                if (switchToPanel) {
-                    edit_conversation.clearFocus();
-                } else {
-                    edit_conversation.requestFocus();
-                }
+        KeyboardUtil.attach(this, kp_panel_root, isShowing -> {
+            if (isShowing) {
                 rv_conversation.scrollToPosition(messageBeens.size()-1);
             }
+        });
+        KPSwitchConflictUtil.attach(kp_panel_root, edit_conversation, switchToPanel -> {
+            if (switchToPanel) {
+                edit_conversation.clearFocus();
+            } else {
+                edit_conversation.requestFocus();
+            }
+            rv_conversation.scrollToPosition(messageBeens.size()-1);
         }, new KPSwitchConflictUtil.SubPanelAndTrigger(layout_emojichoice, iv_emoji)
                 , new KPSwitchConflictUtil.SubPanelAndTrigger(layout_voicechoice, iv_sendvoice));
-        edit_conversation.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    KPSwitchConflictUtil.showKeyboard(kp_panel_root, edit_conversation);
-                }
-                return false;
+        edit_conversation.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                KPSwitchConflictUtil.showKeyboard(kp_panel_root, edit_conversation);
             }
+            return false;
         });
-        kp_panel_root.post(new Runnable() {
-            @Override
-            public void run() {
-                int height=KeyboardUtil.getKeyboardHeight(ConversationActivity.this);
-                LinearLayout.LayoutParams params= (LinearLayout.LayoutParams) kp_panel_root.getLayoutParams();
-                params.height=height;
-                kp_panel_root.setLayoutParams(params);
-            }
+        kp_panel_root.post(() -> {
+            int height=KeyboardUtil.getKeyboardHeight(ConversationActivity.this);
+            LinearLayout.LayoutParams params= (LinearLayout.LayoutParams) kp_panel_root.getLayoutParams();
+            params.height=height;
+            kp_panel_root.setLayoutParams(params);
         });
 
         // 震动功能初始化
         mVibrator = (Vibrator) getApplication().getSystemService(VIBRATOR_SERVICE);
         // 录音播放功能初始化，并设置自定义的监听事件
         recordTool = new RecordTool();
-        recordTool.setRecorderListener(new RecordTool.RecorderListener() {
-            @Override
-            public void finishRecorder(String path) {
-                File file=new File(path);
-                if (file.exists()) {
-                    sendVoiceMessage(file);
-                }
+        recordTool.setRecorderListener(path -> {
+            File file=new File(path);
+            if (file.exists()) {
+                sendVoiceMessage(file);
             }
         });
+
+        registerReceiver=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("MT")) {
+                    BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
+                    // 收到图片文字消息之后立即更新，语音消息等下载完成之后再更新
+                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageReceive) {
+                        MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                        if (messageBean.getUserId().equals(chatUserId) && !messageBean.getMessageType().equals("7")) {
+                            messageBeens.add(messageBean);
+                            adapter.notifyItemInserted(messageBeens.size()-1);
+                            if (!rv_conversation.canScrollVertically(1)) {
+                                rv_conversation.scrollToPosition(messageBeens.size()-1);
+                            }
+                        }
+                    }
+                    // 收到语音消息下载完成之后立即更新
+                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload) {
+                        MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                        // 消息属于当前聊天页面用户
+                        if (messageBean.getUserId().equals(chatUserId) && bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload) {
+                            messageBeens.add(messageBean);
+                            adapter.notifyItemInserted(messageBeens.size()-1);
+                            if (!rv_conversation.canScrollVertically(1)) {
+                                rv_conversation.scrollToPosition(messageBeens.size()-1);
+                            }
+                        }
+                    }
+                    // 当前用户发送消息之后立即更新
+                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageSend) {
+                        MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                        messageBeens.add(messageBean);
+                        adapter.notifyItemInserted(messageBeens.size()-1);
+                        if (!rv_conversation.canScrollVertically(1)) {
+                            rv_conversation.scrollToPosition(messageBeens.size()-1);
+                        }
+                    }
+                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageUploadComp) {
+                        // 语音、图片上传完成之后更新表字段，同时刷新列表
+                        MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                        PlainTextDBHelper.getInstance().updateSendState(temp.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE);
+                        for (MessageBean messageBeen : messageBeens) {
+                            if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
+                                messageBeen.setSync(Enums.Enable.ENABLE);
+                                break;
+                            }
+                        }
+                        ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
+                        if (pb!=null) {
+                            pb.setVisibility(View.GONE);
+                        }
+                    }
+                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageUploadFail) {
+                        // 语音、图片上传完成之后更新表字段，同时刷新列表
+                        MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                        PlainTextDBHelper.getInstance().updateSendState(temp.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
+                        for (MessageBean messageBeen : messageBeens) {
+                            if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
+                                messageBeen.setSync(Enums.Enable.ENABLE);
+                                messageBeen.setResend(Enums.Enable.ENABLE);
+                                break;
+                            }
+                        }
+                        ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
+                        if (pb!=null) {
+                            pb.setVisibility(View.GONE);
+                        }
+                        ImageView imageView=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_status");
+                        if (imageView!=null) {
+                            imageView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        };
+
+        openCurrentReceiver();
     }
+
+    @Override
+    public int initViews() {
+        return R.layout.activity_conversation;
+    }
+
+    @Override
+    public void loadData() {
+
+    }
+
+    @Override
+    public int setStatusBarColor() {
+        return Color.BLACK;
+    }
+
+    @Override
+    public int setStatusBarTranslucent() {
+        return 0;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        closeCurrentReceiver();
+
+        // 设置当前会话列表消息均已读
+        PlainTextDBHelper.getInstance().updateRead(chatUserId);
+        BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.UpdateRead, chatUserId);
+
+        // 关闭音频播放
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
 
     @OnClick({R.id.btn_send_conversation, R.id.iv_image})
     public void onClick(View view) {
@@ -376,7 +368,7 @@ public class ConversationActivity extends AppCompatActivity {
         messageBean.setMsg(edit_conversation.getText().toString());
         messageBean.setMsgMeta("");
         messageBean.setMsgType(Enums.MessageType.TEXT);
-        messageBean.setUserId(getIntent().getStringExtra("UserId"));
+        messageBean.setUserId(chatUserId);
         messageBean.setIsSend("1");
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Util.getMD5String(""+System.currentTimeMillis()));
@@ -390,8 +382,7 @@ public class ConversationActivity extends AppCompatActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
-        MTService.sendTextMessage(this, getIntent().getStringExtra("UserId"), edit_conversation.getText().toString(), userInfoRsp.getUserName());
+        MTService.sendTextMessage(this, chatUserId, edit_conversation.getText().toString(), currentUserInfo.getUserName());
         edit_conversation.setText("");
     }
 
@@ -401,7 +392,7 @@ public class ConversationActivity extends AppCompatActivity {
         messageBean.setMsgMeta("");
         messageBean.setMsgType(Enums.MessageType.MULTI_MEDIA);
         messageBean.setIsSend("1");
-        messageBean.setUserId(getIntent().getStringExtra("UserId"));
+        messageBean.setUserId(chatUserId);
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Util.getMD5String(""+System.currentTimeMillis()));
         messageBean.setFromSvrMsgId("");
@@ -414,8 +405,7 @@ public class ConversationActivity extends AppCompatActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
-        MTService.sendPicMessage(this, getIntent().getStringExtra("UserId"), file.getPath(), userInfoRsp.getUserName(), messageBean);
+        MTService.sendPicMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), messageBean);
     }
 
     private void sendVoiceMessage(File file) {
@@ -424,7 +414,7 @@ public class ConversationActivity extends AppCompatActivity {
         messageBean.setMsgMeta("");
         messageBean.setMsgType(Enums.MessageType.MULTI_MEDIA);
         messageBean.setIsSend("1");
-        messageBean.setUserId(getIntent().getStringExtra("UserId"));
+        messageBean.setUserId(chatUserId);
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Util.getMD5String(""+System.currentTimeMillis()));
         messageBean.setFromSvrMsgId("");
@@ -438,8 +428,7 @@ public class ConversationActivity extends AppCompatActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
-        MTService.sendVoiceMessage(this, getIntent().getStringExtra("UserId"), file.getPath(), userInfoRsp.getUserName(), messageBean);
+        MTService.sendVoiceMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), messageBean);
     }
 
     /**
@@ -455,8 +444,7 @@ public class ConversationActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         // 发送消息
-        UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
-        MTService.sendVoiceMessage(this, getIntent().getStringExtra("UserId"), new File(messageBean.getLocalFileName()).getPath(), userInfoRsp.getUserName(), messageBean);
+        MTService.sendVoiceMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), messageBean);
     }
 
     /**
@@ -472,8 +460,7 @@ public class ConversationActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         // 发送消息
-        UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
-        MTService.sendPicMessage(this, getIntent().getStringExtra("UserId"), new File(messageBean.getLocalFileName()).getPath(), userInfoRsp.getUserName(), messageBean);
+        MTService.sendPicMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), messageBean);
     }
 
     /**
@@ -542,5 +529,11 @@ public class ConversationActivity extends AppCompatActivity {
                 sendPicMessage(file);
             }
         }
+    }
+
+    @Nullable
+    @Override
+    public BroadcastReceiver getReceiver() {
+        return registerReceiver;
     }
 }

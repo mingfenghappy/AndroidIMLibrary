@@ -110,7 +110,6 @@ abstract class BaseIMActivity: BaseActivity() {
                     if (bean.command == BroadcastBean.MTCommand.MessageVoiceDownload || bean.command == BroadcastBean.MTCommand.MessageSend) {
                         // 通知会话列表刷新以及会话详情刷新
                         // TODO: 2018/3/21 0021  需要重新测试语音文件下载与发送消息功能
-//                        BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean)
                     }
                 }
             }

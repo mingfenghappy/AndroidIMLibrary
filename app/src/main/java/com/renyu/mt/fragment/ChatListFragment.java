@@ -15,7 +15,7 @@ import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.mt.R;
-import com.renyu.mt.adapter.ConversationListAdapter;
+import com.renyu.mt.adapter.ChatListAdapter;
 import com.renyu.mt.impl.RetrofitImpl;
 
 import java.util.ArrayList;
@@ -30,20 +30,22 @@ import io.reactivex.disposables.Disposable;
  * Created by Administrator on 2017/7/20.
  */
 
-public class ConversationFragment extends BaseFragment {
+public class ChatListFragment extends BaseFragment {
 
     @BindView(R.id.swipe_conversationlist)
     SwipeRefreshLayout swipe_conversationlist;
     @BindView(R.id.rv_conversationlist)
     RecyclerView rv_conversationlist;
-    ConversationListAdapter adapter;
+    ChatListAdapter adapter;
 
     // 当前用户信息
     UserInfoRsp currentUserInfo;
     // 离线消息
     ArrayList<OfflineIMResponse> offlineMessages;
-    // 用户信息
+    // 好友用户信息Map
     HashMap<String, UserInfoRsp> userInfoRsps;
+    // 是否正在请求接口数据
+    boolean isRequest = false;
 
     @Override
     public void initParams() {
@@ -55,16 +57,18 @@ public class ConversationFragment extends BaseFragment {
 
         rv_conversationlist.setHasFixedSize(true);
         rv_conversationlist.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter=new ConversationListAdapter(getActivity(), offlineMessages);
+        adapter=new ChatListAdapter(getActivity(), offlineMessages);
         rv_conversationlist.setAdapter(adapter);
         swipe_conversationlist.setOnRefreshListener(() -> {
-            // TODO: 2018/3/21 0021 刷新列表
+            if (!isRequest) {
+                getOfflineIMFromRemote();
+            }
         });
     }
 
     @Override
     public int initViews() {
-        return R.layout.fragment_conversation;
+        return R.layout.fragment_chatlist;
     }
 
     @Override
@@ -100,7 +104,7 @@ public class ConversationFragment extends BaseFragment {
                 .subscribe(new Observer<List<OfflineIMResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        isRequest = true;
                     }
 
                     @Override
@@ -159,8 +163,9 @@ public class ConversationFragment extends BaseFragment {
                             }
                         }
                         adapter.notifyDataSetChanged();
+                        swipe_conversationlist.setRefreshing(false);
 
-                        // 首次加载，开始获取好友关系数据
+                        // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
                         MTService.reqFriendInfo(getActivity());
                     }
 
@@ -168,13 +173,17 @@ public class ConversationFragment extends BaseFragment {
                     public void onError(Throwable e) {
                         e.printStackTrace();
 
-                        // 首次加载，开始获取好友关系数据
+                        swipe_conversationlist.setRefreshing(false);
+
+                        // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
                         MTService.reqFriendInfo(getActivity());
+
+                        isRequest = false;
                     }
 
                     @Override
                     public void onComplete() {
-
+                        isRequest = false;
                     }
                 });
     }
@@ -193,7 +202,9 @@ public class ConversationFragment extends BaseFragment {
                 offlineMessage.setAddTime(messageBean.getTimestamp());
                 offlineMessage.setLastMsg(messageBean.getMsg());
                 offlineMessage.setType(Integer.parseInt(messageBean.getMessageType()));
-                offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
+                if (messageBean.getIsSend().equals("0")) {
+                    offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
+                }
 
                 find = offlineMessage;
                 findPosition = i;

@@ -22,8 +22,8 @@ public class MessageBean implements Serializable {
     long timestamp;                  // 客户端自己的NTP时间戳
     String svrMsgId;                 // 客户端需要--离线消息时会传递，用于客户端自己去重判断
     String fromSvrMsgId;             // 媒体消息绑定svrMsgId
-    Enums.Enable sync;               // 消息是否同步 已同步1 未同步0
-    Enums.Enable resend;             // 是否是重发消息
+    Enums.Enable sync;               // 消息是否发送完成 已发送1 未发送0
+    Enums.Enable resend;             // 是否是需要重发消息
     // 临时使用的数据
     String messageType;              // 消息类型（文本、音频、图片）
     String localFileName;            // 文件路径

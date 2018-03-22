@@ -43,19 +43,19 @@ import jp.wasabeef.fresco.processors.GrayscalePostprocessor;
  * Created by Administrator on 2017/7/21.
  */
 
-public class ConversationListAdapter extends RecyclerView.Adapter<ConversationListAdapter.ConversationListHolder> {
+public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ConversationListHolder> {
 
     Context context;
     ArrayList<OfflineIMResponse> offlineMessages;
 
-    public ConversationListAdapter(Context context, ArrayList<OfflineIMResponse> offlineMessages) {
+    public ChatListAdapter(Context context, ArrayList<OfflineIMResponse> offlineMessages) {
         this.context = context;
         this.offlineMessages = offlineMessages;
     }
 
     @Override
     public ConversationListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(context).inflate(R.layout.adapter_conversationlist, parent, false);
+        View view= LayoutInflater.from(context).inflate(R.layout.adapter_chatlist, parent, false);
         return new ConversationListHolder(view);
     }
 

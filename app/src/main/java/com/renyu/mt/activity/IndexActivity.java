@@ -3,17 +3,12 @@ package com.renyu.mt.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.blankj.utilcode.util.FileUtils;
 import com.focustech.common.IDownloadFile;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.params.FusionField;
@@ -25,10 +20,9 @@ import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean;
 import com.focustech.webtm.protocol.tm.message.model.UpdateUserStatusNty;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
-import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
-import com.renyu.mt.fragment.ConversationFragment;
+import com.renyu.mt.fragment.ChatListFragment;
 import com.renyu.mt.fragment.FriendListFragment;
 import com.focustech.webtm.protocol.tm.message.MTService;
 
@@ -36,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
@@ -52,7 +45,7 @@ public class IndexActivity extends BaseIMActivity {
 
     Fragment currentFragment;
     // 离线消息列表
-    ConversationFragment conversationFragment;
+    ChatListFragment conversationFragment;
     // 好友列表
     FriendListFragment friendListFragment;
 
@@ -349,7 +342,7 @@ public class IndexActivity extends BaseIMActivity {
         if (position==0) {
             iv_index_conversationlist.setImageResource(R.mipmap.em_conversation_selected);
             if (conversationFragment==null) {
-                conversationFragment=new ConversationFragment();
+                conversationFragment=new ChatListFragment();
                 transaction.add(R.id.layout_container, conversationFragment);
             }
             else {

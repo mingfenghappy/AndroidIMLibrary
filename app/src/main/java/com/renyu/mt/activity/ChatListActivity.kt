@@ -15,7 +15,7 @@ import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp
 import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
-import com.renyu.mt.fragment.ConversationFragment
+import com.renyu.mt.fragment.ChatListFragment
 import java.util.*
 
 /**
@@ -24,12 +24,11 @@ import java.util.*
 class ChatListActivity : BaseIMActivity() {
 
     // 当前登录用户
-    var userInfoRsp: UserInfoRsp? = null
-
+    var currentUserInfo: UserInfoRsp? = null
     // 是否第一次获取离线消息
-    var isFirst = false
+    private var isFirst = false
 
-    var conversationFragment: ConversationFragment? = null
+    var conversationFragment: ChatListFragment? = null
 
     private var mReceiver: BroadcastReceiver? = null
 
@@ -47,7 +46,7 @@ class ChatListActivity : BaseIMActivity() {
 
     override fun initParams() {
         // 获取当前用户信息
-        userInfoRsp = ACache.get(this).getAsObject("UserInfoRsp") as UserInfoRsp
+        currentUserInfo = ACache.get(this).getAsObject("UserInfoRsp") as UserInfoRsp
 
         mReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -63,7 +62,7 @@ class ChatListActivity : BaseIMActivity() {
                         // 下载语音文件
                         for (i in tempOffline.indices) {
                             if (tempOffline[i].messageType == "7") {
-                                val token = userInfoRsp!!.token
+                                val token = currentUserInfo!!.token
                                 val fileId = tempOffline[i].localFileName
                                 val sb = StringBuilder(FusionField.downloadUrl)
                                 sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token)
@@ -76,6 +75,10 @@ class ChatListActivity : BaseIMActivity() {
                     // 收到消息刷新列表
                     if (bean.command == BroadcastBean.MTCommand.MessageReceive) {
                         // 通知会话列表结束刷新
+                        conversationFragment?.refreshOneMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean)
+                    }
+                    // 发送消息刷新列表
+                    if (bean.command == BroadcastBean.MTCommand.MessageSend) {
                         conversationFragment?.refreshOneMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean)
                     }
                     // 消息已读
@@ -91,11 +94,16 @@ class ChatListActivity : BaseIMActivity() {
                         // 通知会话列表刷新
                         conversationFragment?.refreshOfflineUser(temp.friend)
                     }
-                    // 未知用户个人信息刷新
                     if (bean.command == BroadcastBean.MTCommand.UserInfoRsp) {
                         val userInfoRsp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as UserInfoRsp
-                        // 通知会话列表刷新
-                        conversationFragment?.refreshOfflineUser(userInfoRsp)
+                        // 当前用户重新登录完成
+                        if (currentUserInfo!!.userId == userInfoRsp.userId) {
+
+                        }
+                        else {
+                            // 未知用户个人信息刷新，通知会话列表刷新
+                            conversationFragment?.refreshOfflineUser(userInfoRsp)
+                        }
                     }
                 }
             }
@@ -103,7 +111,7 @@ class ChatListActivity : BaseIMActivity() {
         receiver = mReceiver
         openCurrentReceiver()
 
-        conversationFragment = ConversationFragment()
+        conversationFragment = ChatListFragment()
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
