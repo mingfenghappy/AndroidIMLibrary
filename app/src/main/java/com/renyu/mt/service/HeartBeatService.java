@@ -119,17 +119,6 @@ public class HeartBeatService extends Service {
                     errorTime=0;
 //                    Log.d("HeartBeatService", "收到心跳包，重置");
                 }
-                if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
-                    // 如果是因为App被回收导致页面新建，则执行自动登录
-                    // 如果是因为App使用过程中掉线，则连接成功后执行自动登录
-                    if (ACache.get(getApplication()).getAsObject("isSignIn") != null &&
-                            (Boolean) (ACache.get(getApplication()).getAsObject("isSignIn")) &&
-                            ACache.get(getApplication()).getAsObject("UserInfoRsp") != null) {
-                        UserInfoRsp userInfoRsp = (UserInfoRsp) ACache.get(getApplication()).getAsObject("UserInfoRsp");
-                        MTService.reqLogin(getApplicationContext(), userInfoRsp.getLoginUserName(), userInfoRsp.getPwd());
-                        Log.d("MTApplication", "二次登录成功");
-                    }
-                }
             }
         }
     };

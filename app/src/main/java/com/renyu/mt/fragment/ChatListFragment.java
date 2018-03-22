@@ -14,6 +14,7 @@ import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
+import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ChatListAdapter;
 import com.renyu.mt.impl.RetrofitImpl;
@@ -74,13 +75,15 @@ public class ChatListFragment extends BaseFragment {
     @Override
     public void loadData() {
         getOfflineIMFromLocal();
-        getOfflineIMFromRemote();
+        if (((MTApplication) getActivity().getApplication()).isSignIn) {
+            getOfflineIMFromRemote();
+        }
     }
 
     /**
      * 加载本地会话列表
      */
-    public ArrayList<OfflineIMResponse> getOfflineIMFromLocal() {
+    public void getOfflineIMFromLocal() {
         ArrayList<OfflineIMResponse> temp = PlainTextDBHelper.getInstance().getConversationList();
         for (OfflineIMResponse offlineMessage : temp) {
             if (userInfoRsps.containsKey(offlineMessage.getFromUserId())) {
@@ -92,7 +95,6 @@ public class ChatListFragment extends BaseFragment {
         this.offlineMessages.clear();
         this.offlineMessages.addAll(temp);
         adapter.notifyDataSetChanged();
-        return temp;
     }
 
     /**
@@ -166,7 +168,7 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(getActivity());
+                        MTService.reqFriendInfo(getActivity().getApplicationContext());
                     }
 
                     @Override
@@ -176,7 +178,7 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(getActivity());
+                        MTService.reqFriendInfo(getActivity().getApplicationContext());
 
                         isRequest = false;
                     }

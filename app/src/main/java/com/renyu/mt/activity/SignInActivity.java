@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.FileUtils;
-import com.focustech.tm.open.sdk.params.ConnectConfig;
 import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
@@ -52,15 +51,9 @@ public class SignInActivity extends BaseIMActivity {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
                     BroadcastBean bean= (BroadcastBean) intent.getSerializableExtra("broadcast");
-                    // 登录成功
-                    if (bean.getCommand()== BroadcastBean.MTCommand.LoginRsp) {
-                        Toast.makeText(SignInActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                    }
                     // 此处为当前用户登录后返回的信息
                     if (bean.getCommand()== BroadcastBean.MTCommand.UserInfoRsp) {
                         UserInfoRsp userInfoRsp= (UserInfoRsp) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        userInfoRsp.setLoginUserName(ed_username.getText().toString());
-                        userInfoRsp.setPwd(ed_pwd.getText().toString());
                         ACache.get(SignInActivity.this).put("UserInfoRsp", userInfoRsp);
                         // 登录成功跳转首页
                         startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
@@ -109,22 +102,14 @@ public class SignInActivity extends BaseIMActivity {
         closeCurrentReceiver();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // 关闭所有IM服务
-        closeAllIMService();
-    }
-
     @OnClick({R.id.btn_signin})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_signin:
-                if (ConnectConfig.connState == BroadcastBean.MTCommand.Conn &&
+                if (((MTApplication) getApplication()).connState == BroadcastBean.MTCommand.Conn &&
                         !TextUtils.isEmpty(ed_username.getText().toString()) &&
                         !TextUtils.isEmpty(ed_pwd.getText().toString())) {
-                    MTService.reqLogin(SignInActivity.this, ed_username.getText().toString(), ed_pwd.getText().toString());
+                    MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(), ed_pwd.getText().toString());
                 }
                 break;
         }

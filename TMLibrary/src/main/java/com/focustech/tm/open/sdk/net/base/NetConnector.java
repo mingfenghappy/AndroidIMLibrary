@@ -82,7 +82,6 @@ public class NetConnector {
 				Log.d("NetConnector", "服务器与客户端断开连接...");
 				// 发送连接断开广播
 				BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Disconn, "");
-				ConnectConfig.connState = BroadcastBean.MTCommand.Disconn;
 				close();
 			}
 
@@ -91,7 +90,6 @@ public class NetConnector {
 				Log.d("NetConnector", "服务器与客户端连接创建成功...");
 				// 发送连接创建成功广播
 				BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Conn, "");
-				ConnectConfig.connState = BroadcastBean.MTCommand.Conn;
 			}
 
 			@Override

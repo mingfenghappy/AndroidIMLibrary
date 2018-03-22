@@ -25,8 +25,6 @@ class ChatListActivity : BaseIMActivity() {
 
     // 当前登录用户
     var currentUserInfo: UserInfoRsp? = null
-    // 是否第一次获取离线消息
-    private var isFirst = false
 
     var conversationFragment: ChatListFragment? = null
 
@@ -37,11 +35,7 @@ class ChatListActivity : BaseIMActivity() {
     override fun setStatusBarTranslucent() = 0
 
     override fun loadData() {
-        isFirst = true
-        // 获取离线消息
-        MTService.reqGetOfflineMessage(this)
-        // 获取系统消息
-        MTService.getSysNtyReq(this, 0)
+
     }
 
     override fun initParams() {
@@ -52,25 +46,10 @@ class ChatListActivity : BaseIMActivity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "MT") {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
-                    // 获取到离线消息。离线数据不进行更新，全部依赖本地数据与接口数据的返回
-                    if (bean.command == BroadcastBean.MTCommand.GetOfflineMessageRsp) {
-                        val tempOffline = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as ArrayList<MessageBean>
-                        // 发送已读回执
-                        for (messageBean in tempOffline) {
-                            MTService.hasReadOfflineMessage(this@ChatListActivity, messageBean.fromSvrMsgId)
-                        }
-                        // 下载语音文件
-                        for (i in tempOffline.indices) {
-                            if (tempOffline[i].messageType == "7") {
-                                val token = currentUserInfo!!.token
-                                val fileId = tempOffline[i].localFileName
-                                val sb = StringBuilder(FusionField.downloadUrl)
-                                sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token)
-                                DownloadTool.addFile(sb.toString(), fileId)
-                            }
-                        }
-                        // 更新数据库
-                        PlainTextDBHelper.getInstance().insertMessages((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as ArrayList<MessageBean>)
+                    // 登录成功
+                    if (bean.command == BroadcastBean.MTCommand.LoginRsp) {
+                        // 刷新远程数据
+                        conversationFragment?.getOfflineIMFromRemote()
                     }
                     // 收到消息刷新列表
                     if (bean.command == BroadcastBean.MTCommand.MessageReceive ||
@@ -92,12 +71,8 @@ class ChatListActivity : BaseIMActivity() {
                     }
                     if (bean.command == BroadcastBean.MTCommand.UserInfoRsp) {
                         val userInfoRsp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as UserInfoRsp
-                        // 当前用户重新登录完成
-                        if (currentUserInfo!!.userId == userInfoRsp.userId) {
-
-                        }
-                        else {
-                            // 未知用户个人信息刷新，通知会话列表刷新
+                        // 未知用户个人信息刷新，通知会话列表刷新
+                        if (currentUserInfo!!.userId != userInfoRsp.userId) {
                             conversationFragment?.refreshOfflineUser(userInfoRsp)
                         }
                     }
