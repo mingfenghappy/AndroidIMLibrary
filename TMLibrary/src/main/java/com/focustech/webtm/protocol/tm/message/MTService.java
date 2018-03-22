@@ -47,125 +47,122 @@ public class MTService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (intent!=null && intent.getStringExtra("type")!=null) {
-                    // 连接服务器
-                    if (intent.getStringExtra("type").equals("conn")) {
-                        client.startConnector();
-                    }
-                    // 登录
-                    if (intent.getStringExtra("type").equals("reqLogin")) {
-                        client.reqLogin(intent.getStringExtra("username"), intent.getStringExtra("pwd"));
-                    }
-                    // 发送心跳包
-                    if (intent.getStringExtra("type").equals("heartbeat")) {
-                        client.heartbeat();
-                    }
-                    // 获取好友分组信息
-                    if (intent.getStringExtra("type").equals("reqFriendGroups")) {
-                        client.reqFriendGroups();
-                    }
-                    // 获取全部好友信息
-                    if (intent.getStringExtra("type").equals("reqFriends")) {
-                        client.reqFriends();
-                    }
-                    // 获取全部离线消息
-                    if (intent.getStringExtra("type").equals("reqGetOfflineMessage")) {
-                        client.reqGetOfflineMessage();
-                    }
-                    // 已读离线消息回执
-                    if (intent.getStringExtra("type").equals("hasReadOfflineMessage")) {
-                        client.hasReadOfflineMessage(intent.getStringExtra("svrSeqId"));
-                    }
-                    // 已读单聊消息回执
-                    if (intent.getStringExtra("type").equals("hasReadMessage")) {
-                        client.hasReadMessage(intent.getStringExtra("svrSeqId"));
-                    }
-                    if (intent.getStringExtra("type").equals("getsetting")) {
-                        client.getUserSettingsInfo();
-                    }
-                    if (intent.getStringExtra("type").equals("sendTextMessage")) {
-                        client.sendTextMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("msg"), intent.getStringExtra("userName"));
-                    }
-                    if (intent.getStringExtra("type").equals("sendPicMessage")) {
-                        uploadFile(intent, "picture");
-                    }
-                    if (intent.getStringExtra("type").equals("sendVoiceMessage")) {
-                        uploadFile(intent, "voice");
-                    }
-                    // 获取系统消息
-                    if (intent.getStringExtra("type").equals("getSysNtyReq")) {
-                        client.getSysNtyReq(intent.getLongExtra("time", 0));
-                    }
-                    if (intent.getStringExtra("type").equals("getGroupList")) {
-                        client.requestGroupList();
-                    }
-                    if (intent.getStringExtra("type").equals("getGroupSingleUserInfo")) {
-                        client.requestGroupSingleUserInfo("KfqHpbiMBXg", "ttxPdzMAHf4");
-                    }
-                    if (intent.getStringExtra("type").equals("updateGroupNickName")) {
-                        client.updateGroupNickName("测试群组任", "KfqHpbiMBXg", "ttxPdzMAHf4");
-                    }
-                    if (intent.getStringExtra("type").equals("updateGroupRemark")) {
-                        client.updateGroupRemark("测试群组任备注", "KfqHpbiMBXg");
-                    }
-                    if (intent.getStringExtra("type").equals("updateGroupInfo")) {
-                        client.updateGroupInfo("测试简介", "测试签名", "KfqHpbiMBXg", "测试群组陈天宇", "", "INNOVATION_WORKS", "ALLOW_WITHOUT_VALIDATE");
-                    }
-                    if (intent.getStringExtra("type").equals("updateGroupMessageSetting")) {
-                        client.updateGroupMessageSetting("KfqHpbiMBXg", Enums.MessageSetting.ACCEPT_AND_PROMPT);
-                    }
-                    if (intent.getStringExtra("type").equals("requestGroupInfo")) {
-                        client.requestGroupInfo("KfqHpbiMBXg");
-                    }
-                    if (intent.getStringExtra("type").equals("requestGroupMember")) {
-                        client.requestGroupMember("KfqHpbiMBXg");
-                    }
-                    if (intent.getStringExtra("type").equals("requestGroupMemberInfo")) {
-                        ArrayList<String> userIds = new ArrayList<>();
-                        userIds.add("ttxPdzMAHf4");
-                        userIds.add("InI60G--Oqs");
-                        userIds.add("2Tj0laQY-KU");
-                        client.requestGroupMemberInfo(userIds);
-                    }
-                    if (intent.getStringExtra("type").equals("deleteGroupUser")) {
-                        client.deleteGroupUser("KfqHpbiMBXg", "2Tj0laQY-KU");
-                    }
-                    if (intent.getStringExtra("type").equals("inviteUserJoinGroup")) {
-                        ArrayList<String> userIds = new ArrayList<>();
-                        userIds.add("2Tj0laQY-KU");
-                        client.inviteUserJoinGroup("KfqHpbiMBXg", userIds);
-                    }
-                    if (intent.getStringExtra("type").equals("createGroup")) {
-                        ArrayList<String> userIds = new ArrayList<>();
-                        userIds.add("2Tj0laQY-KU");
-                        client.createGroup("任groupName", "任groupSignature", "任groupKeyword", "任groupDesc", Enums.GroupType.OTHER, Enums.ValidateRule.ALLOW_WITHOUT_VALIDATE);
-                    }
-                    // TODO: 2018/3/22 0022 群聊没有测试
-                    if (intent.getStringExtra("type").equals("groupchatpic")) {
-                        // client.sendGroupPicMessage("ttxPdzMAHf4", "KfqHpbiMBXg", picPath, "365房博士-武汉", str);
-                    }
-                    if (intent.getStringExtra("type").equals("groupchatvoice")) {
-                        // client.sendGroupVoiceMessage("ttxPdzMAHf4", "KfqHpbiMBXg", voicePath, "365房博士-武汉", str);
-                    }
-                    // 添加好友
-                    if (intent.getStringExtra("type").equals("addFriendReq")) {
-                        client.addFriendReq(MTService.this, intent.getStringExtra("userId"), intent.getStringExtra("ext"), intent.getStringExtra("srcFriendGroupId"));
-                    }
-                    // 获取添加好友权限
-                    if (intent.getStringExtra("type").equals("getFriendRuleReq")) {
-                        client.getFriendRuleReq(MTService.this, intent.getStringExtra("userId"));
-                    }
-                    // 删除好友
-                    if (intent.getStringExtra("type").equals("deleteFriendReq")) {
-                        client.deleteFriendReq(MTService.this, intent.getStringExtra("userId"));
-                    }
-                    // 获取单个好友信息
-                    if (intent.getStringExtra("type").equals("getUserInfo")) {
-                        client.getUserInfo(MTService.this, intent.getStringExtra("userId"));
-                    }
+        Runnable runnable = () -> {
+            if (intent!=null && intent.getStringExtra("type")!=null) {
+                // 连接服务器
+                if (intent.getStringExtra("type").equals("conn")) {
+                    client.startConnector();
+                }
+                // 登录
+                if (intent.getStringExtra("type").equals("reqLogin")) {
+                    client.reqLogin(intent.getStringExtra("username"), intent.getStringExtra("pwd"));
+                }
+                // 发送心跳包
+                if (intent.getStringExtra("type").equals("heartbeat")) {
+                    client.heartbeat();
+                }
+                // 获取好友分组信息
+                if (intent.getStringExtra("type").equals("reqFriendGroups")) {
+                    client.reqFriendGroups();
+                }
+                // 获取全部好友信息
+                if (intent.getStringExtra("type").equals("reqFriends")) {
+                    client.reqFriends();
+                }
+                // 获取全部离线消息
+                if (intent.getStringExtra("type").equals("reqGetOfflineMessage")) {
+                    client.reqGetOfflineMessage();
+                }
+                // 已读离线消息回执
+                if (intent.getStringExtra("type").equals("hasReadOfflineMessage")) {
+                    client.hasReadOfflineMessage(intent.getStringExtra("svrSeqId"));
+                }
+                // 已读单聊消息回执
+                if (intent.getStringExtra("type").equals("hasReadMessage")) {
+                    client.hasReadMessage(intent.getStringExtra("svrSeqId"));
+                }
+                if (intent.getStringExtra("type").equals("getsetting")) {
+                    client.getUserSettingsInfo();
+                }
+                if (intent.getStringExtra("type").equals("sendTextMessage")) {
+                    client.sendTextMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("msg"), intent.getStringExtra("userName"));
+                }
+                if (intent.getStringExtra("type").equals("sendPicMessage")) {
+                    uploadFile(intent, "picture");
+                }
+                if (intent.getStringExtra("type").equals("sendVoiceMessage")) {
+                    uploadFile(intent, "voice");
+                }
+                // 获取系统消息
+                if (intent.getStringExtra("type").equals("getSysNtyReq")) {
+                    client.getSysNtyReq(intent.getLongExtra("time", 0));
+                }
+                if (intent.getStringExtra("type").equals("getGroupList")) {
+                    client.requestGroupList();
+                }
+                if (intent.getStringExtra("type").equals("getGroupSingleUserInfo")) {
+                    client.requestGroupSingleUserInfo("KfqHpbiMBXg", "ttxPdzMAHf4");
+                }
+                if (intent.getStringExtra("type").equals("updateGroupNickName")) {
+                    client.updateGroupNickName("测试群组任", "KfqHpbiMBXg", "ttxPdzMAHf4");
+                }
+                if (intent.getStringExtra("type").equals("updateGroupRemark")) {
+                    client.updateGroupRemark("测试群组任备注", "KfqHpbiMBXg");
+                }
+                if (intent.getStringExtra("type").equals("updateGroupInfo")) {
+                    client.updateGroupInfo("测试简介", "测试签名", "KfqHpbiMBXg", "测试群组陈天宇", "", "INNOVATION_WORKS", "ALLOW_WITHOUT_VALIDATE");
+                }
+                if (intent.getStringExtra("type").equals("updateGroupMessageSetting")) {
+                    client.updateGroupMessageSetting("KfqHpbiMBXg", Enums.MessageSetting.ACCEPT_AND_PROMPT);
+                }
+                if (intent.getStringExtra("type").equals("requestGroupInfo")) {
+                    client.requestGroupInfo("KfqHpbiMBXg");
+                }
+                if (intent.getStringExtra("type").equals("requestGroupMember")) {
+                    client.requestGroupMember("KfqHpbiMBXg");
+                }
+                if (intent.getStringExtra("type").equals("requestGroupMemberInfo")) {
+                    ArrayList<String> userIds = new ArrayList<>();
+                    userIds.add("ttxPdzMAHf4");
+                    userIds.add("InI60G--Oqs");
+                    userIds.add("2Tj0laQY-KU");
+                    client.requestGroupMemberInfo(userIds);
+                }
+                if (intent.getStringExtra("type").equals("deleteGroupUser")) {
+                    client.deleteGroupUser("KfqHpbiMBXg", "2Tj0laQY-KU");
+                }
+                if (intent.getStringExtra("type").equals("inviteUserJoinGroup")) {
+                    ArrayList<String> userIds = new ArrayList<>();
+                    userIds.add("2Tj0laQY-KU");
+                    client.inviteUserJoinGroup("KfqHpbiMBXg", userIds);
+                }
+                if (intent.getStringExtra("type").equals("createGroup")) {
+                    ArrayList<String> userIds = new ArrayList<>();
+                    userIds.add("2Tj0laQY-KU");
+                    client.createGroup("任groupName", "任groupSignature", "任groupKeyword", "任groupDesc", Enums.GroupType.OTHER, Enums.ValidateRule.ALLOW_WITHOUT_VALIDATE);
+                }
+                // TODO: 2018/3/22 0022 群聊没有测试
+                if (intent.getStringExtra("type").equals("groupchatpic")) {
+                    // client.sendGroupPicMessage("ttxPdzMAHf4", "KfqHpbiMBXg", picPath, "365房博士-武汉", str);
+                }
+                if (intent.getStringExtra("type").equals("groupchatvoice")) {
+                    // client.sendGroupVoiceMessage("ttxPdzMAHf4", "KfqHpbiMBXg", voicePath, "365房博士-武汉", str);
+                }
+                // 添加好友
+                if (intent.getStringExtra("type").equals("addFriendReq")) {
+                    client.addFriendReq(MTService.this, intent.getStringExtra("userId"), intent.getStringExtra("ext"), intent.getStringExtra("srcFriendGroupId"));
+                }
+                // 获取添加好友权限
+                if (intent.getStringExtra("type").equals("getFriendRuleReq")) {
+                    client.getFriendRuleReq(MTService.this, intent.getStringExtra("userId"));
+                }
+                // 删除好友
+                if (intent.getStringExtra("type").equals("deleteFriendReq")) {
+                    client.deleteFriendReq(MTService.this, intent.getStringExtra("userId"));
+                }
+                // 获取单个好友信息
+                if (intent.getStringExtra("type").equals("getUserInfo")) {
+                    client.getUserInfo(MTService.this, intent.getStringExtra("userId"));
                 }
             }
         };

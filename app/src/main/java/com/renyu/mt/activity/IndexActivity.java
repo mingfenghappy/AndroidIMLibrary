@@ -144,8 +144,7 @@ public class IndexActivity extends BaseIMActivity {
                         }
                     }
                     // 语音消息下载完成或者发出的消息发送完成
-                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload ||
-                            bean.getCommand()== BroadcastBean.MTCommand.MessageSend) {
+                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageSend) {
                         // 通知会话列表刷新
                         if (conversationFragment!=null) {
 //                            conversationFragment.refreshOfflineMessageData();

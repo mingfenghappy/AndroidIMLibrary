@@ -118,11 +118,6 @@ abstract class BaseIMActivity: BaseActivity() {
                         val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean
                         PlainTextDBHelper.getInstance().updateSendState(temp.svrMsgId, Enums.Enable.ENABLE, Enums.Enable.ENABLE)
                     }
-                    // 语音消息下载完成
-                    if (bean.command == BroadcastBean.MTCommand.MessageVoiceDownload) {
-                        // 通知会话列表刷新以及会话详情刷新
-                        // TODO: 2018/3/21 0021  需要重新测试语音文件下载完成
-                    }
                 }
             }
         }

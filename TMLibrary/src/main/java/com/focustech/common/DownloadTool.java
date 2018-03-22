@@ -54,7 +54,7 @@ public class DownloadTool {
                 // 更新数据库
                 PlainTextDBHelper.getInstance().insertMessage(messageBean);
                 // 通知前台页面下载完成，可以更新
-                BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageVoiceDownload, messageBean);
+                BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
             }
         };
         executorService.execute(runnable);

@@ -226,22 +226,10 @@ public class ConversationActivity extends BaseIMActivity {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
-                    // 收到图片文字消息之后立即更新，语音消息等下载完成之后再更新
+                    // 收到消息之后立即更新
                     if (bean.getCommand()== BroadcastBean.MTCommand.MessageReceive) {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        if (messageBean.getUserId().equals(chatUserId) && !messageBean.getMessageType().equals("7")) {
-                            messageBeens.add(messageBean);
-                            adapter.notifyItemInserted(messageBeens.size()-1);
-                            if (!rv_conversation.canScrollVertically(1)) {
-                                rv_conversation.scrollToPosition(messageBeens.size()-1);
-                            }
-                        }
-                    }
-                    // 收到语音消息下载完成之后立即更新
-                    if (bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload) {
-                        MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        // 消息属于当前聊天页面用户
-                        if (messageBean.getUserId().equals(chatUserId) && bean.getCommand()== BroadcastBean.MTCommand.MessageVoiceDownload) {
+                        if (messageBean.getUserId().equals(chatUserId)) {
                             messageBeens.add(messageBean);
                             adapter.notifyItemInserted(messageBeens.size()-1);
                             if (!rv_conversation.canScrollVertically(1)) {

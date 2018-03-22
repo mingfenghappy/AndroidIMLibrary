@@ -73,12 +73,8 @@ class ChatListActivity : BaseIMActivity() {
                         PlainTextDBHelper.getInstance().insertMessages((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as ArrayList<MessageBean>)
                     }
                     // 收到消息刷新列表
-                    if (bean.command == BroadcastBean.MTCommand.MessageReceive) {
-                        // 通知会话列表结束刷新
-                        conversationFragment?.refreshOneMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean)
-                    }
-                    // 发送消息刷新列表
-                    if (bean.command == BroadcastBean.MTCommand.MessageSend) {
+                    if (bean.command == BroadcastBean.MTCommand.MessageReceive ||
+                            bean.command == BroadcastBean.MTCommand.MessageSend) {
                         conversationFragment?.refreshOneMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean)
                     }
                     // 消息已读
