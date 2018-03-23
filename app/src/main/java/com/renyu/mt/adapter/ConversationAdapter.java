@@ -51,7 +51,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
     boolean isGroup;
     String userId;
     // 当前用户信息
-    UserInfoRsp user;
+    UserInfoRsp currentUserInfo;
     // 聊天对象信息
     HashMap<String, UserInfoRsp> userInfoRsps;
     // 当前正在播放的音频文件tag
@@ -64,7 +64,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         this.userId = userId;
 
         this.userInfoRsps = PlainTextDBHelper.getInstance().getFriendsInfo();
-        this.user= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
+        this.currentUserInfo= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
     }
 
     @Override
@@ -173,12 +173,17 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 }
             }
         }
-        String token=user.getToken();
+        String token=currentUserInfo.getToken();
         UserInfoRsp userInfo=userInfoRsps.get(messages.get(position).getUserId());
         ImageRequest request;
         if (userInfo!=null) {
             String faceCode = String.valueOf(userInfo.getUserHeadType().getNumber());
             String fileId = userInfo.getUserHeadId();
+            // 判断是不是自己发送的
+            if (messages.get(position).getIsSend().equals("1")) {
+                faceCode = String.valueOf(currentUserInfo.getUserHeadType().getNumber());
+                fileId = currentUserInfo.getUserHeadId();
+            }
             Object avatar= AvatarUtils.displayImg(faceCode, fileId, token);
             Enums.EquipmentStatus showStatus = UserInfoRsp.getShowStatus(userInfo.getEquipments());
             // TODO: 2017/7/19 所有用户都是离线的？
@@ -291,8 +296,20 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
             }
+            ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setTag(messages.get(position).getSvrMsgId()+"_length");
             // 音频播放时间秒数
-            ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(new File(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr").length()/1000+"\'\'");
+            File file = new File(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr");
+            if (file == null) {
+                ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(0+"\'\'");
+            }
+            else {
+                if (file.length()/1600 < 1) {
+                    ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(1+"\'\'");
+                }
+                else {
+                    ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1600+"\'\'");
+                }
+            }
         }
         else if (getItemViewType(position)==3) {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
@@ -353,7 +370,14 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((ConversationActivity) context).resendVoiceMessageState(messages.get(position));
+                    // 本地真实自己发送的文件
+                    if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
+                        ((ConversationActivity) context).resendVoiceMessageState(messages.get(position));
+                    }
+                    // 同步时远程拿下的文件
+                    else {
+                        ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
+                    }
                 }
             });
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
@@ -364,11 +388,15 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
             }
-            ((SendVoiceViewHolder) holder).bubble.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // 播放语音
+            ((SendVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
+                // 播放语音
+                // 本地真实自己发送的文件
+                if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
                     ((ConversationActivity) context).playMedia(messages.get(position).getLocalFileName(), messages.get(position).getSvrMsgId()+"_voice");
+                }
+                // 同步时远程拿下的文件
+                else {
+                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
                 }
             });
             ((SendVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).getSvrMsgId()+"_voice");
@@ -379,7 +407,27 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((SendVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatto_voice_playing);
             }
-            ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(new File(messages.get(position).getLocalFileName()).length()/1600+"\'\'");
+            ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setTag(messages.get(position).getSvrMsgId()+"_length");
+            // 本地真实自己发送的文件
+            if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
+                File file = new File(messages.get(position).getLocalFileName());
+                ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1600+"\'\'");
+            }
+            // 同步时远程拿下的文件
+            else {
+                File file = new File(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr");
+                if (file == null) {
+                    ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(0+"\'\'");
+                }
+                else {
+                    if (file.length()/1600 < 1) {
+                        ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(1+"\'\'");
+                    }
+                    else {
+                        ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1600+"\'\'");
+                    }
+                }
+            }
         }
     }
 

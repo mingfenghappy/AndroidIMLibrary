@@ -45,7 +45,7 @@ class ChatListActivity : BaseIMActivity() {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
                     // 因为断线或者回收造成的登录成功
                     if (bean.command == BroadcastBean.MTCommand.LoginRsp) {
-                        Log.d("MT", "二次登录成功")
+                        Log.d("MTAPP", "二次登录成功")
                         // 刷新远程数据
                         conversationFragment?.getOfflineIMFromRemote()
                     }

@@ -20,7 +20,6 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
@@ -97,23 +96,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
                 UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
                 String token=userInfoRsp.getToken();
                 Object avatar= AvatarUtils.displayImg(faceCode, fileId, token);
-                if (offlineMessages.get(position).getEquipments() != null) {
-                    Enums.EquipmentStatus showStatus = UserInfoRsp.getShowStatus(offlineMessages.get(position).getEquipments());
-                    // TODO: 2017/7/19 所有用户都是离线的？
-                    if (!UserInfoRsp.isOnline(showStatus.getStatus().getNumber())) {
-                        request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                                .setPostprocessor(new GrayscalePostprocessor())
-                                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
-                    }
-                    else {
-                        request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
-                    }
-                }
-                else {
-                    request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                            .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
-                }
+                request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             }
             else {
                 request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("res:///"+R.drawable.default_avatar0))

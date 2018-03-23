@@ -7,11 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
 import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
-import com.focustech.webtm.protocol.tm.message.model.UpdateUserStatusNty;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
@@ -108,6 +106,7 @@ public class ChatListFragment extends BaseFragment {
      * 加载远程会话列表
      */
     public void getOfflineIMFromRemote() {
+        Log.d("MTAPP", "获取会话列表数据");
         retrofit.create(RetrofitImpl.class).getOfflineIMList(currentUserInfo.getUserId())
                 .compose(Retrofit2Utils.backgroundList())
                 .subscribe(new Observer<List<OfflineIMResponse>>() {
@@ -118,7 +117,7 @@ public class ChatListFragment extends BaseFragment {
 
                     @Override
                     public void onNext(List<OfflineIMResponse> temp) {
-                        Log.d("MT", "找到" + temp.size() + "接口数据");
+                        Log.d("MTAPP", "找到" + temp.size() + "接口数据");
                         // 没有找到的数据列表
                         ArrayList<OfflineIMResponse> newAdd = new ArrayList<>();
                         // 对新消息进行遍历
@@ -183,7 +182,7 @@ public class ChatListFragment extends BaseFragment {
                     public void onError(Throwable e) {
                         e.printStackTrace();
 
-                        Log.d("MT", "没有接口数据");
+                        Log.d("MTAPP", "没有接口数据");
 
                         swipe_conversationlist.setRefreshing(false);
 
@@ -271,23 +270,6 @@ public class ChatListFragment extends BaseFragment {
         }
         // 更新缓存好友信息数据
         userInfoRsps.put(userInfoRsp.getUserId(), userInfoRsp);
-    }
-
-    /**
-     * 刷新用户状态
-     * @param updateUserStatusNty
-     */
-    public void refreshUserState(UpdateUserStatusNty updateUserStatusNty) {
-        for (OfflineIMResponse offlineMessage : offlineMessages) {
-            if (offlineMessage.getFromUserId().equals(updateUserStatusNty.getUserId())) {
-                ArrayList<Enums.EquipmentStatus> equipmentStatuses=new ArrayList<>();
-                equipmentStatuses.add(updateUserStatusNty.getStatus());
-                // TODO: 2017/7/28 这里仅仅做了好友上线下线判断，并未对陌生人进行判断
-                offlineMessage.setEquipments(equipmentStatuses);
-                adapter.notifyDataSetChanged();
-                break;
-            }
-        }
     }
 
     /**

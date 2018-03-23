@@ -10,6 +10,7 @@ import com.focustech.webtm.protocol.tm.message.model.FriendGroupRsp;
 import com.focustech.webtm.protocol.tm.message.model.FriendInfoRsp;
 import com.focustech.webtm.protocol.tm.message.model.FriendStatusRsp;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;
+import com.focustech.webtm.protocol.tm.message.model.OfflineIMDetailResponse;
 import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
@@ -421,6 +422,24 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                 cs.close();
             }
         }
+    }
+
+    /**
+     * 检查离线消息是不是已经存在于数据库中
+     * @param offlineIMDetailResponses
+     * @return
+     */
+    public ArrayList<OfflineIMDetailResponse> checkOfflineMessages(List<OfflineIMDetailResponse> offlineIMDetailResponses) {
+        ArrayList<OfflineIMDetailResponse> temp = new ArrayList<>();
+        for (OfflineIMDetailResponse offlineIMDetailRespons : offlineIMDetailResponses) {
+            Cursor cs=db.query(MessageTable, null, "svrMsgId=?", new String[]{offlineIMDetailRespons.getSvrMsgId()}, null, null, null);
+            cs.moveToFirst();
+            if (cs.getCount()==0) {
+                temp.add(offlineIMDetailRespons);
+            }
+            cs.close();
+        }
+        return temp;
     }
 
     /**

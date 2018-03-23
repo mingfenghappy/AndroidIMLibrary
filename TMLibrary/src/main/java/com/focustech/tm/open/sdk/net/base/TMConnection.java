@@ -87,7 +87,7 @@ public class TMConnection {
                     future.awaitUninterruptibly(3, TimeUnit.SECONDS);
                     if(!future.isWritten()) {
                         // 数据发送失败
-						Log.d("MT", "发送失败");
+						Log.d("MTAPP", "发送失败");
 					}
                 } catch (Exception e) {
                     e.printStackTrace();

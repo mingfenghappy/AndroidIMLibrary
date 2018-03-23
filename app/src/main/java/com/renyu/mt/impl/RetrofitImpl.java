@@ -1,6 +1,7 @@
 package com.renyu.mt.impl;
 
 import com.focustech.webtm.protocol.tm.message.model.IMBaseResponseList;
+import com.focustech.webtm.protocol.tm.message.model.OfflineIMDetailResponse;
 import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
 
 import io.reactivex.Observable;
@@ -22,4 +23,16 @@ public interface RetrofitImpl {
     @GET("getRecentMessageList")
     Observable<IMBaseResponseList<OfflineIMResponse>> getOfflineIMList(
             @Query("toUserId") String toUserId);
+
+    /**
+     * 获取会话详情
+     *
+     * @param toUserId
+     * @return
+     */
+    @GET("getRecentMessage")
+    Observable<IMBaseResponseList<OfflineIMDetailResponse>> getOfflineIMDetailList(
+            @Query("fromUserId") String fromUserId,
+            @Query("toUserId") String toUserId,
+            @Query("queryTime") long queryTime);
 }

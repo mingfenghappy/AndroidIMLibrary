@@ -79,7 +79,7 @@ public class NetConnector {
 			@Override
 			public void sessionDestroyed(IoSession arg0) throws Exception {
 				TMConnection.getInstance(context).setIo(null);
-				Log.d("MT", "服务器与客户端断开连接...");
+				Log.d("MTAPP", "服务器与客户端断开连接...");
 				// 发送连接断开广播
 				BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Disconn, "");
 				close();
@@ -87,24 +87,24 @@ public class NetConnector {
 
 			@Override
 			public void sessionCreated(IoSession arg0) throws Exception {
-				Log.d("MT", "服务器与客户端连接创建成功...");
+				Log.d("MTAPP", "服务器与客户端连接创建成功...");
 				// 发送连接创建成功广播
 				BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Conn, "");
 			}
 
 			@Override
 			public void serviceIdle(IoService arg0, IdleStatus arg1) throws Exception {
-				Log.d("MT", "客户端进入空闲状态...");
+				Log.d("MTAPP", "客户端进入空闲状态...");
 			}
 
 			@Override
 			public void serviceDeactivated(IoService arg0) throws Exception {
-				Log.d("MT", "服务被停用");
+				Log.d("MTAPP", "服务被停用");
 			}
 
 			@Override
 			public void serviceActivated(IoService arg0) throws Exception {
-				Log.d("MT", "服务被激活");
+				Log.d("MTAPP", "服务被激活");
 			}
 		});
 	}
@@ -113,13 +113,13 @@ public class NetConnector {
 	public boolean connect() {
 		currentServer = currentServer();
 		initConnector();
-		Log.d("MT", "开始连接:"+currentServer.toString());
+		Log.d("MTAPP", "开始连接:"+currentServer.toString());
 		// 开始连接
 		cuture = connector.connect(currentServer);
 		// 等待是否连接成功，相当于是转异步执行为同步执行。
 		cuture.awaitUninterruptibly(this.connectConfig.getConnectTimeout());
 		isConnected = cuture.isConnected();
-		Log.d("MT", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
+		Log.d("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
 		if (isConnected) {
 			// 连接成功后获取会话对象。如果没有上面的等待，由于connect()方法是异步的，session可能会无法获取。
 			session = cuture.getSession();

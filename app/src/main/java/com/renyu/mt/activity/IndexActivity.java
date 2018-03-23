@@ -83,9 +83,9 @@ public class IndexActivity extends BaseIMActivity {
                     }
                     if (bean.getCommand()== BroadcastBean.MTCommand.UpdateUserStatusNty) {
                         UpdateUserStatusNty updateUserStatusNty= (UpdateUserStatusNty) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        if (conversationFragment!=null) {
-                            conversationFragment.refreshUserState(updateUserStatusNty);
-                        }
+//                        if (conversationFragment!=null) {
+//                            conversationFragment.refreshUserState(updateUserStatusNty);
+//                        }
                         if (friendListFragment!=null) {
                             friendListFragment.refreshUserState(updateUserStatusNty);
                         }
@@ -165,7 +165,7 @@ public class IndexActivity extends BaseIMActivity {
                                 final String fileId_ = tempOffline.get(i).getLocalFileName();
                                 StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
                                 sb.append("fileid=").append(fileId_).append("&type=").append("voice").append("&token=").append(token);
-                                DownloadTool.addFile(sb.toString(), fileId_);
+//                                DownloadTool.addFile(sb.toString(), fileId_);
                             }
                         }
                         // 更新数据库

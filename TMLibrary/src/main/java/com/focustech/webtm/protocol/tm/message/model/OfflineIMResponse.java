@@ -1,9 +1,5 @@
 package com.focustech.webtm.protocol.tm.message.model;
 
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-
-import java.util.ArrayList;
-
 /**
  * Created by renyu on 2017/6/6.
  */
@@ -30,7 +26,6 @@ public class OfflineIMResponse {
     private int userHeadType;
     private String userNickName;
     private int userRole;
-    private ArrayList<Enums.EquipmentStatus> equipments;
 
     public long getAddTime() {
         return addTime;
@@ -102,13 +97,5 @@ public class OfflineIMResponse {
 
     public void setUserRole(int userRole) {
         this.userRole = userRole;
-    }
-
-    public ArrayList<Enums.EquipmentStatus> getEquipments() {
-        return equipments;
-    }
-
-    public void setEquipments(ArrayList<Enums.EquipmentStatus> equipments) {
-        this.equipments = equipments;
     }
 }

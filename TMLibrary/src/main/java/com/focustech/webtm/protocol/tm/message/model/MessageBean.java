@@ -27,7 +27,7 @@ public class MessageBean implements Serializable {
     // 临时使用的数据
     String messageType;              // 消息类型（文本、音频、图片）
     String localFileName;            // 文件路径
-    String isSend;                   // 1:发送方 0:接收方
+    String isSend;                   // 1:发送 0:接收
     String isRead;                   // 消息是否已读  1:已读 0:未读
     String isVoicePlay;              // 语音消息是否已读  1:已读 0:未读
 
@@ -202,7 +202,8 @@ public class MessageBean implements Serializable {
             else if (m.getMsgType() == Enums.MessageType.MULTI_MEDIA && object.getInt(MessageMeta.msgtype) == 7) {
                 // 接收语音
                 messageBean.setMessageType("7");
-                if (object.has(MessageMeta.picid) && !"".equals(object.getString(MessageMeta.picid).trim()) && object.getString(MessageMeta.picid) != null) {
+                if (object.has(MessageMeta.picid) && !"".equals(object.getString(MessageMeta.picid).trim())
+                        && object.getString(MessageMeta.picid) != null) {
                     // 添加媒体消息的fileId
                     JSONObject pidObject = new JSONObject(object.getString(MessageMeta.picid));
                     String localfilename = "";

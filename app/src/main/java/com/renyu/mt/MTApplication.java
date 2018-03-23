@@ -99,7 +99,7 @@ public class MTApplication extends MultiDexApplication {
 
             // 注册基础广播
             if (baseReceiver == null) {
-                Log.d("MT", "注册基础广播");
+                Log.d("MTAPP", "注册基础广播");
                 openBaseReceiver();
             }
             // 开启心跳服务并进行连接
@@ -128,7 +128,7 @@ public class MTApplication extends MultiDexApplication {
                 if (intent.getAction() == "MT") {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
-                        Log.d("MT", "连接成功");
+                        Log.d("MTAPP", "连接成功");
                         connState = BroadcastBean.MTCommand.Conn;
                         // 如果用户已经登录过，则执行登录操作
                         // 如果是因为App被回收导致页面新建，则执行自动登录
@@ -141,11 +141,11 @@ public class MTApplication extends MultiDexApplication {
                         }
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Disconn) {
-                        Log.d("MT", "连接已断开");
+                        Log.d("MTAPP", "连接已断开");
                         connState = BroadcastBean.MTCommand.Disconn;
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conning) {
-                        Log.d("MT", "正在连接");
+                        Log.d("MTAPP", "正在连接");
                         connState = BroadcastBean.MTCommand.Conning;
                     }
                     // 登录成功
@@ -188,7 +188,8 @@ public class MTApplication extends MultiDexApplication {
                                 String fileId = messageBean.getLocalFileName();
                                 StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
                                 sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token);
-                                DownloadTool.addFile(sb.toString(), fileId);
+                                // 单纯下载文件
+                                DownloadTool.addFile(MTApplication.this, sb.toString(), fileId, messageBean.getSvrMsgId());
                             }
                         }
                         // 更新数据库
