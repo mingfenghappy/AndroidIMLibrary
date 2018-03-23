@@ -34,7 +34,7 @@ public class DownloadTool {
         Runnable runnable= () -> {
             File file=httpHelper.getOkHttpUtils().syncDownload(url, InitParams.FILE_PATH);
             boolean isRenameOK=file.renameTo(new File(file.getParentFile()+"/"+fileId+".amr"));
-            Log.d("DownloadTool", "isRenameOK:" + isRenameOK);
+            Log.d("MT", "isRenameOK:" + isRenameOK);
         };
         executorService.execute(runnable);
     }
@@ -49,7 +49,7 @@ public class DownloadTool {
             // 下载文件
             File file=httpHelper.getOkHttpUtils().syncDownload(sb.toString(), InitParams.FILE_PATH);
             boolean isRenameOK=file.renameTo(new File(file.getParentFile()+"/"+fileId_+".amr"));
-            Log.d("DownloadTool", "isRenameOK:" + isRenameOK);
+            Log.d("MT", "isRenameOK:" + isRenameOK);
             if (isRenameOK) {
                 // 更新数据库
                 PlainTextDBHelper.getInstance().insertMessage(messageBean);

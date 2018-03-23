@@ -7,9 +7,11 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.focustech.common.DownloadTool;
@@ -46,8 +48,6 @@ public class MTApplication extends MultiDexApplication {
     public BroadcastBean.MTCommand connState = BroadcastBean.MTCommand.Disconn;
     // 基础广播
     public BroadcastReceiver baseReceiver = null;
-    // 用户是否已经登录成功
-    public boolean isSignIn = false;
 
     @Override
     public void onCreate() {
@@ -99,7 +99,7 @@ public class MTApplication extends MultiDexApplication {
 
             // 注册基础广播
             if (baseReceiver == null) {
-                Log.d("BaseIMActivity", "注册基础广播");
+                Log.d("MT", "注册基础广播");
                 openBaseReceiver();
             }
             // 开启心跳服务并进行连接
@@ -128,27 +128,28 @@ public class MTApplication extends MultiDexApplication {
                 if (intent.getAction() == "MT") {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
-                        Log.d("MTApplication", "连接成功");
+                        Log.d("MT", "连接成功");
                         connState = BroadcastBean.MTCommand.Conn;
                         // 如果用户已经登录过，则执行登录操作
                         // 如果是因为App被回收导致页面新建，则执行自动登录
                         // 如果是因为App使用过程中掉线，则连接成功后执行自动登录
-                        if (ACache.get(MTApplication.this).getAsObject("UserInfoRsp") != null) {
-                            UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(MTApplication.this).getAsObject("UserInfoRsp");
-                            MTService.reqLogin(MTApplication.this, userInfoRsp.getLoginUserName(), userInfoRsp.getPwd());
+                        if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME)) &&
+                                !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))) {
+                            MTService.reqLogin(MTApplication.this,
+                                    SPUtils.getInstance().getString(CommonParams.SP_UNAME),
+                                    SPUtils.getInstance().getString(CommonParams.SP_PWD));
                         }
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Disconn) {
-                        Log.d("MTApplication", "连接已断开");
+                        Log.d("MT", "连接已断开");
                         connState = BroadcastBean.MTCommand.Disconn;
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conning) {
-                        Log.d("MTApplication", "正在连接");
+                        Log.d("MT", "正在连接");
                         connState = BroadcastBean.MTCommand.Conning;
                     }
                     // 登录成功
                     if (bean.getCommand()== BroadcastBean.MTCommand.LoginRsp) {
-                        isSignIn = true;
                         Toast.makeText(MTApplication.this, "登录成功", Toast.LENGTH_SHORT).show();
                     }
                     // 此处为当前用户登录后返回的信息

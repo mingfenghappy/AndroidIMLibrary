@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TMConnection {
 
-	String TAG = "TMConnection";
-
 	private static volatile TMConnection current;
 
 	// 会话session
@@ -81,7 +79,7 @@ public class TMConnection {
                     return;
                 }
                 if (message instanceof TMMessage && ((TMMessage) message).getHead()!=null) {
-					Log.i(TAG, "out ===>>" + message.toString());
+					Log.i("MT", "out ===>>" + message.toString());
 				}
                 try {
                     // 发送
@@ -89,7 +87,7 @@ public class TMConnection {
                     future.awaitUninterruptibly(3, TimeUnit.SECONDS);
                     if(!future.isWritten()) {
                         // 数据发送失败
-						Log.d("TMConnection", "发送失败");
+						Log.d("MT", "发送失败");
 					}
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -117,7 +115,7 @@ public class TMConnection {
 					}
 				}
                 else {
-					Log.i(TAG, "in ===>>" + message.toString());
+					Log.i("MT", "in ===>>" + message.toString());
 					String cmd = msg.getHead().getCmd();
 					if (methodMapper.containsKey(cmd)) {
 						try {

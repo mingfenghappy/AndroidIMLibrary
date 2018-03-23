@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
@@ -18,6 +19,7 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
+import com.renyu.mt.params.CommonParams;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -55,6 +57,9 @@ public class SignInActivity extends BaseIMActivity {
                     if (bean.getCommand()== BroadcastBean.MTCommand.UserInfoRsp) {
                         UserInfoRsp userInfoRsp= (UserInfoRsp) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
                         ACache.get(SignInActivity.this).put("UserInfoRsp", userInfoRsp);
+                        // 用户登录信息
+                        SPUtils.getInstance().put(CommonParams.SP_UNAME, ed_username.getText().toString());
+                        SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
                         // 登录成功跳转首页
                         startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
                     }
@@ -64,6 +69,11 @@ public class SignInActivity extends BaseIMActivity {
                 }
             }
         };
+
+        if (ACache.get(SignInActivity.this).getAsObject("UserInfoRsp") != null) {
+            // 登录成功跳转首页
+            startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
+        }
     }
 
     @Override
@@ -73,11 +83,8 @@ public class SignInActivity extends BaseIMActivity {
 
     @Override
     public void loadData() {
-        if (ACache.get(SignInActivity.this).getAsObject("UserInfoRsp")!=null) {
-            UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(SignInActivity.this).getAsObject("UserInfoRsp");
-            ed_username.setText(userInfoRsp.getLoginUserName());
-            ed_pwd.setText(userInfoRsp.getPwd());
-        }
+        ed_username.setText(SPUtils.getInstance().getString(CommonParams.SP_UNAME));
+        ed_pwd.setText(SPUtils.getInstance().getString(CommonParams.SP_PWD));
     }
 
     @Override

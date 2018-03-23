@@ -1,7 +1,6 @@
 package com.focustech.common;
 
 import android.media.MediaRecorder;
-import android.util.Log;
 
 import com.renyu.commonlibrary.params.InitParams;
 
@@ -69,23 +68,16 @@ public class RecordTool {
                 mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
                 mediaRecorder.setOutputFile(tempAudioFile.getAbsolutePath());
                 mediaRecorder.setMaxDuration(defalutMaxTime);
-                mediaRecorder.setOnErrorListener(new MediaRecorder.OnErrorListener() {
-                    @Override
-                    public void onError(MediaRecorder mr, int what, int extra) {
-                        // 发生错误，停止录制
-                        mediaRecorder.stop();
-                        mediaRecorder.release();
-                        mediaRecorder = null;
-                        Log.d("RecordTool", "录音发生错误");
-                    }
+                mediaRecorder.setOnErrorListener((mr, what, extra) -> {
+                    // 发生错误，停止录制
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+                    mediaRecorder = null;
                 });
-                mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-                    @Override
-                    public void onInfo(MediaRecorder mr, int what, int extra) {
-                        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-                            recorderListener.finishRecorder(tempAudioFile.getAbsolutePath());
-                            state = RecorderState.stop;
-                        }
+                mediaRecorder.setOnInfoListener((mr, what, extra) -> {
+                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                        recorderListener.finishRecorder(tempAudioFile.getAbsolutePath());
+                        state = RecorderState.stop;
                     }
                 });
                 mediaRecorder.prepare();

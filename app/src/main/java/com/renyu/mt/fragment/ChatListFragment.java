@@ -1,8 +1,10 @@
 package com.renyu.mt.fragment;
 
+import android.app.Activity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
@@ -14,7 +16,6 @@ import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
-import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ChatListAdapter;
 import com.renyu.mt.impl.RetrofitImpl;
@@ -48,6 +49,8 @@ public class ChatListFragment extends BaseFragment {
     // 是否正在请求接口数据
     boolean isRequest = false;
 
+    Activity activity;
+
     @Override
     public void initParams() {
         currentUserInfo = (UserInfoRsp) ACache.get(getActivity()).getAsObject("UserInfoRsp");
@@ -75,9 +78,13 @@ public class ChatListFragment extends BaseFragment {
     @Override
     public void loadData() {
         getOfflineIMFromLocal();
-        if (((MTApplication) getActivity().getApplication()).isSignIn) {
-            getOfflineIMFromRemote();
-        }
+        getOfflineIMFromRemote();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = activity;
     }
 
     /**
@@ -111,6 +118,7 @@ public class ChatListFragment extends BaseFragment {
 
                     @Override
                     public void onNext(List<OfflineIMResponse> temp) {
+                        Log.d("MT", "找到" + temp.size() + "接口数据");
                         // 没有找到的数据列表
                         ArrayList<OfflineIMResponse> newAdd = new ArrayList<>();
                         // 对新消息进行遍历
@@ -168,17 +176,19 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(getActivity().getApplicationContext());
+                        MTService.reqFriendInfo(activity.getApplicationContext());
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
 
+                        Log.d("MT", "没有接口数据");
+
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(getActivity().getApplicationContext());
+                        MTService.reqFriendInfo(activity.getApplicationContext());
 
                         isRequest = false;
                     }
@@ -221,6 +231,7 @@ public class ChatListFragment extends BaseFragment {
             offlineMessage.setLastMsg(messageBean.getMsg());
             offlineMessage.setType(Integer.parseInt(messageBean.getMessageType()));
             offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
+            offlineMessage.setFromUserId(messageBean.getUserId());
             offlineMessages.add(0, offlineMessage);
         }
         // 找到就前置
@@ -231,7 +242,11 @@ public class ChatListFragment extends BaseFragment {
 
         // 不是首次加载的话，如果离线消息中的人不在好友列表中，则获取好友信息
         if (!userInfoRsps.containsKey(messageBean.getUserId())) {
-            MTService.getUserInfo(getActivity().getApplicationContext(), messageBean.getUserId());
+            MTService.getUserInfo(activity.getApplicationContext(), messageBean.getUserId());
+        }
+        // 存在好友关系，直接使用存储的好友关系
+        else {
+            refreshOfflineUser(userInfoRsps.get(messageBean.getUserId()));
         }
     }
 

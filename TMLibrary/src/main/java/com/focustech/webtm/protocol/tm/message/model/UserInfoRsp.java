@@ -26,8 +26,6 @@ public class UserInfoRsp implements Serializable {
     ArrayList<Enums.EquipmentStatus> equipments;    // 好友状态
     long tmNum = 0;                                 // 麦通号码
     int role = 0;                                   // 用户状态
-    String loginUserName;                           // 用户登录用户名
-    String pwd;                                     // 用户密码
 
     public String getUserId() {
         return userId;
@@ -123,22 +121,6 @@ public class UserInfoRsp implements Serializable {
 
     public void setRole(int role) {
         this.role = role;
-    }
-
-    public String getPwd() {
-        return pwd;
-    }
-
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
-    }
-
-    public String getLoginUserName() {
-        return loginUserName;
-    }
-
-    public void setLoginUserName(String loginUserName) {
-        this.loginUserName = loginUserName;
     }
 
     public static UserInfoRsp parse(User.UserInfoRsp rsp) {

@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import com.focustech.common.DownloadTool
+import android.util.Log
 import com.focustech.dbhelper.PlainTextDBHelper
-import com.focustech.tm.open.sdk.params.FusionField
-import com.focustech.webtm.protocol.tm.message.MTService
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean
 import com.focustech.webtm.protocol.tm.message.model.FriendInfoRsp
 import com.focustech.webtm.protocol.tm.message.model.MessageBean
@@ -16,7 +14,6 @@ import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.ChatListFragment
-import java.util.*
 
 /**
  * Created by Administrator on 2018/3/21 0021.
@@ -46,8 +43,9 @@ class ChatListActivity : BaseIMActivity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "MT") {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
-                    // 登录成功
+                    // 因为断线或者回收造成的登录成功
                     if (bean.command == BroadcastBean.MTCommand.LoginRsp) {
+                        Log.d("MT", "二次登录成功")
                         // 刷新远程数据
                         conversationFragment?.getOfflineIMFromRemote()
                     }
