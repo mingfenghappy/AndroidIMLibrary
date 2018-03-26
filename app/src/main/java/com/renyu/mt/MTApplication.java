@@ -278,6 +278,6 @@ public class MTApplication extends MultiDexApplication {
                 R.mipmap.ic_launcher,
                 R.mipmap.ic_launcher,
                 new Intent(),
-                1000);
+                1001);
     }
 }

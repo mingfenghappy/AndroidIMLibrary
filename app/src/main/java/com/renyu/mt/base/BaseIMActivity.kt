@@ -1,10 +1,15 @@
 package com.renyu.mt.base
 
 import android.content.BroadcastReceiver
+import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
+import com.blankj.utilcode.util.ServiceUtils
 import com.renyu.commonlibrary.baseact.BaseActivity
+import com.renyu.mt.R
 import com.renyu.mt.params.CommonParams
+import com.renyu.mt.service.HeartBeatService
 
 /**
  * Created by Administrator on 2018/3/20 0020.
@@ -31,6 +36,22 @@ abstract class BaseIMActivity: BaseActivity() {
             CommonParams.isRestore = true
         }
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // 开启心跳服务并进行连接
+        if (!ServiceUtils.isServiceRunning("com.renyu.mt.service.HeartBeatService")) {
+            if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+                val intent = Intent(this, HeartBeatService::class.java)
+                intent.putExtra("smallIcon", R.mipmap.ic_launcher)
+                intent.putExtra("largeIcon", R.mipmap.ic_launcher)
+                startForegroundService(intent)
+            } else {
+                startService(Intent(this, HeartBeatService::class.java))
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {

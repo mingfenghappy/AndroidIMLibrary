@@ -64,6 +64,7 @@ public class HeartBeatService extends Service {
                     1000);
         }
         if(null==scheduledThreadPoolExecutor){
+            Log.d("MTAPP", "初始化线程池");
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
             scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
                 // 首次开启不算做错误
