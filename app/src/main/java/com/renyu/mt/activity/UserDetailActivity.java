@@ -13,12 +13,12 @@ import android.widget.Toast;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
-import com.focustech.webtm.protocol.tm.message.model.FriendGroupRsp;
-import com.focustech.webtm.protocol.tm.message.model.FriendStatusRsp;
-import com.focustech.webtm.protocol.tm.message.model.GetFriendRuleRsp;
+import com.focustech.message.model.BroadcastBean;
+import com.focustech.message.model.FriendGroupRsp;
+import com.focustech.message.model.FriendStatusRsp;
+import com.focustech.message.model.GetFriendRuleRsp;
 import com.renyu.mt.R;
-import com.focustech.webtm.protocol.tm.message.MTService;
+import com.focustech.message.MTService;
 
 import java.util.ArrayList;
 

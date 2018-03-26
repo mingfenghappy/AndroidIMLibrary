@@ -1,8 +1,8 @@
 package com.focustech.common;
 
-import com.focustech.webtm.protocol.tm.message.params.MessageMeta;
+import com.focustech.message.params.MessageMeta;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.focustech.webtm.protocol.tm.message.msg.MessageRequest;
+import com.focustech.message.msg.MessageRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;

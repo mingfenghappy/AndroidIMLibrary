@@ -5,9 +5,9 @@ import android.util.Log;
 
 import com.focustech.tm.open.sdk.net.impl.Cmd;
 import com.focustech.params.FusionField;
-import com.focustech.webtm.protocol.tm.message.IMessageHandler;
-import com.focustech.webtm.protocol.tm.message.MTMessageHandlerAdapter;
-import com.focustech.webtm.protocol.tm.message.msg.TMMessage;
+import com.focustech.message.IMessageHandler;
+import com.focustech.message.MTMessageHandlerAdapter;
+import com.focustech.message.msg.TMMessage;
 
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;

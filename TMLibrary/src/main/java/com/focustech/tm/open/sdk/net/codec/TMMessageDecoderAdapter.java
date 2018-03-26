@@ -1,6 +1,6 @@
 package com.focustech.tm.open.sdk.net.codec;
 
-import com.focustech.webtm.protocol.tm.message.msg.TMMessage;
+import com.focustech.message.msg.TMMessage;
 import com.focustech.tm.open.sdk.messages.protobuf.Head;
 
 import org.apache.mina.core.buffer.IoBuffer;

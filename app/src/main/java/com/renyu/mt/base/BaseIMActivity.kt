@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.IntentFilter
 import android.os.Bundle
 import com.renyu.commonlibrary.baseact.BaseActivity
-import com.renyu.mt.MTApplication
 import com.renyu.mt.params.CommonParams
 
 /**
@@ -32,8 +31,6 @@ abstract class BaseIMActivity: BaseActivity() {
             CommonParams.isRestore = true
         }
         super.onCreate(savedInstanceState)
-
-        (application as MTApplication).changeNotificationState()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {

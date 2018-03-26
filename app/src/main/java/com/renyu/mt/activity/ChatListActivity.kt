@@ -6,10 +6,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import com.focustech.dbhelper.PlainTextDBHelper
-import com.focustech.webtm.protocol.tm.message.model.BroadcastBean
-import com.focustech.webtm.protocol.tm.message.model.FriendInfoRsp
-import com.focustech.webtm.protocol.tm.message.model.MessageBean
-import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp
+import com.focustech.message.model.BroadcastBean
+import com.focustech.message.model.FriendInfoRsp
+import com.focustech.message.model.MessageBean
+import com.focustech.message.model.UserInfoRsp
 import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity

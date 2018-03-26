@@ -7,10 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.webtm.protocol.tm.message.MTService;
-import com.focustech.webtm.protocol.tm.message.model.MessageBean;
-import com.focustech.webtm.protocol.tm.message.model.OfflineIMResponse;
-import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
+import com.focustech.message.MTService;
+import com.focustech.message.model.MessageBean;
+import com.focustech.message.model.OfflineIMResponse;
+import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;

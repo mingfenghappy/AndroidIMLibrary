@@ -12,8 +12,8 @@ import android.util.Log;
 
 import com.focustech.R;
 import com.focustech.params.FusionField;
-import com.focustech.webtm.protocol.tm.message.MTService;
-import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
+import com.focustech.message.MTService;
+import com.focustech.message.model.BroadcastBean;
 import com.renyu.commonlibrary.commonutils.NotificationUtils;
 import com.renyu.mt.MTApplication;
 

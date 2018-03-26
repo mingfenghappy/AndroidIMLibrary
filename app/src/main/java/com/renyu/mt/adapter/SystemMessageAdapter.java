@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean;
+import com.focustech.message.model.SystemMessageBean;
 import com.renyu.mt.R;
 
 import java.util.ArrayList;

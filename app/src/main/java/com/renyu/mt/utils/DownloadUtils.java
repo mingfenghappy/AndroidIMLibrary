@@ -5,10 +5,10 @@ import android.util.Log;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.params.FusionField;
-import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
-import com.focustech.webtm.protocol.tm.message.model.FileInfoBean;
-import com.focustech.webtm.protocol.tm.message.model.MessageBean;
-import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
+import com.focustech.message.model.BroadcastBean;
+import com.focustech.message.model.FileInfoBean;
+import com.focustech.message.model.MessageBean;
+import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.commonlibrary.params.InitParams;

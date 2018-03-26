@@ -7,8 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean;
-import com.renyu.mt.MTApplication;
+import com.focustech.message.model.SystemMessageBean;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.SystemMessageAdapter;
 
