@@ -11,7 +11,7 @@ import android.widget.ImageView;
 
 import com.renyu.mt.utils.DownloadUtils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.tm.open.sdk.params.FusionField;
+import com.focustech.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.FriendGroupRsp;
 import com.focustech.webtm.protocol.tm.message.model.FriendInfoRsp;

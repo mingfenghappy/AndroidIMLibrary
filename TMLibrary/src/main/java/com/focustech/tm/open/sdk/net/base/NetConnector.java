@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.focustech.tm.open.sdk.net.codec.TMMessageCodecFactory;
-import com.focustech.tm.open.sdk.params.FusionField;
+import com.focustech.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 
 import org.apache.mina.core.future.ConnectFuture;

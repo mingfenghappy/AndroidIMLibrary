@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.focustech.tm.open.sdk.net.impl.Cmd;
-import com.focustech.tm.open.sdk.params.FusionField;
+import com.focustech.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.IMessageHandler;
 import com.focustech.webtm.protocol.tm.message.MTMessageHandlerAdapter;
 import com.focustech.webtm.protocol.tm.message.msg.TMMessage;

@@ -1,4 +1,4 @@
-package com.focustech.tm.open.sdk.params;
+package com.focustech.params;
 
 /**
  * 基本配置参数

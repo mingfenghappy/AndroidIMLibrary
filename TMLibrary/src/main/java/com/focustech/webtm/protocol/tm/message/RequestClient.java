@@ -17,7 +17,7 @@ import com.focustech.tm.open.sdk.messages.protobuf.User;
 import com.focustech.tm.open.sdk.net.base.NetConnector;
 import com.focustech.tm.open.sdk.net.base.TMConnection;
 import com.focustech.tm.open.sdk.net.base.TMMessageProcessorAdapter;
-import com.focustech.tm.open.sdk.params.FusionField;
+import com.focustech.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.group.GroupMsgRequest;
 import com.focustech.webtm.protocol.tm.message.msg.MessageResponse;
 import com.focustech.webtm.protocol.tm.message.msg.TMMessage;

@@ -16,7 +16,7 @@ import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.focustech.tm.open.sdk.params.FusionField;
+import com.focustech.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.MTService;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 import com.focustech.webtm.protocol.tm.message.model.MessageBean;

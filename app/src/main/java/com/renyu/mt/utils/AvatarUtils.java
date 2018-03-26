@@ -3,7 +3,7 @@ package com.renyu.mt.utils;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
-import com.focustech.tm.open.sdk.params.FusionField;
+import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.mt.R;
 
