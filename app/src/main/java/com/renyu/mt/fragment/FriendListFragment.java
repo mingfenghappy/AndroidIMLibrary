@@ -1,30 +1,23 @@
 package com.renyu.mt.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
 import com.alibaba.android.vlayout.layout.StickyLayoutHelper;
 import com.focustech.dbhelper.PlainTextDBHelper;
+import com.focustech.message.MTService;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendInfoRsp;
 import com.focustech.message.model.FriendStatusRsp;
-import com.focustech.message.model.UpdateUserStatusNty;
 import com.focustech.message.model.UserInfoRsp;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
+import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.mt.R;
-import com.renyu.mt.activity.IndexActivity;
-import com.renyu.mt.adapter.FriendListHeaderAdapter;
 import com.renyu.mt.adapter.FriendListAdapter;
+import com.renyu.mt.adapter.FriendListHeaderAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,14 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * 好友列表
  * Created by Administrator on 2017/7/18.
  */
 
-public class FriendListFragment extends Fragment {
+public class FriendListFragment extends BaseFragment {
 
     @BindView(R.id.swipe_friendlist)
     SwipeRefreshLayout swipe_friendlist;
@@ -54,26 +46,11 @@ public class FriendListFragment extends Fragment {
     // 以groupId作为键，存储加载的顺序
     HashMap<String, Integer> dataPositions;
 
-    public static FriendListFragment getInstance(ArrayList<FriendGroupRsp> friendGroupRsps) {
-        FriendListFragment friendListFragment=new FriendListFragment();
-        Bundle bundle=new Bundle();
-        bundle.putSerializable("friendGroupRsps", friendGroupRsps);
-        friendListFragment.setArguments(bundle);
-        return friendListFragment;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_friendlist, container, false);
-        ButterKnife.bind(this, view);
-        return view;
-    }
+    // 是否正在刷新
+    boolean isLoadFriendData;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
+    public void initParams() {
         datas=new HashMap<>();
         dataPositions=new HashMap<>();
         adapters=new ArrayList<>();
@@ -85,20 +62,25 @@ public class FriendListFragment extends Fragment {
         rv_friendlist.setRecycledViewPool(pool);
         delegateAdapter=new DelegateAdapter(manager, false);
         rv_friendlist.setAdapter(delegateAdapter);
-        // 加载本地缓存好友列表
-        getLocalData((ArrayList<FriendGroupRsp>) getArguments().getSerializable("friendGroupRsps"));
 
-        swipe_friendlist.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (!((IndexActivity) getActivity()).isLoadFriendData) {
-                    ((IndexActivity) getActivity()).needReqFriendGroups();
-                }
-                else {
-                    swipe_friendlist.setRefreshing(false);
-                }
-            }
+        swipe_friendlist.setOnRefreshListener(() -> {
+            isLoadFriendData=true;
+            MTService.reqFriendGroups(getActivity());
+            // swipe_friendlist.setRefreshing(false);
         });
+    }
+
+    @Override
+    public int initViews() {
+        return R.layout.fragment_friendlist;
+    }
+
+    @Override
+    public void loadData() {
+        // 加载本地缓存好友列表
+        getLocalData(PlainTextDBHelper.getInstance().getFriendList());
+        // 加载远程好友列表
+        MTService.reqFriendGroups(getActivity());
     }
 
     /**
@@ -176,36 +158,6 @@ public class FriendListFragment extends Fragment {
         }
     }
 
-    public void endRefresh() {
-        swipe_friendlist.setRefreshing(false);
-    }
-
-    /**
-     * 刷新用户状态
-     * @param updateUserStatusNty
-     */
-    public void refreshUserState(UpdateUserStatusNty updateUserStatusNty) {
-        Iterator<Map.Entry<String, List<FriendStatusRsp>>> it = datas.entrySet().iterator();
-        String groupId=null;
-        outer:
-        while (it.hasNext()) {
-            Map.Entry<String, List<FriendStatusRsp>> entry = it.next();
-            for (FriendStatusRsp friendStatusRsp : entry.getValue()) {
-                if (friendStatusRsp.getFriendUserId().equals(updateUserStatusNty.getUserId())) {
-                    ArrayList<Enums.EquipmentStatus> equipmentStatuses = new ArrayList<>();
-                    equipmentStatuses.add(updateUserStatusNty.getStatus());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setEquipments(equipmentStatuses);
-                    groupId=entry.getKey();
-                    break outer;
-                }
-            }
-        }
-        if (!TextUtils.isEmpty(groupId)) {
-            int index=dataPositions.get(groupId);
-            adapters.get(index).notifyDataSetChanged();
-        }
-    }
-
     /**
      * 删除好友关系
      * @param userId
@@ -230,5 +182,9 @@ public class FriendListFragment extends Fragment {
             int index=dataPositions.get(groupId);
             adapters.get(index).notifyDataSetChanged();
         }
+    }
+
+    public void endRefresh() {
+        swipe_friendlist.setRefreshing(false);
     }
 }

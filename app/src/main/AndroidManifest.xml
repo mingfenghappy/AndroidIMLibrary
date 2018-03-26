@@ -20,11 +20,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ChatListActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateHidden|adjustResize"></activity>
-        <activity android:name=".activity.ConversationActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateAlwaysHidden"></activity>
-        <activity android:name=".activity.UserDetailActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateAlwaysHidden"></activity>
+        <activity
+            android:name=".activity.ChatListActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".activity.ConversationActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activity.FriendListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.UserDetailActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".activity.SystemMessageActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateAlwaysHidden"/>
-        <service android:name=".service.HeartBeatService"></service>
+        <service android:name=".service.HeartBeatService" />
     </application>
 
 </manifest>

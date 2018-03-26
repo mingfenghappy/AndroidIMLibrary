@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.message.model.BroadcastBean
 import com.focustech.message.model.FriendInfoRsp
@@ -36,6 +38,14 @@ class ChatListActivity : BaseIMActivity() {
     }
 
     override fun initParams() {
+        val textView = TextView(this)
+        textView.text = "联系人"
+        textView.setOnClickListener { view ->
+            val intent = Intent(this, FriendListActivity::class.java)
+            startActivity(intent)
+        }
+        findViewById<LinearLayout>(R.id.layout_nav_right).addView(textView)
+
         // 获取当前用户信息
         currentUserInfo = ACache.get(this).getAsObject("UserInfoRsp") as UserInfoRsp
 

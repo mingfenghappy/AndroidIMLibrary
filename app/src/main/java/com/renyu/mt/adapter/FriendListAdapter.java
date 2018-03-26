@@ -21,7 +21,6 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.FriendStatusRsp;
 import com.focustech.message.model.UserInfoRsp;
@@ -77,17 +76,8 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
             UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
             String token=userInfoRsp.getToken();
             Object avatar= AvatarUtils.displayImg(faceCode, fileId, token);
-            Enums.EquipmentStatus showStatus = UserInfoRsp.getShowStatus(beans.get(position).getFriendInfoRsp().getFriend().getEquipments());
-            // TODO: 2017/7/19 所有用户都是离线的？
-            if (!UserInfoRsp.isOnline(showStatus.getStatus().getNumber())) {
-                request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                        .setPostprocessor(new GrayscalePostprocessor())
-                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
-            }
-            else {
-                request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
-            }
+            request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
+                    .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
         }
         else {
             holder.tv_adapter_friendlist.setText(beans.get(position).getFriendUserId());
@@ -98,17 +88,13 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         holder.iv_adapter_friendlist.setController(draweeController);
-        holder.layout_adapter_friendlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PlainTextDBHelper.getInstance().updateRead(beans.get(position_).getFriendUserId());
-                BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, beans.get(position_).getFriendUserId());
+        holder.layout_adapter_friendlist.setOnClickListener(view -> {
+            PlainTextDBHelper.getInstance().updateRead(beans.get(position_).getFriendUserId());
+            BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, beans.get(position_).getFriendUserId());
 
-                Intent intent=new Intent(context, ConversationActivity.class);
-                intent.putExtra("UserInfoRsp", beans.get(position_).getFriendInfoRsp().getFriend());
-                intent.putExtra("UserId", beans.get(position_).getFriendUserId());
-                context.startActivity(intent);
-            }
+            Intent intent=new Intent(context, ConversationActivity.class);
+            intent.putExtra("UserId", beans.get(position_).getFriendUserId());
+            context.startActivity(intent);
         });
     }
 

@@ -86,9 +86,9 @@ public class IndexActivity extends BaseIMActivity {
 //                        if (conversationFragment!=null) {
 //                            conversationFragment.refreshUserState(updateUserStatusNty);
 //                        }
-                        if (friendListFragment!=null) {
-                            friendListFragment.refreshUserState(updateUserStatusNty);
-                        }
+//                        if (friendListFragment!=null) {
+//                            friendListFragment.refreshUserState(updateUserStatusNty);
+//                        }
                     }
                     // 获取好友关系组数据
                     if (bean.getCommand()== BroadcastBean.MTCommand.FriendGroupsRsp) {
@@ -122,7 +122,7 @@ public class IndexActivity extends BaseIMActivity {
                         isLoadFriendData=false;
                         // 通知好友列表结束刷新
                         if (friendListFragment!=null) {
-                            friendListFragment.endRefresh();
+//                            friendListFragment.endRefresh();
                         }
                     }
                     // 收到新消息
@@ -352,7 +352,7 @@ public class IndexActivity extends BaseIMActivity {
         if (position==1) {
             iv_index_friendlist.setImageResource(R.mipmap.em_contact_list_selected);
             if (friendListFragment==null) {
-                friendListFragment=FriendListFragment.getInstance(PlainTextDBHelper.getInstance().getFriendList());
+//                friendListFragment=FriendListFragment.getInstance(PlainTextDBHelper.getInstance().getFriendList());
                 transaction.add(R.id.layout_container, friendListFragment);
             }
             else {
