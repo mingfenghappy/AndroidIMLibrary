@@ -268,18 +268,15 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
             }
-            ((ReceiverVoiceViewHolder) holder).bubble.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // 播放语音
-                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
-                    // 更新数据库
-                    PlainTextDBHelper.getInstance().updateVoiceRead(messages.get(position).getSvrMsgId());
-                    // 更新本地缓存
-                    messages.get(position).setIsVoicePlay("1");
-                    // 刷新视图
-                    ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
-                }
+            ((ReceiverVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
+                // 播放语音
+                ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
+                // 更新数据库
+                PlainTextDBHelper.getInstance().updateVoiceRead(messages.get(position).getSvrMsgId());
+                // 更新本地缓存
+                messages.get(position).setIsVoicePlay("1");
+                // 刷新视图
+                ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
             });
             ((ReceiverVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).getSvrMsgId()+"_voice");
             // 判断是否正在播放
@@ -327,12 +324,9 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.VISIBLE);
             }
-            ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // 发送失败则通过点击进行重新发送
-                    ((ConversationActivity) context).resendPicMessage(messages.get(position));
-                }
+            ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setOnClickListener(view -> {
+                // 发送失败则通过点击进行重新发送
+                ((ConversationActivity) context).resendPicMessage(messages.get(position));
             });
             ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
             // 未发送完成则需要显示进度圈
@@ -349,11 +343,8 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             DraweeController draweeController_ = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(request_).setAutoPlayAnimations(true).build();
             ((SendImageViewHolder) holder).aurora_iv_msgitem_photo.setController(draweeController_);
-            ((SendImageViewHolder) holder).bubble.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            ((SendImageViewHolder) holder).bubble.setOnClickListener(view -> {
 
-                }
             });
         }
         else if (getItemViewType(position)==5) {
@@ -367,17 +358,14 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.VISIBLE);
             }
-            ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // 本地真实自己发送的文件
-                    if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
-                        ((ConversationActivity) context).resendVoiceMessageState(messages.get(position));
-                    }
-                    // 同步时远程拿下的文件
-                    else {
-                        ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
-                    }
+            ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setOnClickListener(view -> {
+                // 本地真实自己发送的文件
+                if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
+                    ((ConversationActivity) context).resendVoiceMessageState(messages.get(position));
+                }
+                // 同步时远程拿下的文件
+                else {
+                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
                 }
             });
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");

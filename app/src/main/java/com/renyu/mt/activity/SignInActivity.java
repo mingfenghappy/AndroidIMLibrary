@@ -70,7 +70,10 @@ public class SignInActivity extends BaseIMActivity {
             }
         };
 
-        if (ACache.get(SignInActivity.this).getAsObject("UserInfoRsp") != null) {
+        if (CommonParams.isRestore) {
+            finish();
+        }
+        else if (ACache.get(SignInActivity.this).getAsObject("UserInfoRsp") != null) {
             // 登录成功跳转首页
             startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
         }
@@ -107,6 +110,12 @@ public class SignInActivity extends BaseIMActivity {
     protected void onPause() {
         super.onPause();
         closeCurrentReceiver();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CommonParams.isRestore= false;
     }
 
     @OnClick({R.id.btn_signin})

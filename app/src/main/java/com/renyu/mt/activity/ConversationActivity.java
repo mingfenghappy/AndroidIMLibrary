@@ -18,10 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.focustech.common.DownloadTool;
-import com.focustech.common.MD5Util;
-import com.focustech.common.RecordTool;
+import com.renyu.mt.utils.DownloadUtils;
+import com.focustech.common.MD5Utils;
+import com.renyu.mt.utils.RecordUtils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.tm.open.sdk.params.FusionField;
@@ -36,6 +37,7 @@ import com.focustech.webtm.protocol.tm.message.params.MessageMeta;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.imagelibrary.commonutils.Utils;
+import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ConversationAdapter;
 import com.renyu.mt.base.BaseIMActivity;
@@ -102,7 +104,7 @@ public class ConversationActivity extends BaseIMActivity {
     int pageSize=20;
 
     Vibrator mVibrator;
-    RecordTool recordTool;
+    RecordUtils recordTool;
     MediaPlayer mediaPlayer;
 
     @Override
@@ -228,7 +230,7 @@ public class ConversationActivity extends BaseIMActivity {
         // 震动功能初始化
         mVibrator = (Vibrator) getApplication().getSystemService(VIBRATOR_SERVICE);
         // 录音播放功能初始化，并设置自定义的监听事件
-        recordTool = new RecordTool();
+        recordTool = new RecordUtils();
         recordTool.setRecorderListener(path -> {
             File file=new File(path);
             if (file.exists()) {
@@ -483,7 +485,7 @@ public class ConversationActivity extends BaseIMActivity {
                                    StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
                                    sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token);
                                    // 单纯下载文件
-                                   DownloadTool.addFile(ConversationActivity.this.getApplicationContext(), sb.toString(), fileId, bean.getSvrMsgId());
+                                   DownloadUtils.addFile(ConversationActivity.this.getApplicationContext(), sb.toString(), fileId, bean.getSvrMsgId());
                                }
                            }
                            // 更新数据库，回到第一页
@@ -512,6 +514,10 @@ public class ConversationActivity extends BaseIMActivity {
     }
 
     private void sendTextMessage() {
+        if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
+            Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
+            return;
+        }
         MessageBean messageBean=new MessageBean();
         messageBean.setMsg(edit_conversation.getText().toString());
         messageBean.setMsgMeta("");
@@ -519,7 +525,7 @@ public class ConversationActivity extends BaseIMActivity {
         messageBean.setUserId(chatUserId);
         messageBean.setIsSend("1");
         messageBean.setTimestamp(System.currentTimeMillis());
-        messageBean.setSvrMsgId(MD5Util.getMD5String(""+System.currentTimeMillis()));
+        messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
         messageBean.setFromSvrMsgId("");
         messageBean.setSync(Enums.Enable.ENABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
@@ -535,6 +541,10 @@ public class ConversationActivity extends BaseIMActivity {
     }
 
     private void sendPicMessage(File file) {
+        if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
+            Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
+            return;
+        }
         MessageBean messageBean=new MessageBean();
         messageBean.setMsg("");
         messageBean.setMsgMeta("");
@@ -542,7 +552,7 @@ public class ConversationActivity extends BaseIMActivity {
         messageBean.setIsSend("1");
         messageBean.setUserId(chatUserId);
         messageBean.setTimestamp(System.currentTimeMillis());
-        messageBean.setSvrMsgId(MD5Util.getMD5String(""+System.currentTimeMillis()));
+        messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
         messageBean.setFromSvrMsgId("");
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
@@ -557,6 +567,10 @@ public class ConversationActivity extends BaseIMActivity {
     }
 
     private void sendVoiceMessage(File file) {
+        if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
+            Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
+            return;
+        }
         MessageBean messageBean=new MessageBean();
         messageBean.setMsg("");
         messageBean.setMsgMeta("");
@@ -564,7 +578,7 @@ public class ConversationActivity extends BaseIMActivity {
         messageBean.setIsSend("1");
         messageBean.setUserId(chatUserId);
         messageBean.setTimestamp(System.currentTimeMillis());
-        messageBean.setSvrMsgId(MD5Util.getMD5String(""+System.currentTimeMillis()));
+        messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
         messageBean.setFromSvrMsgId("");
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
@@ -584,6 +598,10 @@ public class ConversationActivity extends BaseIMActivity {
      * @param messageBean
      */
     public void resendVoiceMessageState(MessageBean messageBean) {
+        if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
+            Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
+            return;
+        }
         // 修改数据库状态
         PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
         // 修改列表状态并刷新
@@ -600,6 +618,10 @@ public class ConversationActivity extends BaseIMActivity {
      * @param messageBean
      */
     public void resendPicMessage(MessageBean messageBean) {
+        if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
+            Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
+            return;
+        }
         // 修改数据库状态
         PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
         // 修改列表状态并刷新

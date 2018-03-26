@@ -1,4 +1,4 @@
-package com.focustech.common;
+package com.renyu.mt.utils;
 
 import android.content.Context;
 import android.util.Log;
@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
  * Created by Administrator on 2017/7/25.
  */
 
-public class DownloadTool {
+public class DownloadUtils {
 
     static OKHttpHelper httpHelper;
     static ExecutorService executorService;

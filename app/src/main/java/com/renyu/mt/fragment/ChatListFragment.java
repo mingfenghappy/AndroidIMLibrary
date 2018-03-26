@@ -122,6 +122,7 @@ public class ChatListFragment extends BaseFragment {
                         ArrayList<OfflineIMResponse> newAdd = new ArrayList<>();
                         // 对新消息进行遍历
                         for (OfflineIMResponse temp_ : temp) {
+                            Log.d("MTAPP", "获取到的数据为："+temp_.getUserNickName() + " " + temp_.getLastMsg());
                             // 对老消息进行遍历
                             boolean find = false;
                             for (OfflineIMResponse offlineMessage : offlineMessages) {

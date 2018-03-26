@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.focustech.common.DownloadTool;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.tm.open.sdk.params.FusionField;
@@ -25,12 +24,14 @@ import com.focustech.webtm.protocol.tm.message.model.SystemMessageBean;
 import com.focustech.webtm.protocol.tm.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
+import com.renyu.commonlibrary.commonutils.NotificationUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
 import com.renyu.commonlibrary.network.HttpsUtils;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.params.CommonParams;
 import com.renyu.mt.service.HeartBeatService;
+import com.renyu.mt.utils.DownloadUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -139,14 +140,17 @@ public class MTApplication extends MultiDexApplication {
                                     SPUtils.getInstance().getString(CommonParams.SP_UNAME),
                                     SPUtils.getInstance().getString(CommonParams.SP_PWD));
                         }
+                        changeNotificationState();
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Disconn) {
                         Log.d("MTAPP", "连接已断开");
                         connState = BroadcastBean.MTCommand.Disconn;
+                        changeNotificationState();
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conning) {
                         Log.d("MTAPP", "正在连接");
                         connState = BroadcastBean.MTCommand.Conning;
+                        changeNotificationState();
                     }
                     // 登录成功
                     if (bean.getCommand()== BroadcastBean.MTCommand.LoginRsp) {
@@ -189,7 +193,7 @@ public class MTApplication extends MultiDexApplication {
                                 StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
                                 sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token);
                                 // 单纯下载文件
-                                DownloadTool.addFile(MTApplication.this, sb.toString(), fileId, messageBean.getSvrMsgId());
+                                DownloadUtils.addFile(MTApplication.this, sb.toString(), fileId, messageBean.getSvrMsgId());
                             }
                         }
                         // 更新数据库
@@ -216,7 +220,7 @@ public class MTApplication extends MultiDexApplication {
                         // 下载语音文件
                         if (messageBean.getMessageType().equals("7")) {
                             // 下载完成语音文件之后，方可同步数据库与刷新页面
-                            DownloadTool.addFileAndDb(MTApplication.this, messageBean);
+                            DownloadUtils.addFileAndDb(MTApplication.this, messageBean);
                         } else {
                             PlainTextDBHelper.getInstance().insertMessage(messageBean);
                             // 通知会话列表刷新以及会话详情刷新
@@ -250,5 +254,30 @@ public class MTApplication extends MultiDexApplication {
             unregisterReceiver(baseReceiver);
             baseReceiver = null;
         }
+    }
+
+    /**
+     * 通知App连接状态发生改变
+     */
+    public void changeNotificationState() {
+        String state = "未知状态";
+        switch (connState) {
+            case Conn:
+                state = "连接成功";
+                break;
+            case Conning:
+                state = "正在连接";
+                break;
+            case Disconn:
+                state = "连接失败";
+        }
+        NotificationUtils.getNotificationCenter(this).createNormalNotification("提示",
+                "APP在线情况",
+                state,
+                R.color.colorPrimary,
+                R.mipmap.ic_launcher,
+                R.mipmap.ic_launcher,
+                new Intent(),
+                1000);
     }
 }

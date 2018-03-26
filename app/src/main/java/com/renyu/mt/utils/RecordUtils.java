@@ -1,4 +1,4 @@
-package com.focustech.common;
+package com.renyu.mt.utils;
 
 import android.media.MediaRecorder;
 
@@ -10,7 +10,7 @@ import java.io.File;
  * Created by Administrator on 2017/7/26.
  */
 
-public class RecordTool {
+public class RecordUtils {
 
     // 录音容许最长时间，超过该时间则结束录音 ,默认时间是60秒
     private int defalutMaxTime = 1000 * 60;

@@ -4,14 +4,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.focustech.tm.open.sdk.net.impl.Cmd;
-import com.focustech.webtm.protocol.tm.message.msg.TMMessage;
+import com.focustech.tm.open.sdk.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.IMessageHandler;
 import com.focustech.webtm.protocol.tm.message.MTMessageHandlerAdapter;
+import com.focustech.webtm.protocol.tm.message.msg.TMMessage;
 
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -84,7 +84,7 @@ public class TMConnection {
                 try {
                     // 发送
                     WriteFuture future = session.write(message);
-                    future.awaitUninterruptibly(3, TimeUnit.SECONDS);
+                    future.awaitUninterruptibly(FusionField.connectTimeout, TimeUnit.SECONDS);
                     if(!future.isWritten()) {
                         // 数据发送失败
 						Log.d("MTAPP", "发送失败");
@@ -108,9 +108,7 @@ public class TMConnection {
 				if (msg.getHead()==null) {
 					try {
 						methodMapper.get("HeartBeatRsp").invoke(messageHandler);
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -120,9 +118,7 @@ public class TMConnection {
 					if (methodMapper.containsKey(cmd)) {
 						try {
 							methodMapper.get(cmd).invoke(messageHandler, new Object[]{message});
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}

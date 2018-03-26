@@ -17,6 +17,14 @@ public class FusionField {
 	public static String messageHeaderDomain = "FBS365";
 	// 通信服务器端口
 	public static String socketPort = "443";
+	// 连接超时时间，单位毫秒
+	public static long connectTimeout = 10;
+	// 超时重连次数
+	public static int retryTime = 3;
+	// 心跳包发送间隔
+	public static int heartBeatSendInterval = 30;
+	// 心跳包线程执行间隔
+	public static int heartBeatThreadInterval = 5;
 
 	// 下载文件地址
 	public static String downloadUrl = "http://webim.house365.com/tm/file/download?";

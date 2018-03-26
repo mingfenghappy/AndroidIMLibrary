@@ -27,7 +27,7 @@ class ChatListActivity : BaseIMActivity() {
 
     private var mReceiver: BroadcastReceiver? = null
 
-    override fun setStatusBarColor() = Color.WHITE
+    override fun setStatusBarColor() = Color.BLACK
 
     override fun setStatusBarTranslucent() = 0
 

@@ -128,7 +128,7 @@ public class Utils {
         JSONObject object;
         try {
             object = new JSONObject();
-            String aa = MD5Util.getFileMD5String(file);
+            String aa = MD5Utils.getFileMD5String(file);
             object.put("1", aa);
         }
         catch (Exception e) {
@@ -143,7 +143,7 @@ public class Utils {
         JSONObject object;
         try {
             object = new JSONObject();
-            String aa = MD5Util.getFileMD5String(file);
+            String aa = MD5Utils.getFileMD5String(file);
             object.put("0", aa);
         }
         catch (Exception e) {

@@ -17,8 +17,6 @@ import com.focustech.tm.open.sdk.messages.protobuf.User;
 import com.focustech.tm.open.sdk.net.base.NetConnector;
 import com.focustech.tm.open.sdk.net.base.TMConnection;
 import com.focustech.tm.open.sdk.net.base.TMMessageProcessorAdapter;
-import com.focustech.tm.open.sdk.net.codec.TMMessageCodecFactory;
-import com.focustech.tm.open.sdk.params.ConnectConfig;
 import com.focustech.tm.open.sdk.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.group.GroupMsgRequest;
 import com.focustech.webtm.protocol.tm.message.msg.MessageResponse;
@@ -33,8 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RequestClient {
 
-	// 连接配置
-	ConnectConfig connectConfig;
 	// TM连接器
 	private NetConnector connector;
 
@@ -52,14 +48,9 @@ public class RequestClient {
 	 */
 	public void initConnector() {
 		List<String[]> servers = new ArrayList<>();
-		servers.add(new String[] { FusionField.socketAddress, FusionField.socketPort });
-		connectConfig = new ConnectConfig();
-		connectConfig.addServers(servers);
-		connectConfig.setIoHandler(new TMMessageProcessorAdapter(context));
+		servers.add(new String[] {FusionField.socketAddress, FusionField.socketPort});
 		// 设置心跳包发送字节
-		connectConfig.setHeartbeatMsg(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-		connectConfig.setCodecFactory(new TMMessageCodecFactory());
-		connector = new NetConnector(connectConfig, context);
+		connector = new NetConnector(context);
 	}
 
 	/**
@@ -67,9 +58,11 @@ public class RequestClient {
 	 * @return
 	 */
 	public boolean startConnector() {
-		connector.setHandler(connectConfig.getIoHandler());
+		connector.setHandler(new TMMessageProcessorAdapter(context));
 		// 配置链接服务器
-		for (String[] server : connectConfig.getServers()) {
+		List<String[]> servers = new ArrayList<>();
+		servers.add(new String[] {FusionField.socketAddress, FusionField.socketPort});
+		for (String[] server : servers) {
 			connector.addServer(server[0], Integer.parseInt(server[1]));
 		}
 		return connector.connect();
@@ -104,7 +97,7 @@ public class RequestClient {
 	 * 发送心跳包
 	 */
 	public void heartbeat() {
-		TMConnection.getInstance(context).send(this.connectConfig.getHeartbeatMsg());
+		TMConnection.getInstance(context).send(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
 	}
 
 	public Head.TMHeadMessage getHead(String cmd) {

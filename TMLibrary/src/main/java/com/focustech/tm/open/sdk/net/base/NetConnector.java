@@ -3,7 +3,8 @@ package com.focustech.tm.open.sdk.net.base;
 import android.content.Context;
 import android.util.Log;
 
-import com.focustech.tm.open.sdk.params.ConnectConfig;
+import com.focustech.tm.open.sdk.net.codec.TMMessageCodecFactory;
+import com.focustech.tm.open.sdk.params.FusionField;
 import com.focustech.webtm.protocol.tm.message.model.BroadcastBean;
 
 import org.apache.mina.core.future.ConnectFuture;
@@ -19,6 +20,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 建立mina连接
@@ -32,7 +34,6 @@ public class NetConnector {
 
 	// 可用的server地址
 	private final List<InetSocketAddress> servers = new ArrayList<>();
-	private final ConnectConfig connectConfig;
 	// 当前连接状态
 	private boolean isConnected;
 	// 当前使用的服务
@@ -42,8 +43,7 @@ public class NetConnector {
 
 	Context context;
 
-	public NetConnector(ConnectConfig connectConfig, Context context) {
-		this.connectConfig = connectConfig;
+	public NetConnector(Context context) {
 		this.context = context;
 	}
 
@@ -69,9 +69,9 @@ public class NetConnector {
 			connector.dispose(true);
 			connector=null;
 		}
-		connector = new NioSocketConnector(connectConfig.getIoProcessCount());
+		connector = new NioSocketConnector(Runtime.getRuntime().availableProcessors());
 		//设置过滤器
-		connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(connectConfig.getCodecFactory()));
+		connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TMMessageCodecFactory()));
 		// 为接收器设置管理服务
 		connector.setHandler(this.handler);
 		connector.addListener(new IoServiceListener() {
@@ -117,7 +117,7 @@ public class NetConnector {
 		// 开始连接
 		cuture = connector.connect(currentServer);
 		// 等待是否连接成功，相当于是转异步执行为同步执行。
-		cuture.awaitUninterruptibly(this.connectConfig.getConnectTimeout());
+		cuture.awaitUninterruptibly(FusionField.connectTimeout, TimeUnit.SECONDS);
 		isConnected = cuture.isConnected();
 		Log.d("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
 		if (isConnected) {

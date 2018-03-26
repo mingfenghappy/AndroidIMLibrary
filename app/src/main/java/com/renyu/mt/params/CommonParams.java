@@ -10,4 +10,7 @@ public class CommonParams {
     // 用户登录、密码信息
     public static final String SP_UNAME = "sp_uname";
     public static final String SP_PWD = "sp_pwd";
+
+    // app是否发生了回收，用来给启动页使用
+    public static boolean isRestore = false;
 }
