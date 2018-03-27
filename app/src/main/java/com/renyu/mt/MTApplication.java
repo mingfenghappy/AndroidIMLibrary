@@ -15,13 +15,13 @@ import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.focustech.params.FusionField;
 import com.focustech.message.MTService;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.SystemMessageBean;
 import com.focustech.message.model.UserInfoRsp;
+import com.focustech.params.FusionField;
+import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.commonutils.NotificationUtils;
@@ -204,13 +204,12 @@ public class MTApplication extends MultiDexApplication {
                         MTService.getSysNtyReq(MTApplication.this, Long.parseLong(bean.getSerializable().toString()));
                     }
                     // 获取到系统消息
-                    if (bean.getCommand() == BroadcastBean.MTCommand.SystemMessageBean) {
+                    if (bean.getCommand() == BroadcastBean.MTCommand.SystemMessageResp) {
                         // 插入系统消息
                         SystemMessageBean messageBean = (SystemMessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
                         PlainTextDBHelper.getInstance().insertSystemMessage(messageBean);
                         // 通知会话列表刷新以及会话详情刷新
-                        // TODO: 2018/3/21 0021  需要重新测试系统消息功能
-//                        BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean)
+                        BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
                     }
                     // 收到新消息
                     if (bean.getCommand() == BroadcastBean.MTCommand.Message) {
@@ -237,6 +236,42 @@ public class MTApplication extends MultiDexApplication {
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
                         PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
+                    }
+                    // 删除好友
+                    if (bean.getCommand()== BroadcastBean.MTCommand.DeleteFriendRsp) {
+                        Toast.makeText(MTApplication.this, "删除好友成功", Toast.LENGTH_SHORT).show();
+
+                        String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
+                        // 数据库中删除好友关联关系
+                        PlainTextDBHelper.getInstance().deleteFriendsRelation(userId);
+                    }
+                    // 被添加好友
+                    if (bean.getCommand()== BroadcastBean.MTCommand.AddedFriendSucceededSysNty) {
+                        Toast.makeText(MTApplication.this, "被"+((UserInfoRsp) bean.getSerializable()).getUserName()+"添加好友成功", Toast.LENGTH_SHORT).show();
+
+                        String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
+                        // 数据库添加好友关联
+                        PlainTextDBHelper.getInstance().addFriendsRelation(userId);
+
+                        // 刷新好友列表数据
+                        BroadcastBean.sendBroadcast(MTApplication.this, BroadcastBean.MTCommand.RefreshFriendList, "");
+                    }
+                    // 添加好友
+                    if (bean.getCommand()== BroadcastBean.MTCommand.AddFriendWithoutValidateSucceededSysNty) {
+                        Toast.makeText(MTApplication.this, "添加好友成功", Toast.LENGTH_SHORT).show();
+
+                        String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
+                        // 数据库添加好友关联
+                        PlainTextDBHelper.getInstance().addFriendsRelation(userId);
+
+                        // 刷新好友列表数据
+                        BroadcastBean.sendBroadcast(MTApplication.this, BroadcastBean.MTCommand.RefreshFriendList, "");
+                    }
+                    // 新增好友时信息通知
+                    if (bean.getCommand()== BroadcastBean.MTCommand.FriendInfoNty) {
+                        UserInfoRsp userInfoRsp = (UserInfoRsp) bean.getSerializable();
+                        // 数据库添加好友信息
+                        PlainTextDBHelper.getInstance().insertFriendList(userInfoRsp);
                     }
                 }
             }

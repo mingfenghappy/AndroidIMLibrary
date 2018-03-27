@@ -85,10 +85,7 @@ public class TMConnection {
                     // 发送
                     WriteFuture future = session.write(message);
                     future.awaitUninterruptibly(FusionField.connectTimeout, TimeUnit.SECONDS);
-                    if(!future.isWritten()) {
-                        // 数据发送失败
-						Log.d("MTAPP", "发送失败");
-					}
+					future.isWritten();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

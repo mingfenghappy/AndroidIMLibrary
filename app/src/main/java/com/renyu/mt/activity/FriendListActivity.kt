@@ -9,6 +9,7 @@ import com.focustech.message.MTService
 import com.focustech.message.model.BroadcastBean
 import com.focustech.message.model.FriendGroupRsp
 import com.focustech.message.model.FriendInfoRsp
+import com.focustech.message.model.UserInfoRsp
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.FriendListFragment
@@ -36,6 +37,7 @@ class FriendListActivity : BaseIMActivity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "MT") {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
+                    // 获取好友关系组数据
                     if (bean.command == BroadcastBean.MTCommand.FriendGroupsRsp) {
                         // 清除所有好友组关系数据
                         PlainTextDBHelper.getInstance().clearAllFriendList()
@@ -52,6 +54,16 @@ class FriendListActivity : BaseIMActivity() {
                         val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as FriendInfoRsp
                         // 刷新好友列表
                         friendListFragment?.refreshFriendInfo(temp.friend)
+                    }
+                    // 删除好友
+                    if (bean.command == BroadcastBean.MTCommand.DeleteFriendRsp) {
+                        val userId = (bean.serializable as UserInfoRsp).userId
+                        // 刷新好友列表
+                        friendListFragment?.deleteFriendsRelation(userId)
+                    }
+                    // 添加与被添加好友
+                    if (bean.command == BroadcastBean.MTCommand.RefreshFriendList) {
+                        MTService.reqFriendGroups(this@FriendListActivity)
                     }
                 }
             }

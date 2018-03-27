@@ -464,7 +464,7 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 	}
 
 	/**
-	 * 对方被添加为好友的成功通知
+	 * 不需要应答的被添加好友成功通知
 	 * @param message
 	 */
 	@Override
@@ -474,7 +474,7 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 			UserInfoRsp userInfoRsp=new UserInfoRsp();
 			userInfoRsp.setUserId(nty.getSrcFriendUserId());
 			userInfoRsp.setUserName(nty.getSrcFriendUserName());
-			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.AddFriendWithoutValidateSucceededSysNty, userInfoRsp);
+			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.AddedFriendSucceededSysNty, userInfoRsp);
 
 			// 手动建造添加好友成功通知消息
 			SystemMessageBean bean=new SystemMessageBean();
@@ -484,7 +484,7 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 			bean.setSrcFriendUserName(nty.getSrcFriendUserName());
 			bean.setTimestamp(""+nty.getTimestamp());
 			bean.setType(SystemMsgType.ADD_FRIEND_SUCC);
-			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.SystemMessageBean, bean);
+			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.SystemMessageResp, bean);
 		} catch (InvalidProtocolBufferException e) {
 			e.printStackTrace();
 		}
@@ -542,7 +542,7 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 			bean.setSrcFriendUserName(nty.getTargetFriendUserName());
 			bean.setTimestamp(""+nty.getTimestamp());
 			bean.setType(SystemMsgType.ADD_FRIEND_SUCC_RECEVER);
-			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.SystemMessageBean, bean);
+			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.SystemMessageResp, bean);
 		} catch (InvalidProtocolBufferException e) {
 			e.printStackTrace();
 		}
@@ -554,7 +554,13 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 	 */
 	@Override
 	public void onFriendInfoNty(TMMessage message) {
-		BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.FriendInfoNty, "");
+		try {
+			Contacts.FriendInfoNty nty = Contacts.FriendInfoNty.parseFrom(message.getBody());
+			UserInfoRsp userInfoRsp = UserInfoRsp.parse(nty.getFriend());
+			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.FriendInfoNty, userInfoRsp);
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

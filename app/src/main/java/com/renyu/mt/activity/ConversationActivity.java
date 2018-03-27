@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.focustech.message.model.SystemMessageBean;
 import com.renyu.mt.utils.DownloadUtils;
 import com.focustech.common.MD5Utils;
 import com.renyu.mt.utils.RecordUtils;
@@ -251,12 +252,15 @@ public class ConversationActivity extends BaseIMActivity {
                     }
                     // 收到消息之后立即更新
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageReceive) {
-                        MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        if (messageBean.getUserId().equals(chatUserId)) {
-                            messageBeens.add(messageBean);
-                            adapter.notifyItemInserted(messageBeens.size()-1);
-                            if (!rv_conversation.canScrollVertically(1)) {
-                                rv_conversation.scrollToPosition(messageBeens.size()-1);
+                        // 过滤掉系统消息
+                        if (!((((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable()) instanceof SystemMessageBean)) {
+                            MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                            if (messageBean.getUserId().equals(chatUserId)) {
+                                messageBeens.add(messageBean);
+                                adapter.notifyItemInserted(messageBeens.size()-1);
+                                if (!rv_conversation.canScrollVertically(1)) {
+                                    rv_conversation.scrollToPosition(messageBeens.size()-1);
+                                }
                             }
                         }
                     }

@@ -8,10 +8,7 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.focustech.dbhelper.PlainTextDBHelper
-import com.focustech.message.model.BroadcastBean
-import com.focustech.message.model.FriendInfoRsp
-import com.focustech.message.model.MessageBean
-import com.focustech.message.model.UserInfoRsp
+import com.focustech.message.model.*
 import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
@@ -62,7 +59,12 @@ class ChatListActivity : BaseIMActivity() {
                     // 收到消息刷新列表
                     if (bean.command == BroadcastBean.MTCommand.MessageReceive ||
                             bean.command == BroadcastBean.MTCommand.MessageSend) {
-                        conversationFragment?.refreshOneMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean)
+                        if ((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable is SystemMessageBean) {
+                            conversationFragment?.refreshSystemMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as SystemMessageBean)
+                        }
+                        else {
+                            conversationFragment?.refreshOneMessage((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as MessageBean)
+                        }
                     }
                     // 消息已读
                     if (bean.command == BroadcastBean.MTCommand.UpdateRead) {

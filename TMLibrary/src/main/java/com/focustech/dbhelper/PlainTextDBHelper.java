@@ -179,22 +179,26 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * @param rsp
      */
     public void insertFriendList(UserInfoRsp rsp) {
+        ContentValues cv2=new ContentValues();
+        cv2.put(userId, rsp.getUserId());
+        cv2.put(userName, rsp.getUserName());
+        cv2.put(token, rsp.getToken());
+        cv2.put(userNickName, rsp.getUserNickName());
+        cv2.put(userSignature, rsp.getUserSignature());
+        cv2.put(HeadType, rsp.getUserHeadType().getNumber());
+        cv2.put(userHeadId, rsp.getUserHeadId());
+        cv2.put(netIp, rsp.getNetIp());
+        cv2.put(timestamp, rsp.getTimestamp());
+        cv2.put(tmNum, rsp.getTmNum());
+        cv2.put(role, rsp.getRole());
+
         Cursor cs=db.query(UserInfoRspTable, null, "userId=?", new String[]{rsp.getUserId()}, null, null, null);
         cs.moveToFirst();
         if (cs.getCount()==0) {
-            ContentValues cv2=new ContentValues();
-            cv2.put(userId, rsp.getUserId());
-            cv2.put(userName, rsp.getUserName());
-            cv2.put(token, rsp.getToken());
-            cv2.put(userNickName, rsp.getUserNickName());
-            cv2.put(userSignature, rsp.getUserSignature());
-            cv2.put(HeadType, rsp.getUserHeadType().getNumber());
-            cv2.put(userHeadId, rsp.getUserHeadId());
-            cv2.put(netIp, rsp.getNetIp());
-            cv2.put(timestamp, rsp.getTimestamp());
-            cv2.put(tmNum, rsp.getTmNum());
-            cv2.put(role, rsp.getRole());
             db.insert(UserInfoRspTable, null, cv2);
+        }
+        else {
+            db.update(UserInfoRspTable, cv2, "userId=?", new String[]{rsp.getUserId()});
         }
         cs.close();
     }

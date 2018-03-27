@@ -1,26 +1,30 @@
 package com.renyu.mt.activity;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.focustech.dbhelper.PlainTextDBHelper;
+import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.SystemMessageBean;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.SystemMessageAdapter;
+import com.renyu.mt.base.BaseIMActivity;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * Created by Administrator on 2017/8/8.
  */
 
-public class SystemMessageActivity extends AppCompatActivity {
+public class SystemMessageActivity extends BaseIMActivity {
 
     @BindView(R.id.rv_messagelist)
     RecyclerView rv_messagelist;
@@ -28,19 +32,66 @@ public class SystemMessageActivity extends AppCompatActivity {
 
     ArrayList<SystemMessageBean> beans;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_systemmessage);
-        ButterKnife.bind(this);
+    BroadcastReceiver registerReceiver;
 
+    @Override
+    public void initParams() {
         beans=new ArrayList<>();
         beans.addAll(PlainTextDBHelper.getInstance().getSystemMessage());
 
         rv_messagelist.setHasFixedSize(true);
-        LinearLayoutManager manager=new LinearLayoutManager(this);
-        rv_messagelist.setLayoutManager(manager);
+        rv_messagelist.setLayoutManager(new LinearLayoutManager(this));
         adapter=new SystemMessageAdapter(this, beans);
         rv_messagelist.setAdapter(adapter);
+
+        registerReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("MT")) {
+                    BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
+                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageReceive) {
+                        // 过滤掉非系统消息
+                        if (((((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable()) instanceof SystemMessageBean)) {
+                            SystemMessageBean systemMessageBean = (SystemMessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                            beans.add(0, systemMessageBean);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+        };
+        openCurrentReceiver();
+    }
+
+    @Override
+    public int initViews() {
+        return R.layout.activity_systemmessage;
+    }
+
+    @Override
+    public void loadData() {
+
+    }
+
+    @Override
+    public int setStatusBarColor() {
+        return Color.BLACK;
+    }
+
+    @Override
+    public int setStatusBarTranslucent() {
+        return 0;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        closeCurrentReceiver();
+    }
+
+    @Nullable
+    @Override
+    public BroadcastReceiver getReceiver() {
+        return registerReceiver;
     }
 }

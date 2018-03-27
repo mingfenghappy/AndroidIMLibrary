@@ -30,12 +30,14 @@ public class BroadcastBean implements Serializable {
         MessageUploadFail,       // 自增，用于标志发送的语音消息上传失败
         MessageDownloadComp,     // 自增，用于标志下载语音文件完成
         ReceptNty,
-        UpdateRead,               // 自增，用于标志未读消息清除
+        UpdateRead,              // 自增，用于标志未读消息清除
         NewSysNty,
         GetFriendRuleRsp,
         DeleteFriendRsp,
-        SystemMessageBean,
+        SystemMessageResp,       // 自增，用于标志收到系统消息
+        AddedFriendSucceededSysNty,
         AddFriendWithoutValidateSucceededSysNty,
+        RefreshFriendList,
         FriendInfoNty
     }
 

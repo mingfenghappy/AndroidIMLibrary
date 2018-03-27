@@ -10,6 +10,7 @@ import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.MTService;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.OfflineIMResponse;
+import com.focustech.message.model.SystemMessageBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
@@ -248,6 +249,42 @@ public class ChatListFragment extends BaseFragment {
         else {
             refreshOfflineUser(userInfoRsps.get(messageBean.getUserId()));
         }
+    }
+
+    /**
+     * 刷新系统消息
+     * @param systemMessageBean
+     */
+    public void refreshSystemMessage(SystemMessageBean systemMessageBean) {
+        OfflineIMResponse find = null;
+        int findPosition = -1;
+        for (int i = 0; i < offlineMessages.size(); i++) {
+            // 找到IM列表中该联系人的消息
+            OfflineIMResponse offlineMessage = offlineMessages.get(i);
+            if (offlineMessage.getFromUserId().equals("-1")) {
+                offlineMessage.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
+                offlineMessage.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
+                offlineMessage.setUnloadCount(offlineMessage.getUnloadCount()+1);
+
+                find = offlineMessage;
+                findPosition = i;
+
+                break;
+            }
+        }
+        // 没有找到的话直接新增一条数据
+        if (find == null || findPosition == -1) {
+            OfflineIMResponse messageBean=new OfflineIMResponse();
+            messageBean.setFromUserId("-1");
+            messageBean.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
+            messageBean.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
+            offlineMessages.add(0, messageBean);
+        }
+        // 找到就前置
+        else {
+            offlineMessages.add(0, offlineMessages.remove(findPosition));
+        }
+        adapter.notifyDataSetChanged();
     }
 
     /**

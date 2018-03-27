@@ -245,7 +245,7 @@ public class IndexActivity extends BaseIMActivity {
                         }
                     }
                     // 获取到系统消息
-                    if (bean.getCommand()== BroadcastBean.MTCommand.SystemMessageBean) {
+                    if (bean.getCommand()== BroadcastBean.MTCommand.SystemMessageResp) {
                         // 插入系统消息
                         PlainTextDBHelper.getInstance().insertSystemMessage((SystemMessageBean) bean.getSerializable());
                         // 通知会话列表刷新
