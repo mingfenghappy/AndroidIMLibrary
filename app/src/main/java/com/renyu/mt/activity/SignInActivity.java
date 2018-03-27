@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.SPUtils;
-import com.focustech.message.MTService;
+import com.renyu.mt.service.MTService;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;

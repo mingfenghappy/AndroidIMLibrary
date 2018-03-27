@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
+import com.blankj.utilcode.util.Utils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -112,7 +113,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
                 holder.tv_adapter_conversationlist_message.setVisibility(View.INVISIBLE);
             }
             holder.layout_adapter_conversationlist.setOnClickListener(view -> {
-                PlainTextDBHelper.getInstance().updateRead(offlineMessages.get(position_).getFromUserId());
+                PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(offlineMessages.get(position_).getFromUserId());
                 BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());
 
                 Intent intent=new Intent(context, ConversationActivity.class);

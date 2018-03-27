@@ -1,6 +1,5 @@
 package com.renyu.mt.impl;
 
-import com.focustech.message.model.IMBaseResponseList;
 import com.focustech.message.model.OfflineIMDetailResponse;
 import com.focustech.message.model.OfflineIMResponse;
 

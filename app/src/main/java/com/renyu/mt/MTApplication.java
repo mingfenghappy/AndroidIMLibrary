@@ -15,7 +15,6 @@ import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.message.MTService;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.SystemMessageBean;
@@ -31,6 +30,7 @@ import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.params.CommonParams;
 import com.renyu.mt.service.HeartBeatService;
+import com.renyu.mt.service.MTService;
 import com.renyu.mt.utils.DownloadUtils;
 
 import java.io.File;
@@ -197,7 +197,7 @@ public class MTApplication extends MultiDexApplication {
                             }
                         }
                         // 更新数据库
-                        PlainTextDBHelper.getInstance().insertMessages((ArrayList<MessageBean>) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable());
+                        PlainTextDBHelper.getInstance(MTApplication.this).insertMessages((ArrayList<MessageBean>) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable());
                     }
                     // 收到系统消息
                     if (bean.getCommand() == BroadcastBean.MTCommand.NewSysNty) {
@@ -207,7 +207,7 @@ public class MTApplication extends MultiDexApplication {
                     if (bean.getCommand() == BroadcastBean.MTCommand.SystemMessageResp) {
                         // 插入系统消息
                         SystemMessageBean messageBean = (SystemMessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance().insertSystemMessage(messageBean);
+                        PlainTextDBHelper.getInstance(MTApplication.this).insertSystemMessage(messageBean);
                         // 通知会话列表刷新以及会话详情刷新
                         BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
                     }
@@ -221,7 +221,7 @@ public class MTApplication extends MultiDexApplication {
                             // 下载完成语音文件之后，方可同步数据库与刷新页面
                             DownloadUtils.addFileAndDb(MTApplication.this, messageBean);
                         } else {
-                            PlainTextDBHelper.getInstance().insertMessage(messageBean);
+                            PlainTextDBHelper.getInstance(MTApplication.this).insertMessage(messageBean);
                             // 通知会话列表刷新以及会话详情刷新
                             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
                         }
@@ -230,12 +230,12 @@ public class MTApplication extends MultiDexApplication {
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadComp) {
                         // 语音、图片上传完成之后更新表字段
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE);
+                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE);
                     }
                     // 语音、图片上传失败之后更新表字段
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
+                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
                     }
                     // 删除好友
                     if (bean.getCommand()== BroadcastBean.MTCommand.DeleteFriendRsp) {
@@ -243,7 +243,7 @@ public class MTApplication extends MultiDexApplication {
 
                         String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
                         // 数据库中删除好友关联关系
-                        PlainTextDBHelper.getInstance().deleteFriendsRelation(userId);
+                        PlainTextDBHelper.getInstance(MTApplication.this).deleteFriendsRelation(userId);
                     }
                     // 被添加好友
                     if (bean.getCommand()== BroadcastBean.MTCommand.AddedFriendSucceededSysNty) {
@@ -251,7 +251,7 @@ public class MTApplication extends MultiDexApplication {
 
                         String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
                         // 数据库添加好友关联
-                        PlainTextDBHelper.getInstance().addFriendsRelation(userId);
+                        PlainTextDBHelper.getInstance(MTApplication.this).addFriendsRelation(userId);
 
                         // 刷新好友列表数据
                         BroadcastBean.sendBroadcast(MTApplication.this, BroadcastBean.MTCommand.RefreshFriendList, "");
@@ -262,7 +262,7 @@ public class MTApplication extends MultiDexApplication {
 
                         String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
                         // 数据库添加好友关联
-                        PlainTextDBHelper.getInstance().addFriendsRelation(userId);
+                        PlainTextDBHelper.getInstance(MTApplication.this).addFriendsRelation(userId);
 
                         // 刷新好友列表数据
                         BroadcastBean.sendBroadcast(MTApplication.this, BroadcastBean.MTCommand.RefreshFriendList, "");
@@ -271,7 +271,7 @@ public class MTApplication extends MultiDexApplication {
                     if (bean.getCommand()== BroadcastBean.MTCommand.FriendInfoNty) {
                         UserInfoRsp userInfoRsp = (UserInfoRsp) bean.getSerializable();
                         // 数据库添加好友信息
-                        PlainTextDBHelper.getInstance().insertFriendList(userInfoRsp);
+                        PlainTextDBHelper.getInstance(MTApplication.this).insertFriendList(userInfoRsp);
                     }
                 }
             }

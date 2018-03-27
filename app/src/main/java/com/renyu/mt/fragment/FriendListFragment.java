@@ -8,8 +8,9 @@ import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
 import com.alibaba.android.vlayout.layout.StickyLayoutHelper;
+import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.message.MTService;
+import com.renyu.mt.service.MTService;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendInfoRsp;
 import com.focustech.message.model.FriendStatusRsp;
@@ -78,7 +79,7 @@ public class FriendListFragment extends BaseFragment {
     @Override
     public void loadData() {
         // 加载本地缓存好友列表
-        getLocalData(PlainTextDBHelper.getInstance().getFriendList());
+        getLocalData(PlainTextDBHelper.getInstance(Utils.getApp()).getFriendList());
         // 加载远程好友列表
         MTService.reqFriendGroups(getActivity());
     }
@@ -92,7 +93,7 @@ public class FriendListFragment extends BaseFragment {
         dataPositions.clear();
         datas.clear();
 
-        HashMap<String, UserInfoRsp> userInfoRsps= PlainTextDBHelper.getInstance().getFriendsInfo();
+        HashMap<String, UserInfoRsp> userInfoRsps= PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo();
         for (int j = 0; j < temp.size(); j++) {
             FriendGroupRsp friendGroupRsp=temp.get(j);
             adapters.add(new FriendListHeaderAdapter(getActivity(), new StickyLayoutHelper(), friendGroupRsp.getFriendGroupName().equals("default")?"我的好友":friendGroupRsp.getFriendGroupName()));
@@ -122,7 +123,7 @@ public class FriendListFragment extends BaseFragment {
      * 收到新的好友对应组信息之后进行刷新
      */
     public void refreshFriendList() {
-        getLocalData(PlainTextDBHelper.getInstance().getFriendList());
+        getLocalData(PlainTextDBHelper.getInstance(Utils.getApp()).getFriendList());
     }
 
     /**

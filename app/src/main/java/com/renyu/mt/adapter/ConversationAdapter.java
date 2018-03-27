@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
+import com.blankj.utilcode.util.Utils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -63,7 +64,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         this.isGroup = isGroup;
         this.userId = userId;
 
-        this.userInfoRsps = PlainTextDBHelper.getInstance().getFriendsInfo();
+        this.userInfoRsps = PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo();
         this.currentUserInfo= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
     }
 
@@ -272,7 +273,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 播放语音
                 ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
                 // 更新数据库
-                PlainTextDBHelper.getInstance().updateVoiceRead(messages.get(position).getSvrMsgId());
+                PlainTextDBHelper.getInstance(Utils.getApp()).updateVoiceRead(messages.get(position).getSvrMsgId());
                 // 更新本地缓存
                 messages.get(position).setIsVoicePlay("1");
                 // 刷新视图

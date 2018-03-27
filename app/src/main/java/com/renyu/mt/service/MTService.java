@@ -1,4 +1,4 @@
-package com.focustech.message;
+package com.renyu.mt.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.focustech.message.RequestClient;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.MessageBean;

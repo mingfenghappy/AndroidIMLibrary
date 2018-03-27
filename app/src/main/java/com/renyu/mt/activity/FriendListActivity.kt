@@ -4,8 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
-import com.focustech.message.MTService
+import com.renyu.mt.service.MTService
 import com.focustech.message.model.BroadcastBean
 import com.focustech.message.model.FriendGroupRsp
 import com.focustech.message.model.FriendInfoRsp
@@ -40,9 +41,9 @@ class FriendListActivity : BaseIMActivity() {
                     // 获取好友关系组数据
                     if (bean.command == BroadcastBean.MTCommand.FriendGroupsRsp) {
                         // 清除所有好友组关系数据
-                        PlainTextDBHelper.getInstance().clearAllFriendList()
+                        PlainTextDBHelper.getInstance(Utils.getApp()).clearAllFriendList()
                         // 增加所有好友组关系数据
-                        PlainTextDBHelper.getInstance().insertFriendList((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as ArrayList<FriendGroupRsp>)
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as ArrayList<FriendGroupRsp>)
                         // 通知好友列表刷新
                         friendListFragment?.refreshFriendList()
                         // 获取完成组信息之后，就获取全部好友信息

@@ -8,8 +8,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.message.MTService;
+import com.renyu.mt.service.MTService;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendStatusRsp;
@@ -49,9 +50,9 @@ public class UserDetailActivity extends BaseIMActivity {
                     // 收到好友列表信息，刷新好友关系
                     if (bean.getCommand() == BroadcastBean.MTCommand.FriendGroupsRsp) {
                         // 清除所有好友组关系数据
-                        PlainTextDBHelper.getInstance().clearAllFriendList();
+                        PlainTextDBHelper.getInstance(Utils.getApp()).clearAllFriendList();
                         // 增加所有好友组关系数据
-                        PlainTextDBHelper.getInstance().insertFriendList((ArrayList<FriendGroupRsp>) (((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable()));
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList((ArrayList<FriendGroupRsp>) (((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable()));
                         // 刷新好友关系
                         refreshFriendState();
                     }
@@ -60,7 +61,7 @@ public class UserDetailActivity extends BaseIMActivity {
                         Enums.ValidateRule validateRule = ((GetFriendRuleRsp) bean.getSerializable()).getFriendRule();
                         // 无需认证直接添加
                         if (validateRule == Enums.ValidateRule.ALLOW_WITHOUT_VALIDATE) {
-                            ArrayList<FriendGroupRsp> friendGroupRsps = PlainTextDBHelper.getInstance().getGroupInfo();
+                            ArrayList<FriendGroupRsp> friendGroupRsps = PlainTextDBHelper.getInstance(Utils.getApp()).getGroupInfo();
                             for (FriendGroupRsp friendGroupRsp : friendGroupRsps) {
                                 if (friendGroupRsp.getFriendGroupType()== Enums.FriendGroupType.DEFAULT) {
                                     MTService.addFriendReq(UserDetailActivity.this, userId, "", friendGroupRsp.getFriendGroupId());
@@ -102,7 +103,7 @@ public class UserDetailActivity extends BaseIMActivity {
         btn_userdetail_add.setVisibility(View.GONE);
         btn_userdetail_delete.setVisibility(View.GONE);
         boolean isFriend=false;
-        ArrayList<FriendGroupRsp> friendGroupRsps= PlainTextDBHelper.getInstance().getFriendList();
+        ArrayList<FriendGroupRsp> friendGroupRsps= PlainTextDBHelper.getInstance(Utils.getApp()).getFriendList();
         outer:
         for (FriendGroupRsp friendGroupRsp : friendGroupRsps) {
             for (FriendStatusRsp friendStatusRsp : friendGroupRsp.getFriends()) {

@@ -1,4 +1,4 @@
-package com.focustech.message.model;
+package com.renyu.mt.impl;
 
 import com.google.gson.annotations.SerializedName;
 import com.renyu.commonlibrary.network.params.ResponseList;

@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.focustech.message.MTService;
+import com.renyu.mt.service.MTService;
 
 public class MainActivity extends AppCompatActivity {
 

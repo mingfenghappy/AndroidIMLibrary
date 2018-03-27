@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.blankj.utilcode.util.Utils;
 import com.renyu.mt.utils.DownloadUtils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.params.FusionField;
@@ -24,7 +25,7 @@ import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
 import com.renyu.mt.fragment.ChatListFragment;
 import com.renyu.mt.fragment.FriendListFragment;
-import com.focustech.message.MTService;
+import com.renyu.mt.service.MTService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,9 +94,9 @@ public class IndexActivity extends BaseIMActivity {
                     // 获取好友关系组数据
                     if (bean.getCommand()== BroadcastBean.MTCommand.FriendGroupsRsp) {
                         // 清除所有好友组关系数据
-                        PlainTextDBHelper.getInstance().clearAllFriendList();
+                        PlainTextDBHelper.getInstance(Utils.getApp()).clearAllFriendList();
                         // 增加所有好友组关系数据
-                        PlainTextDBHelper.getInstance().insertFriendList((ArrayList<FriendGroupRsp>) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable());
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList((ArrayList<FriendGroupRsp>) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable());
                         // 通知好友列表刷新
                         if (friendListFragment!=null) {
                             friendListFragment.refreshFriendList();
@@ -108,7 +109,7 @@ public class IndexActivity extends BaseIMActivity {
                         // 更新缓存好友信息数据
                         userInfoRsps.put(temp.getFriend().getUserId(), temp.getFriend());
                         // 插入或更新好友信息
-                        PlainTextDBHelper.getInstance().insertFriendList(temp);
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList(temp);
                         // 通知会话列表刷新
                         if (conversationFragment!=null) {
                             conversationFragment.refreshOfflineUser(temp.getFriend());
@@ -136,7 +137,7 @@ public class IndexActivity extends BaseIMActivity {
                             DownloadUtils.addFileAndDb(IndexActivity.this, messageBean);
                         }
                         else {
-                            PlainTextDBHelper.getInstance().insertMessage(messageBean);
+                            PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
                             // 通知会话列表刷新
                             if (conversationFragment!=null) {
 //                                conversationFragment.refreshOfflineMessageData();
@@ -169,7 +170,7 @@ public class IndexActivity extends BaseIMActivity {
                             }
                         }
                         // 更新数据库
-                        PlainTextDBHelper.getInstance().insertMessages((ArrayList<MessageBean>) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable());
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertMessages((ArrayList<MessageBean>) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable());
                         // 通知会话列表刷新
                         if (conversationFragment!=null) {
 //                            conversationFragment.refreshOfflineMessageData();
@@ -182,7 +183,7 @@ public class IndexActivity extends BaseIMActivity {
 //                        }
 //                        else {
 //                            // 不是首次加载的话，如果离线消息中的人不在好友列表中，则获取好友信息
-//                            ArrayList<MessageBean> temp = PlainTextDBHelper.getInstance().getConversationList();
+//                            ArrayList<MessageBean> temp = PlainTextDBHelper.getInstance(Utils.getApp()).getConversationList();
 //                            for (MessageBean messageBean : temp) {
 //                                if (!userInfoRsps.containsKey(messageBean.getUserId())) {
 //                                    MTService.getUserInfo(getApplication(), messageBean.getUserId());
@@ -206,7 +207,7 @@ public class IndexActivity extends BaseIMActivity {
                     if (bean.getCommand()== BroadcastBean.MTCommand.DeleteFriendRsp) {
                         String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
                         // 数据库中删除好友关联关系
-                        PlainTextDBHelper.getInstance().deleteFriendsRelation(userId);
+                        PlainTextDBHelper.getInstance(Utils.getApp()).deleteFriendsRelation(userId);
                         // 通知好友列表删除好友关系
                         if (friendListFragment!=null) {
                             friendListFragment.deleteFriendsRelation(userId);
@@ -216,7 +217,7 @@ public class IndexActivity extends BaseIMActivity {
                     if (bean.getCommand()== BroadcastBean.MTCommand.AddFriendWithoutValidateSucceededSysNty) {
                         String userId=((UserInfoRsp) bean.getSerializable()).getUserId();
                         // 数据库添加好友关联
-                        PlainTextDBHelper.getInstance().addFriendsRelation(userId);
+                        PlainTextDBHelper.getInstance(Utils.getApp()).addFriendsRelation(userId);
                         // 通知会话列表刷新
                         if (conversationFragment!=null) {
                             conversationFragment.refreshOfflineUser(userInfoRsp);
@@ -234,7 +235,7 @@ public class IndexActivity extends BaseIMActivity {
                         // 更新缓存数据
                         userInfoRsps.put(userInfoRsp.getUserId(), userInfoRsp);
                         // 插入或更新好友信息
-                        PlainTextDBHelper.getInstance().insertFriendList(userInfoRsp);
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList(userInfoRsp);
                         // 通知会话列表刷新
                         if (conversationFragment!=null) {
                             conversationFragment.refreshOfflineUser(userInfoRsp);
@@ -247,7 +248,7 @@ public class IndexActivity extends BaseIMActivity {
                     // 获取到系统消息
                     if (bean.getCommand()== BroadcastBean.MTCommand.SystemMessageResp) {
                         // 插入系统消息
-                        PlainTextDBHelper.getInstance().insertSystemMessage((SystemMessageBean) bean.getSerializable());
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertSystemMessage((SystemMessageBean) bean.getSerializable());
                         // 通知会话列表刷新
                         if (conversationFragment!=null) {
 //                            conversationFragment.refreshOfflineMessageData();
@@ -260,7 +261,7 @@ public class IndexActivity extends BaseIMActivity {
         // 获取当前用户信息
         userInfoRsp= (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
         // 获取所有好友信息
-        userInfoRsps= PlainTextDBHelper.getInstance().getFriendsInfo();
+        userInfoRsps= PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo();
         change(0);
     }
 
@@ -352,7 +353,7 @@ public class IndexActivity extends BaseIMActivity {
         if (position==1) {
             iv_index_friendlist.setImageResource(R.mipmap.em_contact_list_selected);
             if (friendListFragment==null) {
-//                friendListFragment=FriendListFragment.getInstance(PlainTextDBHelper.getInstance().getFriendList());
+//                friendListFragment=FriendListFragment.getInstance(PlainTextDBHelper.getInstance(Utils.getApp()).getFriendList());
                 transaction.add(R.id.layout_container, friendListFragment);
             }
             else {

@@ -44,22 +44,16 @@ android {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force "com.github.renyu:AndroidCommonLibrary:1.11.6"
-    }
-}
+
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.google.protobuf:protobuf-java:2.4.1'
-    compile 'com.alibaba:fastjson:1.2.34'
-    compile "com.github.renyu:AndroidCommonLibrary:1.11.6"
-    compile "com.github.renyu:AndroidImageLibrary:1.4.2"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    api 'com.google.protobuf:protobuf-java:2.4.1'
+    api 'com.alibaba:fastjson:1.2.34'
+    api 'com.tencent.wcdb:wcdb-android:1.0.6'
 }

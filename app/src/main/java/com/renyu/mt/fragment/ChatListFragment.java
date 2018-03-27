@@ -6,8 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.message.MTService;
+import com.renyu.mt.service.MTService;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.OfflineIMResponse;
 import com.focustech.message.model.SystemMessageBean;
@@ -56,7 +57,7 @@ public class ChatListFragment extends BaseFragment {
 
         offlineMessages=new ArrayList<>();
 
-        userInfoRsps= PlainTextDBHelper.getInstance().getFriendsInfo();
+        userInfoRsps= PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo();
 
         rv_conversationlist.setHasFixedSize(true);
         rv_conversationlist.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -90,7 +91,7 @@ public class ChatListFragment extends BaseFragment {
      * 加载本地会话列表
      */
     public void getOfflineIMFromLocal() {
-        ArrayList<OfflineIMResponse> temp = PlainTextDBHelper.getInstance().getConversationList();
+        ArrayList<OfflineIMResponse> temp = PlainTextDBHelper.getInstance(Utils.getApp()).getConversationList();
         for (OfflineIMResponse offlineMessage : temp) {
             if (userInfoRsps.containsKey(offlineMessage.getFromUserId())) {
                 offlineMessage.setUserNickName(userInfoRsps.get(offlineMessage.getFromUserId()).getUserNickName());

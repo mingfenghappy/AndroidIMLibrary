@@ -37,6 +37,12 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force "com.github.renyu:AndroidCommonLibrary:1.11.6"
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -45,7 +51,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
     // butterknife
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     // fresco-processors  An Android image processor library providing a variety of image transformations for Fresco.
@@ -54,5 +60,9 @@ dependencies {
     }
     // JKeyboardPanelSwitch  For resolve the layout conflict when keybord & panel are switching (Android键盘面板冲突 布局闪动处理方案)
     implementation 'cn.dreamtobe.kpswitch:library:1.6.0'
-    compile project(':TMLibrary')
+    implementation ('com.github.renyu:AndroidCommonLibrary:1.11.8') {
+        exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
+    }
+    implementation 'com.github.renyu:AndroidImageLibrary:1.4.3'
+    implementation project(':TMLibrary')
 }

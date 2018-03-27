@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.blankj.utilcode.util.Utils;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendInfoRsp;
@@ -78,11 +77,11 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     public final static String groupId="groupId";
     public final static String groupName="groupName";
 
-    public static PlainTextDBHelper getInstance() {
+    public static PlainTextDBHelper getInstance(Context context) {
         if (dbHelper == null) {
             synchronized (PlainTextDBHelper.class) {
                 if (dbHelper == null) {
-                    dbHelper = new PlainTextDBHelper(Utils.getApp());
+                    dbHelper = new PlainTextDBHelper(context);
                     dbHelper.setWriteAheadLoggingEnabled(true);
                     db=dbHelper.getWritableDatabase();
                 }

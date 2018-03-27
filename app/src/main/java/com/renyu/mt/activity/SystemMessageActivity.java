@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.SystemMessageBean;
@@ -37,7 +38,7 @@ public class SystemMessageActivity extends BaseIMActivity {
     @Override
     public void initParams() {
         beans=new ArrayList<>();
-        beans.addAll(PlainTextDBHelper.getInstance().getSystemMessage());
+        beans.addAll(PlainTextDBHelper.getInstance(Utils.getApp()).getSystemMessage());
 
         rv_messagelist.setHasFixedSize(true);
         rv_messagelist.setLayoutManager(new LinearLayoutManager(this));

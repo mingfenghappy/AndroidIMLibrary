@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.message.model.*
 import com.renyu.commonlibrary.commonutils.ACache
@@ -75,7 +76,7 @@ class ChatListActivity : BaseIMActivity() {
                     if (bean.command == BroadcastBean.MTCommand.FriendInfoRsp) {
                         val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as FriendInfoRsp
                         // 插入或更新好友信息
-                        PlainTextDBHelper.getInstance().insertFriendList(temp)
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList(temp)
                         // 通知会话列表刷新
                         conversationFragment?.refreshOfflineUser(temp.friend)
                     }

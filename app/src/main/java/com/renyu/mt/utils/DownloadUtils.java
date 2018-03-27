@@ -3,6 +3,7 @@ package com.renyu.mt.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.params.FusionField;
 import com.focustech.message.model.BroadcastBean;
@@ -69,7 +70,7 @@ public class DownloadUtils {
                 Log.d("MTAPP", "isRenameOK:" + isRenameOK);
                 if (isRenameOK) {
                     // 更新数据库
-                    PlainTextDBHelper.getInstance().insertMessage(messageBean);
+                    PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
                     // 通知前台页面下载完成，可以更新
                     BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
                 }

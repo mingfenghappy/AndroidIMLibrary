@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.Utils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -89,7 +90,7 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         holder.iv_adapter_friendlist.setController(draweeController);
         holder.layout_adapter_friendlist.setOnClickListener(view -> {
-            PlainTextDBHelper.getInstance().updateRead(beans.get(position_).getFriendUserId());
+            PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(beans.get(position_).getFriendUserId());
             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, beans.get(position_).getFriendUserId());
 
             Intent intent=new Intent(context, ConversationActivity.class);

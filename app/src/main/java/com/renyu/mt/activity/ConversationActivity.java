@@ -20,29 +20,29 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.focustech.message.model.SystemMessageBean;
-import com.renyu.mt.utils.DownloadUtils;
+import com.blankj.utilcode.util.Utils;
 import com.focustech.common.MD5Utils;
-import com.renyu.mt.utils.RecordUtils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.focustech.params.FusionField;
-import com.focustech.message.MTService;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.FileInfoBean;
-import com.focustech.message.model.IMBaseResponseList;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.OfflineIMDetailResponse;
+import com.focustech.message.model.SystemMessageBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.focustech.message.params.MessageMeta;
+import com.focustech.params.FusionField;
+import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
-import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ConversationAdapter;
 import com.renyu.mt.base.BaseIMActivity;
+import com.renyu.mt.impl.IMBaseResponseList;
 import com.renyu.mt.impl.RetrofitImpl;
+import com.renyu.mt.service.MTService;
+import com.renyu.mt.utils.DownloadUtils;
+import com.renyu.mt.utils.RecordUtils;
 
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
@@ -123,7 +123,7 @@ public class ConversationActivity extends BaseIMActivity {
         chatUserId = getIntent().getStringExtra("UserId");
 
         messageBeens=new ArrayList<>();
-        ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance().getConversationByUser(chatUserId, page, pageSize);
+        ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance(Utils.getApp()).getConversationByUser(chatUserId, page, pageSize);
         page++;
         messageBeens.addAll(temp);
 
@@ -148,7 +148,7 @@ public class ConversationActivity extends BaseIMActivity {
                         // 上拉加载更多
                         boolean canScrollDown=rv_conversation.canScrollVertically(-1);
                         if (!canScrollDown) {
-                            ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance().getConversationByUser(chatUserId, page, pageSize);
+                            ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance(Utils.getApp()).getConversationByUser(chatUserId, page, pageSize);
                             page++;
                             messageBeens.addAll(0, temp);
                             adapter.notifyItemRangeInserted(0, temp.size());
@@ -349,7 +349,7 @@ public class ConversationActivity extends BaseIMActivity {
         closeCurrentReceiver();
 
         // 设置当前会话列表消息均已读
-        PlainTextDBHelper.getInstance().updateRead(chatUserId);
+        PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(chatUserId);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.UpdateRead, chatUserId);
 
         // 关闭音频播放
@@ -367,7 +367,7 @@ public class ConversationActivity extends BaseIMActivity {
                 sendTextMessage();
                 break;
             case R.id.iv_image:
-                Utils.choicePic(ConversationActivity.this, 1, 1000);
+                com.renyu.imagelibrary.commonutils.Utils.choicePic(ConversationActivity.this, 1, 1000);
                 break;
         }
     }
@@ -419,7 +419,7 @@ public class ConversationActivity extends BaseIMActivity {
                            }
                            // 全部离线消息
                            ArrayList<MessageBean> offlineMessages=new ArrayList<>();
-                           ArrayList<OfflineIMDetailResponse> temp = PlainTextDBHelper.getInstance().checkOfflineMessages(offlineIMDetailResponses);
+                           ArrayList<OfflineIMDetailResponse> temp = PlainTextDBHelper.getInstance(Utils.getApp()).checkOfflineMessages(offlineIMDetailResponses);
                            for (OfflineIMDetailResponse offlineIMDetailRespons : temp) {
                                MessageBean bean=new MessageBean();
                                bean.setTimestamp(offlineIMDetailRespons.getAddTime());
@@ -494,9 +494,9 @@ public class ConversationActivity extends BaseIMActivity {
                            }
                            // 更新数据库，回到第一页
                            if (offlineMessages.size() != 0) {
-                               PlainTextDBHelper.getInstance().insertMessages(offlineMessages);
+                               PlainTextDBHelper.getInstance(Utils.getApp()).insertMessages(offlineMessages);
                                page = 1;
-                               ArrayList<MessageBean> temp1=PlainTextDBHelper.getInstance().getConversationByUser(chatUserId, 0, pageSize);
+                               ArrayList<MessageBean> temp1=PlainTextDBHelper.getInstance(Utils.getApp()).getConversationByUser(chatUserId, 0, pageSize);
                                messageBeens.clear();
                                messageBeens.addAll(temp1);
                                adapter.notifyDataSetChanged();
@@ -536,7 +536,7 @@ public class ConversationActivity extends BaseIMActivity {
         messageBean.setMessageType("0");
         messageBean.setLocalFileName("");
         messageBean.setIsRead("1");
-        PlainTextDBHelper.getInstance().insertMessage(messageBean);
+        PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
@@ -563,7 +563,7 @@ public class ConversationActivity extends BaseIMActivity {
         messageBean.setMessageType("8");
         messageBean.setLocalFileName(file.getPath());
         messageBean.setIsRead("1");
-        PlainTextDBHelper.getInstance().insertMessage(messageBean);
+        PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
@@ -590,7 +590,7 @@ public class ConversationActivity extends BaseIMActivity {
         messageBean.setLocalFileName(file.getPath());
         messageBean.setIsRead("1");
         messageBean.setIsVoicePlay("1");
-        PlainTextDBHelper.getInstance().insertMessage(messageBean);
+        PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
@@ -607,7 +607,7 @@ public class ConversationActivity extends BaseIMActivity {
             return;
         }
         // 修改数据库状态
-        PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
+        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
         // 修改列表状态并刷新
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
@@ -627,7 +627,7 @@ public class ConversationActivity extends BaseIMActivity {
             return;
         }
         // 修改数据库状态
-        PlainTextDBHelper.getInstance().updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
+        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
         // 修改列表状态并刷新
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
