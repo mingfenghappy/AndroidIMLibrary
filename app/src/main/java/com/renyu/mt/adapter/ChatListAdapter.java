@@ -29,6 +29,7 @@ import com.renyu.mt.R;
 import com.renyu.mt.activity.ConversationActivity;
 import com.renyu.mt.activity.SystemMessageActivity;
 import com.renyu.mt.utils.AvatarUtils;
+import com.renyu.mt.utils.FaceIconUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,10 +80,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
                     offlineMessages.get(position).getFromUserId():
                     offlineMessages.get(position).getUserNickName());
             if (offlineMessages.get(position).getType()==0) {
-                holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getLastMsg());
+                holder.tv_adapter_conversationlist_msg.setText(FaceIconUtil.getInstance().replaceFaceMsg(offlineMessages.get(position).getLastMsg()));
             }
             else if (offlineMessages.get(position).getType()==9) {
-                holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getLastMsg());
+                holder.tv_adapter_conversationlist_msg.setText(FaceIconUtil.getInstance().replaceFaceMsg(offlineMessages.get(position).getLastMsg()));
             }
             else if (offlineMessages.get(position).getType()==8) {
                 holder.tv_adapter_conversationlist_msg.setText("[图片]");

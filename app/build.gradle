@@ -59,7 +59,7 @@ dependencies {
         exclude group: 'com.facebook.fresco', module: 'fresco'
     }
     // JKeyboardPanelSwitch  For resolve the layout conflict when keybord & panel are switching (Android键盘面板冲突 布局闪动处理方案)
-    implementation 'cn.dreamtobe.kpswitch:library:1.6.0'
+    implementation 'cn.dreamtobe.kpswitch:library:1.6.1'
     implementation ('com.github.renyu:AndroidCommonLibrary:1.11.8') {
         exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
     }

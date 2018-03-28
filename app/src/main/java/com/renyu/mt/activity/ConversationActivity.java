@@ -214,13 +214,18 @@ public class ConversationActivity extends BaseIMActivity {
         rv_panel_content.setHasFixedSize(true);
         rv_panel_content.setLayoutManager(new GridLayoutManager(this, 7));
         rv_panel_content.setAdapter(faceAdapter);
+        KeyboardUtil.attach(this, kp_panel_root, isShowing -> {
+            if (isShowing) {
+                rv_conversation.scrollToPosition(messageBeens.size()-1);
+            }
+        });
         KPSwitchConflictUtil.attach(kp_panel_root, edit_conversation, switchToPanel -> {
             if (switchToPanel) {
                 edit_conversation.clearFocus();
+                rv_conversation.scrollToPosition(messageBeens.size()-1);
             } else {
                 edit_conversation.requestFocus();
             }
-            rv_conversation.scrollToPosition(messageBeens.size()-1);
         }, new KPSwitchConflictUtil.SubPanelAndTrigger(layout_emojichoice, iv_emoji)
                 , new KPSwitchConflictUtil.SubPanelAndTrigger(layout_voicechoice, iv_sendvoice));
         edit_conversation.setOnTouchListener((view, motionEvent) -> {
