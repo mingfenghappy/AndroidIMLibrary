@@ -30,6 +30,7 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.R;
 import com.renyu.mt.activity.ConversationActivity;
 import com.renyu.mt.utils.AvatarUtils;
+import com.renyu.mt.utils.FaceIconUtil;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -223,7 +224,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
             }
             // 加载文字
-            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(messages.get(position).getMsg());
+            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
         }
         else if (getItemViewType(position)==1) {
             ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
@@ -312,7 +313,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         else if (getItemViewType(position)==3) {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
-            ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(messages.get(position).getMsg());
+            ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
         }
         else if (getItemViewType(position)==4) {
             ((SendImageViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));

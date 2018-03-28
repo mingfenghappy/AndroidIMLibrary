@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -37,11 +38,13 @@ import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ConversationAdapter;
+import com.renyu.mt.adapter.FaceAdapter;
 import com.renyu.mt.base.BaseIMActivity;
 import com.renyu.mt.impl.IMBaseResponseList;
 import com.renyu.mt.impl.RetrofitImpl;
 import com.renyu.mt.service.MTService;
 import com.renyu.mt.utils.DownloadUtils;
+import com.renyu.mt.utils.FaceIconUtil;
 import com.renyu.mt.utils.RecordUtils;
 
 import org.jetbrains.annotations.Nullable;
@@ -84,6 +87,8 @@ public class ConversationActivity extends BaseIMActivity {
     View layout_imagechoice;
     View layout_voicechoice;
     View layout_emojichoice;
+    RecyclerView rv_panel_content;
+    FaceAdapter faceAdapter;
     @BindView(R.id.layout_record)
     RelativeLayout layout_record;
     @BindView(R.id.iv_record)
@@ -201,11 +206,14 @@ public class ConversationActivity extends BaseIMActivity {
             return true;
         });
         layout_emojichoice=kp_panel_root.findViewById(R.id.layout_emojichoice);
-        KeyboardUtil.attach(this, kp_panel_root, isShowing -> {
-            if (isShowing) {
-                rv_conversation.scrollToPosition(messageBeens.size()-1);
-            }
+        faceAdapter = new FaceAdapter(this, (value, res) -> {
+            int currentPosition = edit_conversation.getSelectionStart();
+            edit_conversation.getText().insert(currentPosition, FaceIconUtil.getInstance().getEmojiSpannableString(value, res));
         });
+        rv_panel_content = layout_emojichoice.findViewById(R.id.rv_panel_content);
+        rv_panel_content.setHasFixedSize(true);
+        rv_panel_content.setLayoutManager(new GridLayoutManager(this, 7));
+        rv_panel_content.setAdapter(faceAdapter);
         KPSwitchConflictUtil.attach(kp_panel_root, edit_conversation, switchToPanel -> {
             if (switchToPanel) {
                 edit_conversation.clearFocus();
@@ -523,7 +531,7 @@ public class ConversationActivity extends BaseIMActivity {
             return;
         }
         MessageBean messageBean=new MessageBean();
-        messageBean.setMsg(edit_conversation.getText().toString());
+        messageBean.setMsg(FaceIconUtil.getInstance().replaceAddBounce(edit_conversation.getText().toString()));
         messageBean.setMsgMeta("");
         messageBean.setMsgType(Enums.MessageType.TEXT);
         messageBean.setUserId(chatUserId);

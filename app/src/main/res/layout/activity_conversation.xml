@@ -85,7 +85,7 @@
                 layout="@layout/panel_content" />
             <include
                 android:id="@+id/layout_emojichoice"
-                layout="@layout/panel_content" />
+                layout="@layout/panel_emoji" />
             <include
                 android:id="@+id/layout_voicechoice"
                 layout="@layout/panel_recordvoice" />
