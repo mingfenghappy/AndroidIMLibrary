@@ -1,17 +1,6 @@
 package com.focustech.message.msg;
 
-/**********************************************************
- * @文件名称：MessageResponse.java
- * @文件作者：yangyanlong
- * @创建时间：2013-11-11 下午3:02:19
- * @文件描述：
- * @修改历史：2013-11-11创建初始版本
- **********************************************************/
-public class MessageResponse extends TMResponse
-{
-	public static final int FLAG_ALREADY_READ = 1;
-	public static final int FLAG_NOT_READ = 0;
-	// TODO 用于网友表单数据接收
+public class MessageResponse extends TMResponse {
     private String msgMeta;
 	public String getMsgMeta() {
 		 return msgMeta;
@@ -20,7 +9,6 @@ public class MessageResponse extends TMResponse
 	{
 		this.msgMeta = msgMeta;
 	}
-
 
 	private String msg;
 	private String fontFace;

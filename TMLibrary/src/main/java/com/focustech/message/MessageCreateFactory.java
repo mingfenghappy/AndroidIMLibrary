@@ -1,25 +1,18 @@
 package com.focustech.message;
 
+import com.focustech.message.group.GroupMsgResponse;
+import com.focustech.message.msg.MessageResponse;
 import com.focustech.message.msg.TMMessage;
 import com.focustech.message.params.MessageMeta;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums.Enable;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums.MessageType;
 import com.focustech.tm.open.sdk.messages.protobuf.Messages;
 import com.focustech.tm.open.sdk.messages.protobuf.Messages.Message;
-import com.focustech.message.group.GroupMsgResponse;
-import com.focustech.message.msg.MessageResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**********************************************************
- * @文件名称：MessageCreateFactory.java
- * @文件作者：huangshuo
- * @创建时间：2014-9-10 下午4:21:31
- * @文件描述：
- * @修改历史：2014-9-10创建初始版本
- **********************************************************/
 public class MessageCreateFactory {
 	/**
 	 * 普通消息适配
