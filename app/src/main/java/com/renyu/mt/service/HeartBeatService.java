@@ -69,7 +69,7 @@ public class HeartBeatService extends Service {
                 // 首次开启不算做错误
                 if (((MTApplication) getApplicationContext()).connState != BroadcastBean.MTCommand.Conn ||
                         sendCount == 0) {
-                    Log.d("MTAPP", "算是首次开启连接");
+                    Log.d("MTAPP", "正在连接");
                     // 重置相关数据
                     errorTime = 0;
                     sendCount = 1;
@@ -125,6 +125,11 @@ public class HeartBeatService extends Service {
                     lastReceiveTime=System.currentTimeMillis();
                     errorTime=0;
                     Log.d("MTAPP", "收到心跳包，重置");
+                    // 准备发送重连指令之后收到心跳包，则认为是一次成功的发送
+                    if (sendCount == 0) {
+                        sendCount++;
+                        Log.d("MTAPP", "修正心跳包发送指令");
+                    }
                 }
             }
         }

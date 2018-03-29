@@ -30,7 +30,7 @@ public class TMMessageProcessorAdapter extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        Log.d("MTAPP", cause.getMessage());
     }
 
 	@Override
@@ -39,26 +39,26 @@ public class TMMessageProcessorAdapter extends IoHandlerAdapter {
 	}
 
     @Override
+    public void sessionOpened(IoSession session) throws Exception {
+        super.sessionOpened(session);
+//        Log.d("MTAPP", "sessionOpened");
+    }
+
+    @Override
     public void sessionClosed(IoSession session) throws Exception {
         super.sessionClosed(session);
-        Log.d("MTAPP", "sessionClosed");
+//        Log.d("MTAPP", "sessionClosed");
     }
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {
         super.sessionCreated(session);
-        Log.d("MTAPP", "sessionCreated");
+//        Log.d("MTAPP", "sessionCreated");
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         super.sessionIdle(session, status);
-        Log.d("MTAPP", "sessionIdle");
-    }
-
-    @Override
-    public void sessionOpened(IoSession session) throws Exception {
-        super.sessionOpened(session);
-        Log.d("MTAPP", "sessionOpened");
+//        Log.d("MTAPP", "sessionIdle");
     }
 }

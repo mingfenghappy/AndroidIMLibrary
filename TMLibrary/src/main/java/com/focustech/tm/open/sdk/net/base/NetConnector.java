@@ -3,9 +3,8 @@ package com.focustech.tm.open.sdk.net.base;
 import android.content.Context;
 import android.util.Log;
 
-import com.focustech.tm.open.sdk.net.codec.TMMessageCodecFactory;
-import com.focustech.params.FusionField;
 import com.focustech.message.model.BroadcastBean;
+import com.focustech.tm.open.sdk.net.codec.TMMessageCodecFactory;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
@@ -20,7 +19,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 建立mina连接
@@ -99,12 +97,12 @@ public class NetConnector {
 
 			@Override
 			public void serviceDeactivated(IoService arg0) throws Exception {
-				Log.d("MTAPP", "服务被停用");
+//				Log.d("MTAPP", "服务被停用");
 			}
 
 			@Override
 			public void serviceActivated(IoService arg0) throws Exception {
-				Log.d("MTAPP", "服务被激活");
+//				Log.d("MTAPP", "服务被激活");
 			}
 		});
 	}
@@ -114,18 +112,29 @@ public class NetConnector {
 		currentServer = currentServer();
 		initConnector();
 		Log.d("MTAPP", "开始连接:"+currentServer.toString());
-		// 开始连接
-		cuture = connector.connect(currentServer);
-		// 等待是否连接成功，相当于是转异步执行为同步执行。
-		cuture.awaitUninterruptibly(FusionField.connectTimeout, TimeUnit.SECONDS);
-		isConnected = cuture.isConnected();
-		Log.d("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
-		if (isConnected) {
-			// 连接成功后获取会话对象。如果没有上面的等待，由于connect()方法是异步的，session可能会无法获取。
-			session = cuture.getSession();
-			// 设置发送连接session
-			TMConnection.getInstance(context).setIo(session);
-			return true;
+		try {
+			// 开始连接
+			cuture = connector.connect(currentServer);
+			// 等待是否连接成功，相当于是转异步执行为同步执行。
+			cuture.awaitUninterruptibly();
+			isConnected = cuture.isConnected();
+			if (isConnected) {
+				Log.d("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
+				// 连接成功后获取会话对象。如果没有上面的等待，由于connect()方法是异步的，session可能会无法获取。
+				session = cuture.getSession();
+				// 设置发送连接session
+				TMConnection.getInstance(context).setIo(session);
+				return true;
+			}
+			else {
+				Log.e("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
+				if (cuture.getException() != null) {
+					Log.e("MTAPP", cuture.getException().toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.e("MTAPP", e.getMessage());
 		}
 		return false;
 	}

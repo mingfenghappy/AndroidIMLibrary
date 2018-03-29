@@ -129,7 +129,6 @@ public class MTApplication extends MultiDexApplication {
                 if (intent.getAction() == "MT") {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
-                        Log.d("MTAPP", "连接成功");
                         connState = BroadcastBean.MTCommand.Conn;
                         // 如果用户已经登录过，则执行登录操作
                         // 如果是因为App被回收导致页面新建，则执行自动登录
@@ -143,12 +142,10 @@ public class MTApplication extends MultiDexApplication {
                         changeNotificationState();
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Disconn) {
-                        Log.d("MTAPP", "连接已断开");
                         connState = BroadcastBean.MTCommand.Disconn;
                         changeNotificationState();
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conning) {
-                        Log.d("MTAPP", "正在连接");
                         connState = BroadcastBean.MTCommand.Conning;
                         changeNotificationState();
                     }

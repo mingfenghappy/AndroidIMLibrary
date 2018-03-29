@@ -8,9 +8,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.focustech.message.RequestClient;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.MessageBean;
+import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.commonlibrary.network.OKHttpUtils;
 
