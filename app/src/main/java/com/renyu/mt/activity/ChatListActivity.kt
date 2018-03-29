@@ -14,6 +14,7 @@ import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.ChatListFragment
+import com.renyu.mt.utils.IntentWrapper
 
 /**
  * Created by Administrator on 2018/3/21 0021.
@@ -98,6 +99,9 @@ class ChatListActivity : BaseIMActivity() {
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
                 .commitAllowingStateLoss()
+
+        // 开启白名单
+        IntentWrapper.whiteListMatters(this, null)
     }
 
     override fun initViews() = R.layout.activity_chatlist
