@@ -125,6 +125,16 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * 删除全部数据
+     */
+    public void clearAllInfo() {
+        db.execSQL("delete from "+UserInfoRspTable);
+        db.execSQL("delete from "+FriendInfoRspTable);
+        db.execSQL("delete from "+MessageTable);
+        db.execSQL("delete from "+SystemMessageTable);
+    }
+
+    /**
      * 删除好友对应组关系
      */
     public void clearAllFriendList() {

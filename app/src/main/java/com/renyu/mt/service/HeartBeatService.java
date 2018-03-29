@@ -10,8 +10,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.focustech.params.FusionField;
 import com.focustech.message.model.BroadcastBean;
+import com.focustech.params.FusionField;
 import com.renyu.commonlibrary.commonutils.NotificationUtils;
 import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;

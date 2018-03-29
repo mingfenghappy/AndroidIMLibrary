@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.renyu.mt.service.MTService;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendStatusRsp;
@@ -19,8 +18,8 @@ import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
-
-import org.jetbrains.annotations.Nullable;
+import com.renyu.mt.params.CommonParams;
+import com.renyu.mt.service.MTService;
 
 import java.util.ArrayList;
 
@@ -38,11 +37,9 @@ public class UserDetailActivity extends BaseIMActivity {
     @BindView(R.id.btn_userdetail_add)
     Button btn_userdetail_add;
 
-    BroadcastReceiver registerReceiver;
-
     @Override
     public void initParams() {
-        registerReceiver =new BroadcastReceiver() {
+        receiver =new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
@@ -86,6 +83,13 @@ public class UserDetailActivity extends BaseIMActivity {
                     if (bean.getCommand()== BroadcastBean.MTCommand.RefreshFriendList) {
                         // 刷新好友关系
                         refreshFriendState();
+                    }
+                    // 被踢下线
+                    if (bean.getCommand() == BroadcastBean.MTCommand.Kickout) {
+                        CommonParams.isKickout = true;
+                        if (!isPause) {
+                            kickout();
+                        }
                     }
                 }
             }
@@ -165,11 +169,5 @@ public class UserDetailActivity extends BaseIMActivity {
                 MTService.getFriendRuleReq(this, getIntent().getStringExtra("UserId"));
                 break;
         }
-    }
-
-    @Nullable
-    @Override
-    public BroadcastReceiver getReceiver() {
-        return registerReceiver;
     }
 }

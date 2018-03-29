@@ -11,7 +11,8 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.SPUtils;
-import com.renyu.mt.service.MTService;
+import com.blankj.utilcode.util.Utils;
+import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
@@ -20,8 +21,7 @@ import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.base.BaseIMActivity;
 import com.renyu.mt.params.CommonParams;
-
-import org.jetbrains.annotations.Nullable;
+import com.renyu.mt.service.MTService;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -37,8 +37,6 @@ public class SignInActivity extends BaseIMActivity {
     @BindView(R.id.ed_pwd)
     EditText ed_pwd;
 
-    BroadcastReceiver mReceiver;
-
     @Override
     public void initParams() {
         // 初始化文件夹
@@ -48,7 +46,7 @@ public class SignInActivity extends BaseIMActivity {
         FileUtils.createOrExistsDir(InitParams.LOG_PATH);
         FileUtils.createOrExistsDir(InitParams.CACHE_PATH);
 
-        mReceiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
@@ -56,7 +54,7 @@ public class SignInActivity extends BaseIMActivity {
                     // 此处为当前用户登录后返回的信息
                     if (bean.getCommand()== BroadcastBean.MTCommand.UserInfoRsp) {
                         UserInfoRsp userInfoRsp= (UserInfoRsp) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        ACache.get(SignInActivity.this).put("UserInfoRsp", userInfoRsp);
+                        ACache.get(Utils.getApp()).put("UserInfoRsp", userInfoRsp);
                         // 用户登录信息
                         SPUtils.getInstance().put(CommonParams.SP_UNAME, ed_username.getText().toString());
                         SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
@@ -70,10 +68,15 @@ public class SignInActivity extends BaseIMActivity {
             }
         };
 
+        if (CommonParams.isKickout) {
+            CommonParams.isKickout = false;
+            return;
+        }
+
         if (CommonParams.isRestore) {
             finish();
         }
-        else if (ACache.get(SignInActivity.this).getAsObject("UserInfoRsp") != null) {
+        else if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null) {
             // 登录成功跳转首页
             startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
         }
@@ -125,6 +128,8 @@ public class SignInActivity extends BaseIMActivity {
                 if (((MTApplication) getApplication()).connState == BroadcastBean.MTCommand.Conn &&
                         !TextUtils.isEmpty(ed_username.getText().toString()) &&
                         !TextUtils.isEmpty(ed_pwd.getText().toString())) {
+                    // 删除旧数据
+                    PlainTextDBHelper.getInstance(Utils.getApp()).clearAllInfo();
                     MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(), ed_pwd.getText().toString());
                 }
                 break;
@@ -134,12 +139,11 @@ public class SignInActivity extends BaseIMActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        finish();
-    }
-
-    @Nullable
-    @Override
-    public BroadcastReceiver getReceiver() {
-        return mReceiver;
+        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.FINISH) {
+            finish();
+        }
+        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.KICKOUT) {
+            CommonParams.isKickout = false;
+        }
     }
 }

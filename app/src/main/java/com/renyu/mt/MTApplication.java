@@ -126,7 +126,7 @@ public class MTApplication extends MultiDexApplication {
         baseReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction() == "MT") {
+                if (intent.getAction().equals("MT")) {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
                         connState = BroadcastBean.MTCommand.Conn;
@@ -269,6 +269,16 @@ public class MTApplication extends MultiDexApplication {
                         UserInfoRsp userInfoRsp = (UserInfoRsp) bean.getSerializable();
                         // 数据库添加好友信息
                         PlainTextDBHelper.getInstance(MTApplication.this).insertFriendList(userInfoRsp);
+                    }
+                    // 被踢下线
+                    if (bean.getCommand()== BroadcastBean.MTCommand.Kickout) {
+                        CommonParams.isKickout = true;
+
+                        // 清除缓存内容
+                        SPUtils.getInstance().remove(CommonParams.SP_UNAME);
+                        SPUtils.getInstance().remove(CommonParams.SP_PWD);
+                        ACache.get(com.blankj.utilcode.util.Utils.getApp()).remove("UserInfoRsp");
+                        Log.d("MTApp", "发生注销");
                     }
                 }
             }

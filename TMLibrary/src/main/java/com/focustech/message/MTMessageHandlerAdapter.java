@@ -199,9 +199,13 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 		}
 	}
 
+	/**
+	 * 被踢下线
+	 * @param message
+	 */
 	@Override
 	public void onKickoutNty(TMMessage message) {
-
+		BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Kickout, "");
 	}
 
 	/**

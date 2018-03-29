@@ -14,6 +14,7 @@ import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.ChatListFragment
+import com.renyu.mt.params.CommonParams
 import com.renyu.mt.utils.IntentWrapper
 
 /**
@@ -25,8 +26,6 @@ class ChatListActivity : BaseIMActivity() {
     var currentUserInfo: UserInfoRsp? = null
 
     var conversationFragment: ChatListFragment? = null
-
-    private var mReceiver: BroadcastReceiver? = null
 
     override fun setStatusBarColor() = Color.BLACK
 
@@ -48,7 +47,7 @@ class ChatListActivity : BaseIMActivity() {
         // 获取当前用户信息
         currentUserInfo = ACache.get(this).getAsObject("UserInfoRsp") as UserInfoRsp
 
-        mReceiver = object : BroadcastReceiver() {
+        receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "MT") {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
@@ -88,10 +87,16 @@ class ChatListActivity : BaseIMActivity() {
                             conversationFragment?.refreshOfflineUser(userInfoRsp)
                         }
                     }
+                    // 被踢下线
+                    if (bean.command == BroadcastBean.MTCommand.Kickout) {
+                        CommonParams.isKickout = true
+                        if (!isPause) {
+                            kickout()
+                        }
+                    }
                 }
             }
         }
-        receiver = mReceiver
         openCurrentReceiver()
 
         conversationFragment = ChatListFragment()
@@ -113,7 +118,9 @@ class ChatListActivity : BaseIMActivity() {
 
     override fun onBackPressed() {
         val intent = Intent(this, SignInActivity::class.java)
+        intent.putExtra(CommonParams.TYPE, CommonParams.FINISH)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(intent)
+        finish()
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
-import com.renyu.mt.service.MTService
 import com.focustech.message.model.BroadcastBean
 import com.focustech.message.model.FriendGroupRsp
 import com.focustech.message.model.FriendInfoRsp
@@ -14,14 +13,14 @@ import com.focustech.message.model.UserInfoRsp
 import com.renyu.mt.R
 import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.FriendListFragment
+import com.renyu.mt.params.CommonParams
+import com.renyu.mt.service.MTService
 import java.util.*
 
 /**
  * Created by Administrator on 2018/3/26 0026.
  */
 class FriendListActivity : BaseIMActivity() {
-
-    private var mReceiver: BroadcastReceiver? = null
 
     var friendListFragment: FriendListFragment? = null
 
@@ -34,7 +33,7 @@ class FriendListActivity : BaseIMActivity() {
     }
 
     override fun initParams() {
-        mReceiver = object : BroadcastReceiver() {
+        receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "MT") {
                     val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
@@ -66,10 +65,16 @@ class FriendListActivity : BaseIMActivity() {
                     if (bean.command == BroadcastBean.MTCommand.RefreshFriendList) {
                         MTService.reqFriendGroups(this@FriendListActivity)
                     }
+                    // 被踢下线
+                    if (bean.command == BroadcastBean.MTCommand.Kickout) {
+                        CommonParams.isKickout = true
+                        if (!isPause) {
+                            kickout()
+                        }
+                    }
                 }
             }
         }
-        receiver = mReceiver
         openCurrentReceiver()
 
         friendListFragment = FriendListFragment()

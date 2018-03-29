@@ -13,4 +13,13 @@ public class CommonParams {
 
     // app是否发生了回收，用来给启动页使用
     public static boolean isRestore = false;
+
+    // 是否被踢下线
+    public static boolean isKickout = false;
+
+    public static final String TYPE = "type";
+    // 退出App
+    public static final int FINISH = 1;
+    // 被踢下线
+    public static final int KICKOUT = 2;
 }

@@ -42,12 +42,12 @@ import com.renyu.mt.adapter.FaceAdapter;
 import com.renyu.mt.base.BaseIMActivity;
 import com.renyu.mt.impl.IMBaseResponseList;
 import com.renyu.mt.impl.RetrofitImpl;
+import com.renyu.mt.params.CommonParams;
 import com.renyu.mt.service.MTService;
 import com.renyu.mt.utils.DownloadUtils;
 import com.renyu.mt.utils.FaceIconUtil;
 import com.renyu.mt.utils.RecordUtils;
 
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,8 +97,6 @@ public class ConversationActivity extends BaseIMActivity {
     TextView tv_record;
 
     ArrayList<MessageBean> messageBeens;
-
-    BroadcastReceiver registerReceiver;
 
     // 当前用户信息
     UserInfoRsp currentUserInfo;
@@ -252,7 +250,7 @@ public class ConversationActivity extends BaseIMActivity {
             }
         });
 
-        registerReceiver=new BroadcastReceiver() {
+        receiver=new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
@@ -326,6 +324,13 @@ public class ConversationActivity extends BaseIMActivity {
                         TextView textView = rv_conversation.findViewWithTag(fileInfoBean.getSvrMsgId()+"_length");
                         if (textView!=null) {
                             textView.setText(fileInfoBean.getFileSize()/1600+"\'\'");
+                        }
+                    }
+                    // 被踢下线
+                    if (bean.getCommand() == BroadcastBean.MTCommand.Kickout) {
+                        CommonParams.isKickout = true;
+                        if (!isPause) {
+                            kickout();
                         }
                     }
                 }
@@ -719,11 +724,5 @@ public class ConversationActivity extends BaseIMActivity {
                 sendPicMessage(file);
             }
         }
-    }
-
-    @Nullable
-    @Override
-    public BroadcastReceiver getReceiver() {
-        return registerReceiver;
     }
 }

@@ -137,6 +137,9 @@ public class FriendListFragment extends BaseFragment {
         while (it.hasNext()) {
             Map.Entry<String, List<FriendStatusRsp>> entry=it.next();
             for (FriendStatusRsp friendStatusRsp : entry.getValue()) {
+                if (friendStatusRsp.getFriendInfoRsp().getFriend() == null) {
+                    continue;
+                }
                 if (friendStatusRsp.getFriendInfoRsp().getFriend().getUserId().equals(userInfoRsp.getUserId())) {
                     friendStatusRsp.getFriendInfoRsp().getFriend().setUserHeadId(userInfoRsp.getUserHeadId());
                     friendStatusRsp.getFriendInfoRsp().getFriend().setEquipments(userInfoRsp.getEquipments());

@@ -14,8 +14,7 @@ import com.focustech.message.model.SystemMessageBean;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.SystemMessageAdapter;
 import com.renyu.mt.base.BaseIMActivity;
-
-import org.jetbrains.annotations.Nullable;
+import com.renyu.mt.params.CommonParams;
 
 import java.util.ArrayList;
 
@@ -33,8 +32,6 @@ public class SystemMessageActivity extends BaseIMActivity {
 
     ArrayList<SystemMessageBean> beans;
 
-    BroadcastReceiver registerReceiver;
-
     @Override
     public void initParams() {
         beans=new ArrayList<>();
@@ -45,7 +42,7 @@ public class SystemMessageActivity extends BaseIMActivity {
         adapter=new SystemMessageAdapter(this, beans);
         rv_messagelist.setAdapter(adapter);
 
-        registerReceiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("MT")) {
@@ -56,6 +53,13 @@ public class SystemMessageActivity extends BaseIMActivity {
                             SystemMessageBean systemMessageBean = (SystemMessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
                             beans.add(0, systemMessageBean);
                             adapter.notifyDataSetChanged();
+                        }
+                    }
+                    // 被踢下线
+                    if (bean.getCommand() == BroadcastBean.MTCommand.Kickout) {
+                        CommonParams.isKickout = true;
+                        if (!isPause) {
+                            kickout();
                         }
                     }
                 }
@@ -88,11 +92,5 @@ public class SystemMessageActivity extends BaseIMActivity {
     protected void onDestroy() {
         super.onDestroy();
         closeCurrentReceiver();
-    }
-
-    @Nullable
-    @Override
-    public BroadcastReceiver getReceiver() {
-        return registerReceiver;
     }
 }

@@ -38,7 +38,8 @@ public class BroadcastBean implements Serializable {
         AddedFriendSucceededSysNty,
         AddFriendWithoutValidateSucceededSysNty,
         RefreshFriendList,
-        FriendInfoNty
+        FriendInfoNty,
+        Kickout
     }
 
     MTCommand command;
