@@ -24,7 +24,7 @@ public class FusionField {
 	// 心跳包发送间隔
 	public static int heartBeatSendInterval = 30;
 	// 心跳包线程执行间隔
-	public static int heartBeatThreadInterval = 5;
+	public static int heartBeatThreadInterval = 10;
 
 	// 下载文件地址
 	public static String downloadUrl = "http://webim.house365.com/tm/file/download?";

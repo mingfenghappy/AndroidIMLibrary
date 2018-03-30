@@ -27,12 +27,10 @@ public class HeartBeatService extends Service {
 
     ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    // 上一次收到心跳包返回的时间
-    long lastReceiveTime=-1;
     // 心跳包计数器
     long sendCount=0;
-    // 总错误次数
-    int errorTime=0;
+    // 下一次认定连接断开的截止时间
+    long failureTime=0;
 
     @Nullable
     @Override
@@ -66,36 +64,29 @@ public class HeartBeatService extends Service {
             Log.d("MTAPP", "初始化线程池");
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
             scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
-                // 首次开启不算做错误
                 if (((MTApplication) getApplicationContext()).connState != BroadcastBean.MTCommand.Conn ||
                         sendCount == 0) {
-                    Log.d("MTAPP", "正在连接");
                     // 重置相关数据
-                    errorTime = 0;
                     sendCount = 1;
-                    lastReceiveTime = System.currentTimeMillis();
+                    failureTime = System.currentTimeMillis() + FusionField.heartBeatSendInterval*1000*FusionField.retryTime;
+                    // 开始连接
+                    Log.d("MTAPP", "正在连接");
                     MTService.conn(getApplicationContext());
                     return;
                 }
-                // 每30s发送心跳数据
-                int interval = FusionField.heartBeatSendInterval/FusionField.heartBeatThreadInterval;
-                if (sendCount%interval == 0) {
-                    Log.d("MTAPP", "发送心跳包");
-                    MTService.heartbeat(getApplicationContext());
-                }
-                // 超过30s之后判定一次失败
-                // TODO: 2018/3/26 0026 偷个懒
-                if (System.currentTimeMillis()-lastReceiveTime > FusionField.heartBeatSendInterval*1000) {
-                    errorTime++;
-                    Log.d("MTAPP", "当前出现错误，错误次数为" + errorTime);
-                }
-                sendCount++;
-                // 错误超过3次重新发起连接登录
-                if (errorTime >= FusionField.retryTime) {
-                    errorTime = 0;
+                // 判断是否发生连接断开
+                if (System.currentTimeMillis()-failureTime > 0) {
                     sendCount = 0;
-                    lastReceiveTime = System.currentTimeMillis();
                     Log.d("MTAPP", "达到错误，准备下次重新连接");
+                }
+                else {
+                    // 发送心跳数据
+                    int interval = FusionField.heartBeatSendInterval/FusionField.heartBeatThreadInterval;
+                    if (sendCount%interval == 0) {
+                        Log.d("MTAPP", "发送心跳包");
+                        MTService.heartbeat(getApplicationContext());
+                    }
+                    sendCount++;
                 }
             }, 1, FusionField.heartBeatThreadInterval, TimeUnit.SECONDS);
         }
@@ -122,14 +113,9 @@ public class HeartBeatService extends Service {
                 BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                 if (bean.getCommand() == BroadcastBean.MTCommand.HeartBeat ||
                         bean.getCommand() == BroadcastBean.MTCommand.Conn) {
-                    lastReceiveTime=System.currentTimeMillis();
-                    errorTime=0;
+                    // 重置相关数据
+                    failureTime = System.currentTimeMillis() + FusionField.heartBeatSendInterval*1000*FusionField.retryTime;
                     Log.d("MTAPP", "收到心跳包，重置");
-                    // 准备发送重连指令之后收到心跳包，则认为是一次成功的发送
-                    if (sendCount == 0) {
-                        sendCount++;
-                        Log.d("MTAPP", "修正心跳包发送指令");
-                    }
                 }
             }
         }
