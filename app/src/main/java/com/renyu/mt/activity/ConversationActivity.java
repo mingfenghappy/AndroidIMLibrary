@@ -121,6 +121,14 @@ public class ConversationActivity extends BaseDemoActivity {
         });
         layout_nav_right.addView(textView);
 
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (ACache.get(this).getAsObject("UserInfoRsp") == null) {
+            com.renyu.tmbaseuilibrary.params.CommonParams.isKickout = true;
+            finish();
+            Log.d("MTAPP", "回退到上一页");
+            return;
+        }
+
         currentUserInfo = (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
         chatUserId = getIntent().getStringExtra("UserId");
 

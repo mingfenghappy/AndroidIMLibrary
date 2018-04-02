@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -15,6 +16,7 @@ import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendStatusRsp;
 import com.focustech.message.model.GetFriendRuleRsp;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
+import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
 import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
@@ -38,6 +40,14 @@ public class UserDetailActivity extends BaseDemoActivity {
 
     @Override
     public void initParams() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (ACache.get(this).getAsObject("UserInfoRsp") == null) {
+            com.renyu.tmbaseuilibrary.params.CommonParams.isKickout = true;
+            finish();
+            Log.d("MTAPP", "回退到上一页");
+            return;
+        }
+
         receiver =new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

@@ -72,7 +72,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
                     .setPostprocessor(new GrayscalePostprocessor())
                     .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             holder.tv_adapter_conversationlist_msg.setText(offlineMessages.get(position).getLastMsg());
-            holder.layout_adapter_conversationlist.setOnClickListener(view -> context.startActivity(new Intent(context, SystemMessageActivity.class)));
         }
         // 普通好友消息
         else {
@@ -106,26 +105,33 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
                         .setPostprocessor(new GrayscalePostprocessor())
                         .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             }
-            if (offlineMessages.get(position).getUnloadCount()>0) {
-                holder.tv_adapter_conversationlist_message.setText(""+offlineMessages.get(position).getUnloadCount());
-                holder.tv_adapter_conversationlist_message.setVisibility(View.VISIBLE);
-            }
-            else {
-                holder.tv_adapter_conversationlist_message.setVisibility(View.INVISIBLE);
-            }
-            holder.layout_adapter_conversationlist.setOnClickListener(view -> {
-                PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(offlineMessages.get(position_).getFromUserId());
-                BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());
-
-                Intent intent=new Intent(context, ConversationActivity.class);
-                intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
-                context.startActivity(intent);
-            });
         }
         draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         holder.iv_adapter_conversationlist.setController(draweeController);
         holder.tv_adapter_conversationlist_time.setText(getFriendlyTimeSpanByNow(offlineMessages.get(position).getAddTime()));
+        if (offlineMessages.get(position).getUnloadCount()>0) {
+            holder.tv_adapter_conversationlist_message.setText(""+offlineMessages.get(position).getUnloadCount());
+            holder.tv_adapter_conversationlist_message.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.tv_adapter_conversationlist_message.setVisibility(View.INVISIBLE);
+        }
+        holder.layout_adapter_conversationlist.setOnClickListener(view -> {
+            if (offlineMessages.get(position).getFromUserId().equals("-1")) {
+                PlainTextDBHelper.getInstance(Utils.getApp()).updateSystemMessageRead();
+
+                context.startActivity(new Intent(context, SystemMessageActivity.class));
+            }
+            else {
+                PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(offlineMessages.get(position_).getFromUserId());
+
+                Intent intent=new Intent(context, ConversationActivity.class);
+                intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
+                context.startActivity(intent);
+            }
+            BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());
+        });
     }
 
     @Override

@@ -43,6 +43,14 @@ class ChatListActivity : BaseDemoActivity() {
         }
         findViewById<LinearLayout>(R.id.layout_nav_right).addView(textView)
 
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (ACache.get(this).getAsObject("UserInfoRsp") == null) {
+            com.renyu.tmbaseuilibrary.params.CommonParams.isKickout = true
+            finish()
+            Log.d("MTAPP", "回退到上一页")
+            return
+        }
+
         // 获取当前用户信息
         currentUserInfo = ACache.get(this).getAsObject("UserInfoRsp") as UserInfoRsp
 

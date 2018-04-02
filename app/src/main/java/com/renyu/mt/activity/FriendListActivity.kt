@@ -4,12 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.util.Log
 import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.message.model.BroadcastBean
 import com.focustech.message.model.FriendGroupRsp
 import com.focustech.message.model.FriendInfoRsp
 import com.focustech.message.model.UserInfoRsp
+import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.fragment.FriendListFragment
 import com.renyu.tmbaseuilibrary.params.CommonParams
@@ -32,6 +34,14 @@ class FriendListActivity : BaseDemoActivity() {
     }
 
     override fun initParams() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (ACache.get(this).getAsObject("UserInfoRsp") == null) {
+            com.renyu.tmbaseuilibrary.params.CommonParams.isKickout = true
+            finish()
+            Log.d("MTAPP", "回退到上一页")
+            return
+        }
+
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "MT") {

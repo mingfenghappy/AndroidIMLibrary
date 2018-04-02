@@ -18,6 +18,9 @@ public class SystemMessageBean implements Serializable {
     int type;                 // 系统消息类型
     String groupId="";
     String groupName="";
+    String isRead;            // 消息是否已读  1:已读 0:未读
+
+    int count;                // 未读消息数（仅会话列表使用）
 
     public String getSrcFriendUserId() {
         return srcFriendUserId;
@@ -81,6 +84,22 @@ public class SystemMessageBean implements Serializable {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(String isRead) {
+        this.isRead = isRead;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public static SystemMessageBean parse(Contacts.AddedFriendSucceededSysNty nty) {

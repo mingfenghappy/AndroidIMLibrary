@@ -279,6 +279,7 @@ public class ChatListFragment extends BaseFragment {
             messageBean.setFromUserId("-1");
             messageBean.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
             messageBean.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
+            messageBean.setUnloadCount(1);
             offlineMessages.add(0, messageBean);
         }
         // 找到就前置

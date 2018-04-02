@@ -115,7 +115,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                 isVoicePlay+" text, "+ timestamp+" text, "+svrMsgId+" text, "+fromSvrMsgId+" text, "+sync+" text, "+
                 resend+" text, "+messageType+" text, "+localFileName+" text);");
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SystemMessageTable+"("+ID+" integer primary key AUTOINCREMENT, "+
-                userId+" text, "+userName+" text, "+ext+" text, "+src+" text, "+timestamp+" text, "+
+                userId+" text, "+userName+" text, "+isRead+" text, "+ext+" text, "+src+" text, "+timestamp+" text, "+
                 type+" text, "+groupId+" text, "+groupName+" text);");
     }
 
@@ -339,6 +339,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         cv1.put(groupId, bean.getGroupId());
         cv1.put(groupName, bean.getGroupName());
         cv1.put(timestamp, bean.getTimestamp());
+        cv1.put(isRead, "0");
         db.insert(SystemMessageTable, null, cv1);
     }
 
@@ -350,6 +351,8 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         SystemMessageBean systemMessageBean=null;
         Cursor cs=db.rawQuery("select *, max("+timestamp+") from "+SystemMessageTable, new String[]{});
         cs.moveToFirst();
+        // 未读消息数
+        int unReadCount = 0;
         for (int i=0;i<cs.getCount();i++) {
             cs.moveToPosition(i);
             if (TextUtils.isEmpty(cs.getString(cs.getColumnIndex(userId)))) {
@@ -363,8 +366,14 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
             systemMessageBean.setGroupId(cs.getString(cs.getColumnIndex(groupId)));
             systemMessageBean.setGroupName(cs.getString(cs.getColumnIndex(groupName)));
             systemMessageBean.setType(Integer.parseInt(cs.getString(cs.getColumnIndex(type))));
+            if (Integer.parseInt(cs.getString(cs.getColumnIndex(isRead))) == 0) {
+                unReadCount++;
+            }
         }
         cs.close();
+        if (systemMessageBean != null) {
+            systemMessageBean.setCount(unReadCount);
+        }
         return systemMessageBean;
     }
 
@@ -499,6 +508,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                 messageBean.setFromUserId("-1");
                 messageBean.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
                 messageBean.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
+                messageBean.setUnloadCount(systemMessageBean.getCount());
                 // 插入系统消息到相应的位置
                 messageBeens.add(i, messageBean);
                 break;
@@ -510,6 +520,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
             messageBean.setFromUserId("-1");
             messageBean.setLastMsg(SystemMessageBean.getSystemMsgContent(systemMessageBean));
             messageBean.setAddTime(Long.parseLong(systemMessageBean.getTimestamp()));
+            messageBean.setUnloadCount(systemMessageBean.getCount());
             messageBeens.add(messageBean);
         }
         return messageBeens;
@@ -589,6 +600,15 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         ContentValues cv=new ContentValues();
         cv.put(isRead, "1");
         db.update(MessageTable, cv, userId+"=?", new String[]{userId_});
+    }
+
+    /**
+     * 更新系统消息已读状态
+     */
+    public void updateSystemMessageRead() {
+        ContentValues cv=new ContentValues();
+        cv.put(isRead, "1");
+        db.update(SystemMessageTable, cv, null, null);
     }
 
     /**

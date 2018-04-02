@@ -23,7 +23,6 @@ import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
-import com.renyu.commonlibrary.commonutils.NotificationUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
 import com.renyu.commonlibrary.network.HttpsUtils;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
@@ -33,6 +32,7 @@ import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.HeartBeatService;
 import com.renyu.tmbaseuilibrary.service.MTService;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
+import com.renyu.tmbaseuilibrary.utils.VoiceUitls;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ import okhttp3.OkHttpClient;
  * Created by Administrator on 2017/7/7.
  */
 
-public class MTApplication extends MultiDexApplication {
+abstract public class MTApplication extends MultiDexApplication {
 
     // 连接状态
     public BroadcastBean.MTCommand connState = BroadcastBean.MTCommand.Disconn;
@@ -167,8 +167,6 @@ public class MTApplication extends MultiDexApplication {
                         }
                         else if (ACache.get(MTApplication.this).getAsObject("UserInfoRsp") != null &&
                                 ((UserInfoRsp) ACache.get(MTApplication.this).getAsObject("UserInfoRsp")).getUserId().equals(userInfoRsp.getUserId())) {
-                            ACache.get(MTApplication.this).put("UserInfoRsp", userInfoRsp);
-
                             // 获取离线消息
                             MTService.reqGetOfflineMessage(MTApplication.this);
                             // 获取系统消息
@@ -208,6 +206,11 @@ public class MTApplication extends MultiDexApplication {
                         PlainTextDBHelper.getInstance(MTApplication.this).insertSystemMessage(messageBean);
                         // 通知会话列表刷新以及会话详情刷新
                         BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
+
+                        // 发送通知
+                        VoiceUitls.playNewMessage("系统消息:"+SystemMessageBean.getSystemMsgContent(messageBean),
+                                "系统消息", SystemMessageBean.getSystemMsgContent(messageBean),
+                                R.raw.ring_system_message_high, getNotificationIntent());
                     }
                     // 收到新消息
                     if (bean.getCommand() == BroadcastBean.MTCommand.Message) {
@@ -218,10 +221,27 @@ public class MTApplication extends MultiDexApplication {
                         if (messageBean.getMessageType().equals("7")) {
                             // 下载完成语音文件之后，方可同步数据库与刷新页面
                             DownloadUtils.addFileAndDb(MTApplication.this, messageBean);
+
+                            // 发送通知
+                            VoiceUitls.playNewMessage(messageBean.getUserId()+":[语音]",
+                                    messageBean.getUserId(), "[语音]",
+                                    R.raw.ring_user_message_high, getNotificationIntent());
                         } else {
                             PlainTextDBHelper.getInstance(MTApplication.this).insertMessage(messageBean);
                             // 通知会话列表刷新以及会话详情刷新
                             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
+
+                            // 发送通知
+                            if (messageBean.getMessageType().equals("8")) {
+                                VoiceUitls.playNewMessage(messageBean.getUserId()+":[图片]",
+                                        messageBean.getUserId(), "[图片]",
+                                        R.raw.ring_user_message_high, getNotificationIntent());
+                            }
+                            else {
+                                VoiceUitls.playNewMessage(messageBean.getUserId()+":"+messageBean.getMsg(),
+                                        messageBean.getUserId(), messageBean.getMsg(),
+                                        R.raw.ring_user_message_high, getNotificationIntent());
+                            }
                         }
                     }
                     // 语音、图片上传完成之后更新表字段
@@ -314,13 +334,8 @@ public class MTApplication extends MultiDexApplication {
             case Disconn:
                 state = "连接失败";
         }
-        NotificationUtils.getNotificationCenter(this).createNormalNotification("提示",
-                "APP在线情况",
-                state,
-                R.color.colorPrimary,
-                R.drawable.ic_im_notification,
-                R.drawable.ic_im_notification,
-                new Intent(),
-                1001);
+        VoiceUitls.playNoVoiceMessage("提示", "APP在线情况", state);
     }
+
+    abstract public Intent getNotificationIntent();
 }
