@@ -2,8 +2,8 @@ package com.renyu.mt.activity;
 
 import android.content.Intent;
 
+import com.renyu.mt.params.CommonParams;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
-import com.renyu.tmbaseuilibrary.params.CommonParams;
 
 abstract public class BaseDemoActivity extends BaseIMActivity {
     @Override

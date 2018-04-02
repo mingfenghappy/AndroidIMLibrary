@@ -13,7 +13,7 @@ import com.focustech.message.model.*
 import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
 import com.renyu.mt.fragment.ChatListFragment
-import com.renyu.tmbaseuilibrary.params.CommonParams
+import com.renyu.mt.params.CommonParams
 import com.renyu.tmbaseuilibrary.utils.IntentWrapper
 
 /**
@@ -88,7 +88,7 @@ class ChatListActivity : BaseDemoActivity() {
                     }
                     // 被踢下线
                     if (bean.command == BroadcastBean.MTCommand.Kickout) {
-                        CommonParams.isKickout = true
+                        com.renyu.tmbaseuilibrary.params.CommonParams.isKickout = true
                         if (!isPause) {
                             kickout()
                         }

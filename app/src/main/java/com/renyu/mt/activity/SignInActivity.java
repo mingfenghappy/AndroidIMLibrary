@@ -138,10 +138,10 @@ public class SignInActivity extends BaseDemoActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.FINISH) {
+        if (intent.getIntExtra(com.renyu.mt.params.CommonParams.TYPE, -1) == com.renyu.mt.params.CommonParams.FINISH) {
             finish();
         }
-        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.KICKOUT) {
+        if (intent.getIntExtra(com.renyu.mt.params.CommonParams.TYPE, -1) == com.renyu.mt.params.CommonParams.KICKOUT) {
             CommonParams.isKickout = false;
         }
     }
