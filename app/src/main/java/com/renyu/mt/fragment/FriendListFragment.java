@@ -10,7 +10,7 @@ import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
 import com.alibaba.android.vlayout.layout.StickyLayoutHelper;
 import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.renyu.mt.service.MTService;
+import com.renyu.tmbaseuilibrary.service.MTService;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendInfoRsp;
 import com.focustech.message.model.FriendStatusRsp;

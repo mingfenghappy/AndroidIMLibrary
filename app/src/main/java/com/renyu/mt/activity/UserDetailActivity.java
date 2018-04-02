@@ -15,11 +15,10 @@ import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendStatusRsp;
 import com.focustech.message.model.GetFriendRuleRsp;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
-import com.renyu.mt.base.BaseIMActivity;
-import com.renyu.mt.params.CommonParams;
-import com.renyu.mt.service.MTService;
+import com.renyu.tmbaseuilibrary.app.MTApplication;
+import com.renyu.tmbaseuilibrary.params.CommonParams;
+import com.renyu.tmbaseuilibrary.service.MTService;
 
 import java.util.ArrayList;
 
@@ -30,7 +29,7 @@ import butterknife.OnClick;
  * Created by Administrator on 2017/8/2.
  */
 
-public class UserDetailActivity extends BaseIMActivity {
+public class UserDetailActivity extends BaseDemoActivity {
 
     @BindView(R.id.btn_userdetail_delete)
     Button btn_userdetail_delete;

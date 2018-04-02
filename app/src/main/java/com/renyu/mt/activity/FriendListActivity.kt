@@ -11,16 +11,15 @@ import com.focustech.message.model.FriendGroupRsp
 import com.focustech.message.model.FriendInfoRsp
 import com.focustech.message.model.UserInfoRsp
 import com.renyu.mt.R
-import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.FriendListFragment
-import com.renyu.mt.params.CommonParams
-import com.renyu.mt.service.MTService
+import com.renyu.tmbaseuilibrary.params.CommonParams
+import com.renyu.tmbaseuilibrary.service.MTService
 import java.util.*
 
 /**
  * Created by Administrator on 2018/3/26 0026.
  */
-class FriendListActivity : BaseIMActivity() {
+class FriendListActivity : BaseDemoActivity() {
 
     var friendListFragment: FriendListFragment? = null
 

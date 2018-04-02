@@ -28,7 +28,7 @@ import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
 import com.renyu.mt.activity.ConversationActivity;
-import com.renyu.mt.utils.AvatarUtils;
+import com.renyu.tmbaseuilibrary.utils.AvatarUtils;
 
 import java.util.List;
 

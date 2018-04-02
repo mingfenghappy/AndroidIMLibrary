@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.renyu.mt.R
-import com.renyu.mt.utils.FaceIconUtil
+import com.renyu.tmbaseuilibrary.utils.FaceIconUtil
 import kotlinx.android.synthetic.main.adapter_face.view.*
 import org.jetbrains.anko.imageResource
 
@@ -26,14 +26,14 @@ class FaceAdapter() : RecyclerView.Adapter<FaceAdapter.FaceHolder>() {
         this.onItemClickListener = onItemClickListener
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): FaceHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FaceHolder {
         var view = LayoutInflater.from(context).inflate(R.layout.adapter_face, parent, false)
         return FaceHolder(view)
     }
 
     override fun getItemCount() = iconfaceRsId!!.size
 
-    override fun onBindViewHolder(holder: FaceHolder?, position: Int) {
+    override fun onBindViewHolder(holder: FaceHolder, position: Int) {
         holder?.showImage(position)
     }
 

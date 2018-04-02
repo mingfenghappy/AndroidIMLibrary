@@ -1,1 +1,1 @@
-include ':app', ':TMLibrary'
+include ':app', ':TMLibrary', ':TMBaseUILibrary'

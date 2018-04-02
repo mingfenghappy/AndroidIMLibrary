@@ -118,8 +118,8 @@ public class NetConnector {
 			// 等待是否连接成功，相当于是转异步执行为同步执行。
 			cuture.awaitUninterruptibly();
 			isConnected = cuture.isConnected();
+			Log.d("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
 			if (isConnected) {
-				Log.d("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
 				// 连接成功后获取会话对象。如果没有上面的等待，由于connect()方法是异步的，session可能会无法获取。
 				session = cuture.getSession();
 				// 设置发送连接session
@@ -127,7 +127,7 @@ public class NetConnector {
 				return true;
 			}
 			else {
-				Log.e("MTAPP", "连接状态:"+ (isConnected ? "connected" : "disconnected"));
+				BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.Disconn, "");
 				if (cuture.getException() != null) {
 					Log.e("MTAPP", cuture.getException().toString());
 				}

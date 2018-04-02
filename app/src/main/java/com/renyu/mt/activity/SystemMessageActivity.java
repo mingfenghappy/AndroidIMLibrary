@@ -13,8 +13,7 @@ import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.SystemMessageBean;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.SystemMessageAdapter;
-import com.renyu.mt.base.BaseIMActivity;
-import com.renyu.mt.params.CommonParams;
+import com.renyu.tmbaseuilibrary.params.CommonParams;
 
 import java.util.ArrayList;
 
@@ -24,7 +23,7 @@ import butterknife.BindView;
  * Created by Administrator on 2017/8/8.
  */
 
-public class SystemMessageActivity extends BaseIMActivity {
+public class SystemMessageActivity extends BaseDemoActivity {
 
     @BindView(R.id.rv_messagelist)
     RecyclerView rv_messagelist;

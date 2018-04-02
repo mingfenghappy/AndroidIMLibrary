@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.renyu.mt.service.MTService;
+import com.renyu.tmbaseuilibrary.service.MTService;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.OfflineIMResponse;
 import com.focustech.message.model.SystemMessageBean;

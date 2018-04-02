@@ -1,4 +1,4 @@
-package com.renyu.mt.params;
+package com.renyu.tmbaseuilibrary.params;
 
 /**
  * Created by Administrator on 2018/3/21 0021.

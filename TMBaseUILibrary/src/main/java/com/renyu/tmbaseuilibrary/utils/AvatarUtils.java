@@ -1,11 +1,11 @@
-package com.renyu.mt.utils;
+package com.renyu.tmbaseuilibrary.utils;
 
 import android.content.res.Resources;
 import android.text.TextUtils;
 
 import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
-import com.renyu.mt.R;
+import com.renyu.tmbaseuilibrary.R;
 
 import java.lang.reflect.Field;
 

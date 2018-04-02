@@ -1,4 +1,4 @@
-package com.renyu.mt;
+package com.renyu.tmbaseuilibrary.app;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,10 +28,11 @@ import com.renyu.commonlibrary.commonutils.Utils;
 import com.renyu.commonlibrary.network.HttpsUtils;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.mt.params.CommonParams;
-import com.renyu.mt.service.HeartBeatService;
-import com.renyu.mt.service.MTService;
-import com.renyu.mt.utils.DownloadUtils;
+import com.renyu.tmbaseuilibrary.R;
+import com.renyu.tmbaseuilibrary.params.CommonParams;
+import com.renyu.tmbaseuilibrary.service.HeartBeatService;
+import com.renyu.tmbaseuilibrary.service.MTService;
+import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -104,11 +105,11 @@ public class MTApplication extends MultiDexApplication {
                 openBaseReceiver();
             }
             // 开启心跳服务并进行连接
-            if (!ServiceUtils.isServiceRunning("com.renyu.mt.service.HeartBeatService")) {
+            if (!ServiceUtils.isServiceRunning("com.renyu.tmbaseuilibrary.service.HeartBeatService")) {
                 if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
                     Intent intent = new Intent(this, HeartBeatService.class);
-                    intent.putExtra("smallIcon", R.mipmap.ic_launcher);
-                    intent.putExtra("largeIcon", R.mipmap.ic_launcher);
+                    intent.putExtra("smallIcon", R.drawable.ic_im_notification);
+                    intent.putExtra("largeIcon", R.drawable.ic_im_notification);
                     startForegroundService(intent);
                 }
                 else {
@@ -317,8 +318,8 @@ public class MTApplication extends MultiDexApplication {
                 "APP在线情况",
                 state,
                 R.color.colorPrimary,
-                R.mipmap.ic_launcher,
-                R.mipmap.ic_launcher,
+                R.drawable.ic_im_notification,
+                R.drawable.ic_im_notification,
                 new Intent(),
                 1001);
     }

@@ -35,18 +35,17 @@ import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
-import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
 import com.renyu.mt.adapter.ConversationAdapter;
 import com.renyu.mt.adapter.FaceAdapter;
-import com.renyu.mt.base.BaseIMActivity;
 import com.renyu.mt.impl.IMBaseResponseList;
 import com.renyu.mt.impl.RetrofitImpl;
-import com.renyu.mt.params.CommonParams;
-import com.renyu.mt.service.MTService;
-import com.renyu.mt.utils.DownloadUtils;
-import com.renyu.mt.utils.FaceIconUtil;
-import com.renyu.mt.utils.RecordUtils;
+import com.renyu.tmbaseuilibrary.app.MTApplication;
+import com.renyu.tmbaseuilibrary.params.CommonParams;
+import com.renyu.tmbaseuilibrary.service.MTService;
+import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
+import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
+import com.renyu.tmbaseuilibrary.utils.RecordUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,7 +68,7 @@ import io.reactivex.disposables.Disposable;
  * Created by Administrator on 2017/7/24.
  */
 
-public class ConversationActivity extends BaseIMActivity {
+public class ConversationActivity extends BaseDemoActivity {
 
     @BindView(R.id.layout_nav_right)
     LinearLayout layout_nav_right;

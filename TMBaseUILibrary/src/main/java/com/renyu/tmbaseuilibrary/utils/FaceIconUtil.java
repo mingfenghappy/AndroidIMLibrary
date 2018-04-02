@@ -1,4 +1,4 @@
-package com.renyu.mt.utils;
+package com.renyu.tmbaseuilibrary.utils;
 
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
@@ -8,7 +8,7 @@ import android.text.style.ImageSpan;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.Utils;
-import com.renyu.mt.R;
+import com.renyu.tmbaseuilibrary.R;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

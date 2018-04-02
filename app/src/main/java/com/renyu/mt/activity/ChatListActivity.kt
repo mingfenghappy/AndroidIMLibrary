@@ -12,15 +12,14 @@ import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.message.model.*
 import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.mt.R
-import com.renyu.mt.base.BaseIMActivity
 import com.renyu.mt.fragment.ChatListFragment
-import com.renyu.mt.params.CommonParams
-import com.renyu.mt.utils.IntentWrapper
+import com.renyu.tmbaseuilibrary.params.CommonParams
+import com.renyu.tmbaseuilibrary.utils.IntentWrapper
 
 /**
  * Created by Administrator on 2018/3/21 0021.
  */
-class ChatListActivity : BaseIMActivity() {
+class ChatListActivity : BaseDemoActivity() {
 
     // 当前登录用户
     var currentUserInfo: UserInfoRsp? = null

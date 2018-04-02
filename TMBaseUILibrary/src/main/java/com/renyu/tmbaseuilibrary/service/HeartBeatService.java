@@ -1,10 +1,11 @@
-package com.renyu.mt.service;
+package com.renyu.tmbaseuilibrary.service;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -13,8 +14,7 @@ import android.util.Log;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.params.FusionField;
 import com.renyu.commonlibrary.commonutils.NotificationUtils;
-import com.renyu.mt.MTApplication;
-import com.renyu.mt.R;
+import com.renyu.tmbaseuilibrary.app.MTApplication;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +55,7 @@ public class HeartBeatService extends Service {
                     "提示",
                     "Push Service",
                     "Push Service",
-                    R.color.colorPrimary,
+                    Color.WHITE,
                     intent.getExtras().getInt("smallIcon"),
                     intent.getExtras().getInt("largeIcon"),
                     1000);

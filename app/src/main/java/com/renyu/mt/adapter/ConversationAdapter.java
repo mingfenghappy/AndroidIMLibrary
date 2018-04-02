@@ -29,8 +29,8 @@ import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.R;
 import com.renyu.mt.activity.ConversationActivity;
-import com.renyu.mt.utils.AvatarUtils;
-import com.renyu.mt.utils.FaceIconUtil;
+import com.renyu.tmbaseuilibrary.utils.AvatarUtils;
+import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

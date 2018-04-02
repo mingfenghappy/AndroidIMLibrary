@@ -17,11 +17,10 @@ import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.mt.MTApplication;
 import com.renyu.mt.R;
-import com.renyu.mt.base.BaseIMActivity;
-import com.renyu.mt.params.CommonParams;
-import com.renyu.mt.service.MTService;
+import com.renyu.tmbaseuilibrary.app.MTApplication;
+import com.renyu.tmbaseuilibrary.params.CommonParams;
+import com.renyu.tmbaseuilibrary.service.MTService;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -30,7 +29,7 @@ import butterknife.OnClick;
  * Created by Administrator on 2017/7/18.
  */
 
-public class SignInActivity extends BaseIMActivity {
+public class SignInActivity extends BaseDemoActivity {
 
     @BindView(R.id.ed_username)
     EditText ed_username;
