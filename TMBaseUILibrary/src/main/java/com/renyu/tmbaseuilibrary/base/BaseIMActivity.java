@@ -5,10 +5,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.blankj.utilcode.util.ServiceUtils;
 import com.renyu.commonlibrary.baseact.BaseActivity;
+import com.renyu.commonlibrary.commonutils.ACache;
+import com.renyu.commonlibrary.views.dialog.ChoiceDialog;
 import com.renyu.tmbaseuilibrary.R;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.HeartBeatService;
@@ -69,11 +73,39 @@ public abstract class BaseIMActivity extends BaseActivity {
         isPause = true;
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("isRestore", true);
+    public void kickout() {
+        new Handler().post(() -> {
+            ChoiceDialog dialog = ChoiceDialog.getInstanceByTextCommit("已经下线", "确定");
+            dialog.setOnDialogPosListener(() -> {
+                CommonParams.isKickout = false;
+                try {
+                    Class signInClass = Class.forName("com.renyu.mt.activity.SignInActivity");
+                    Intent intent = new Intent(this, signInClass);
+                    intent.putExtra(CommonParams.TYPE, CommonParams.KICKOUT);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            });
+            dialog.show(BaseIMActivity.this);
+        });
     }
 
-    abstract public void kickout();
+    /**
+     * 存在回收之后再次回收，造成下线标志位出错
+     * @return
+     */
+    public boolean checkNullInfo() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (ACache.get(this).getAsObject("UserInfoRsp") == null) {
+            CommonParams.isKickout = true;
+            finish();
+            Log.d("MTAPP", "回退到上一页");
+            return true;
+        }
+        return false;
+    }
 }

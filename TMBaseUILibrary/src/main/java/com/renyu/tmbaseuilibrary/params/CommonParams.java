@@ -16,4 +16,10 @@ public class CommonParams {
 
     // 是否被踢下线
     public static boolean isKickout = false;
+
+    public static final String TYPE = "type";
+    // 退出App
+    public static final int FINISH = 1;
+    // 被踢下线
+    public static final int KICKOUT = 2;
 }

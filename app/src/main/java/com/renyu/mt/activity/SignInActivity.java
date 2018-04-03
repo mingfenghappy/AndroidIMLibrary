@@ -19,8 +19,10 @@ import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.R;
 import com.renyu.tmbaseuilibrary.app.MTApplication;
+import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.MTService;
+import com.renyu.tmuilibrary.activity.ChatListActivity;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -29,7 +31,7 @@ import butterknife.OnClick;
  * Created by Administrator on 2017/7/18.
  */
 
-public class SignInActivity extends BaseDemoActivity {
+public class SignInActivity extends BaseIMActivity {
 
     @BindView(R.id.ed_username)
     EditText ed_username;
@@ -138,10 +140,10 @@ public class SignInActivity extends BaseDemoActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getIntExtra(com.renyu.mt.params.CommonParams.TYPE, -1) == com.renyu.mt.params.CommonParams.FINISH) {
+        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.FINISH) {
             finish();
         }
-        if (intent.getIntExtra(com.renyu.mt.params.CommonParams.TYPE, -1) == com.renyu.mt.params.CommonParams.KICKOUT) {
+        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.KICKOUT) {
             CommonParams.isKickout = false;
         }
     }

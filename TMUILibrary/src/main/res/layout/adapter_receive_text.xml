@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="13dp" >
+    <TextView
+        android:id="@+id/aurora_tv_msgitem_date"
+        style="@style/chat_text_date_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" >
+        <com.facebook.drawee.view.SimpleDraweeView
+            xmlns:fresco="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/aurora_iv_msgitem_avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            fresco:actualImageResource="@drawable/default_avatar0"
+            fresco:actualImageScaleType="focusCrop"
+            fresco:placeholderImage="@drawable/default_avatar0"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:failureImage="@drawable/default_avatar0"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/aurora_tv_msgitem_display_name"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@id/aurora_iv_msgitem_avatar"
+            android:background="@drawable/ease_chatfrom_bg" >
+            <TextView
+                android:id="@+id/aurora_tv_msgitem_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:layout_centerInParent="true"
+                android:gravity="center|left"
+                android:paddingLeft="6dp"
+                android:paddingRight="1dp"
+                android:lineSpacingExtra="2dp"
+                android:minHeight="38dp"
+                android:maxWidth="225.0dip"
+                android:textColor="#ff000000"
+                android:textSize="15sp" />
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/aurora_tv_msgitem_display_name"
+            style="@style/chat_text_name_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:textSize="13sp"
+            android:layout_toRightOf="@id/aurora_iv_msgitem_avatar"
+            android:visibility="gone" />
+    </RelativeLayout>
+</LinearLayout>
