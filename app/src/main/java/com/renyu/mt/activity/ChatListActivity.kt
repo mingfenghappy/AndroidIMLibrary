@@ -9,7 +9,6 @@ import com.renyu.mt.params.InitParams.SignInActivityName
 import com.renyu.tmbaseuilibrary.params.CommonParams
 import com.renyu.tmbaseuilibrary.utils.IntentWrapper
 import com.renyu.tmuilibrary.activity.BaseChatListActivity
-import com.renyu.tmuilibrary.activity.FriendListActivity
 import com.renyu.tmuilibrary.fragment.ChatListFragment
 
 /**

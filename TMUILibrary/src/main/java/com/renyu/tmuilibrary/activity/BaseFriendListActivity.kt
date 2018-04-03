@@ -3,7 +3,6 @@ package com.renyu.tmuilibrary.activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.message.model.BroadcastBean
@@ -13,24 +12,12 @@ import com.focustech.message.model.UserInfoRsp
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity
 import com.renyu.tmbaseuilibrary.params.CommonParams
 import com.renyu.tmbaseuilibrary.service.MTService
-import com.renyu.tmuilibrary.R
 import com.renyu.tmuilibrary.fragment.FriendListFragment
-import java.util.*
+import java.util.ArrayList
 
-/**
- * Created by Administrator on 2018/3/26 0026.
- */
-class FriendListActivity : BaseIMActivity() {
+abstract class BaseFriendListActivity : BaseIMActivity() {
 
-    var friendListFragment: FriendListFragment? = null
-
-    override fun setStatusBarColor() = Color.BLACK
-
-    override fun setStatusBarTranslucent() = 0
-
-    override fun loadData() {
-
-    }
+    @JvmField var friendListFragment: FriendListFragment? = null
 
     override fun initParams() {
         // 存在回收之后再次回收，造成下线标志位出错
@@ -51,7 +38,7 @@ class FriendListActivity : BaseIMActivity() {
                         // 通知好友列表刷新
                         friendListFragment?.refreshFriendList()
                         // 获取完成组信息之后，就获取全部好友信息
-                        MTService.reqFriendInfo(this@FriendListActivity)
+                        MTService.reqFriendInfo(Utils.getApp())
 
                         friendListFragment?.endRefresh()
                     }
@@ -68,7 +55,7 @@ class FriendListActivity : BaseIMActivity() {
                     }
                     // 添加与被添加好友
                     if (bean.command == BroadcastBean.MTCommand.RefreshFriendList) {
-                        MTService.reqFriendGroups(this@FriendListActivity)
+                        MTService.reqFriendGroups(Utils.getApp())
                     }
                     // 被踢下线
                     if (bean.command == BroadcastBean.MTCommand.Kickout) {
@@ -81,15 +68,7 @@ class FriendListActivity : BaseIMActivity() {
             }
         }
         openCurrentReceiver()
-
-        friendListFragment = FriendListFragment()
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.layout_friendlistframe, friendListFragment, "friendListFragment")
-                .commitAllowingStateLoss()
     }
-
-    override fun initViews() = R.layout.activity_friendlist
 
     override fun onDestroy() {
         super.onDestroy()
