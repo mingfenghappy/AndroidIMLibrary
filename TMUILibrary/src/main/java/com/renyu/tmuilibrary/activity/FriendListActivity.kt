@@ -47,7 +47,7 @@ class FriendListActivity : BaseIMActivity() {
                         // 清除所有好友组关系数据
                         PlainTextDBHelper.getInstance(Utils.getApp()).clearAllFriendList()
                         // 增加所有好友组关系数据
-                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as ArrayList<FriendGroupRsp>)
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable!! as ArrayList<FriendGroupRsp>)
                         // 通知好友列表刷新
                         friendListFragment?.refreshFriendList()
                         // 获取完成组信息之后，就获取全部好友信息
@@ -85,11 +85,11 @@ class FriendListActivity : BaseIMActivity() {
         friendListFragment = FriendListFragment()
         supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.layout_chatlistframe, friendListFragment, "friendListFragment")
+                .replace(R.id.layout_friendlistframe, friendListFragment, "friendListFragment")
                 .commitAllowingStateLoss()
     }
 
-    override fun initViews() = R.layout.activity_chatlist
+    override fun initViews() = R.layout.activity_friendlist
 
     override fun onDestroy() {
         super.onDestroy()

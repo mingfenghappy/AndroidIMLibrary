@@ -3,47 +3,23 @@ package com.renyu.tmuilibrary.activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.util.Log
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.focustech.message.model.*
 import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity
 import com.renyu.tmbaseuilibrary.params.CommonParams
-import com.renyu.tmbaseuilibrary.utils.IntentWrapper
-import com.renyu.tmuilibrary.R
 import com.renyu.tmuilibrary.fragment.ChatListFragment
 
-/**
- * Created by Administrator on 2018/3/21 0021.
- */
-class ChatListActivity : BaseIMActivity() {
+abstract class BaseChatListActivity : BaseIMActivity() {
 
     // 当前登录用户
     var currentUserInfo: UserInfoRsp? = null
 
-    var conversationFragment: ChatListFragment? = null
-
-    override fun setStatusBarColor() = Color.BLACK
-
-    override fun setStatusBarTranslucent() = 0
-
-    override fun loadData() {
-
-    }
+    @JvmField var conversationFragment: ChatListFragment? = null
 
     override fun initParams() {
-        val textView = TextView(this)
-        textView.text = "联系人"
-        textView.setOnClickListener { view ->
-            val intent = Intent(this, FriendListActivity::class.java)
-            startActivity(intent)
-        }
-        findViewById<LinearLayout>(R.id.layout_nav_right).addView(textView)
-
         // 存在回收之后再次回收，造成下线标志位出错
         if (checkNullInfo()) {
             return
@@ -103,29 +79,10 @@ class ChatListActivity : BaseIMActivity() {
             }
         }
         openCurrentReceiver()
-
-        conversationFragment = ChatListFragment()
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
-                .commitAllowingStateLoss()
-
-        // 开启白名单
-        IntentWrapper.whiteListMatters(this, null)
     }
-
-    override fun initViews() = R.layout.activity_chatlist
 
     override fun onDestroy() {
         super.onDestroy()
         closeCurrentReceiver()
-    }
-
-    override fun onBackPressed() {
-        val intent = Intent(this, Class.forName("com.renyu.mt.activity.SignInActivity"))
-        intent.putExtra(CommonParams.TYPE, CommonParams.FINISH)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(intent)
-        finish()
     }
 }

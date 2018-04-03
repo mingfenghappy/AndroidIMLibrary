@@ -22,7 +22,6 @@ import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.MTService;
-import com.renyu.tmuilibrary.activity.ChatListActivity;
 
 import butterknife.BindView;
 import butterknife.OnClick;

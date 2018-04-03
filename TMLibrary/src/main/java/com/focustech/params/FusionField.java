@@ -28,4 +28,18 @@ public class FusionField {
 
 	// 下载文件地址
 	public static String downloadUrl = "http://webim.house365.com/tm/file/download?";
+
+	static {
+		try {
+			Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+			VERSION = clazz.getField("VERSION").get(clazz).toString();
+			messageHeaderDomain = clazz.getField("messageHeaderDomain").get(clazz).toString();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
 }

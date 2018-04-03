@@ -79,13 +79,20 @@ public abstract class BaseIMActivity extends BaseActivity {
             dialog.setOnDialogPosListener(() -> {
                 CommonParams.isKickout = false;
                 try {
-                    Class signInClass = Class.forName("com.renyu.mt.activity.SignInActivity");
+                    Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+                    String SignInActivityName = clazz.getField("SignInActivityName").get(clazz).toString();
+
+                    Class signInClass = Class.forName(SignInActivityName);
                     Intent intent = new Intent(this, signInClass);
                     intent.putExtra(CommonParams.TYPE, CommonParams.KICKOUT);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
                     finish();
                 } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 }
 
