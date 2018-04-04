@@ -53,5 +53,8 @@ dependencies {
     api('com.github.renyu:AndroidCommonLibrary:1.11.9') {
         exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
     }
+    api ('com.github.renyu:AndroidImageLibrary:1.4.3') {
+        exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
+    }
     api project(':TMLibrary')
 }
