@@ -11,7 +11,7 @@ public class CommonParams {
     public static final String SP_UNAME = "sp_uname";
     public static final String SP_PWD = "sp_pwd";
 
-    // app是否发生了回收，用来给启动页使用
+    // app是否发生了回收，用来给中控页使用
     public static boolean isRestore = false;
 
     // 是否被踢下线

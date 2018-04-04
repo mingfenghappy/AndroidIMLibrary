@@ -80,7 +80,7 @@ public abstract class BaseIMActivity extends BaseActivity {
                 CommonParams.isKickout = false;
                 try {
                     Class clazz = Class.forName("com.renyu.mt.params.InitParams");
-                    String SignInActivityName = clazz.getField("SignInActivityName").get(clazz).toString();
+                    String SignInActivityName = clazz.getField("InitActivityName").get(clazz).toString();
 
                     Class signInClass = Class.forName(SignInActivityName);
                     Intent intent = new Intent(this, signInClass);

@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.renyu.mt.R
-import com.renyu.mt.params.InitParams.SignInActivityName
 import com.renyu.tmbaseuilibrary.params.CommonParams
 import com.renyu.tmbaseuilibrary.utils.IntentWrapper
 import com.renyu.tmuilibrary.activity.BaseChatListActivity
@@ -50,7 +49,7 @@ class ChatListActivity : BaseChatListActivity() {
     override fun initViews() = R.layout.activity_chatlist
 
     override fun onBackPressed() {
-        val intent = Intent(this, SignInActivityName::class.java)
+        val intent = Intent(this, SignInActivity::class.java)
         intent.putExtra(CommonParams.TYPE, CommonParams.FINISH)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(intent)

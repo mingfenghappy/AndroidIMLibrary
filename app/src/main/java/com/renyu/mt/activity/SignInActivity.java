@@ -73,12 +73,15 @@ public class SignInActivity extends BaseIMActivity {
             return;
         }
 
-        if (CommonParams.isRestore) {
-            finish();
-        }
-        else if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null) {
+        if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null) {
+            // 在登录页的情况下发生回收会执行页面关闭
+            if (CommonParams.isRestore) {
+                finish();
+            }
             // 登录成功跳转首页
-            startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
+            else {
+                startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
+            }
         }
     }
 
