@@ -28,6 +28,7 @@ import butterknife.OnClick;
 
 /**
  * Created by Administrator on 2017/7/18.
+ * 中控页，此处需要根据不同流程进行不同的定制。例如腾讯QQ跟链家两个App的IM的流程是不同的，一个需强制登录成功，一个不需要登录成功
  */
 
 public class SignInActivity extends BaseIMActivity {

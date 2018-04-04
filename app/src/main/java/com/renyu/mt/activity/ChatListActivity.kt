@@ -36,7 +36,7 @@ class ChatListActivity : BaseChatListActivity() {
         }
         findViewById<LinearLayout>(R.id.layout_nav_right).addView(textView)
 
-        conversationFragment = ChatListFragment()
+        conversationFragment = ChatListFragment.getInstance(null)
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")

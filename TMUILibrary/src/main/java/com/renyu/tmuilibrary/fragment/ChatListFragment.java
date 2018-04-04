@@ -1,14 +1,14 @@
 package com.renyu.tmuilibrary.fragment;
 
-import android.app.Activity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
-import com.renyu.tmbaseuilibrary.service.MTService;
 import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.OfflineIMResponse;
 import com.focustech.message.model.SystemMessageBean;
@@ -16,6 +16,7 @@ import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
+import com.renyu.tmbaseuilibrary.service.MTService;
 import com.renyu.tmuilibrary.R;
 import com.renyu.tmuilibrary.adapter.ChatListAdapter;
 import com.renyu.tmuilibrary.impl.RetrofitImpl;
@@ -34,6 +35,7 @@ import io.reactivex.disposables.Disposable;
 public class ChatListFragment extends BaseFragment {
 
     SwipeRefreshLayout swipe_conversationlist;
+    LinearLayout layout_conversationlist;
     RecyclerView rv_conversationlist;
     ChatListAdapter adapter;
 
@@ -46,7 +48,13 @@ public class ChatListFragment extends BaseFragment {
     // 是否正在请求接口数据
     boolean isRequest = false;
 
-    Activity activity;
+    public View headView = null;
+
+    public static ChatListFragment getInstance(View headView) {
+        ChatListFragment fragment = new ChatListFragment();
+        fragment.setHeadView(headView);
+        return fragment;
+    }
 
     @Override
     public void initParams() {
@@ -57,8 +65,12 @@ public class ChatListFragment extends BaseFragment {
         userInfoRsps= PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo();
 
         rv_conversationlist = view.findViewById(R.id.rv_conversationlist);
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        manager.setSmoothScrollbarEnabled(true);
+        manager.setAutoMeasureEnabled(true);
+        rv_conversationlist.setLayoutManager(manager);
+        rv_conversationlist.setNestedScrollingEnabled(false);
         rv_conversationlist.setHasFixedSize(true);
-        rv_conversationlist.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter=new ChatListAdapter(getActivity(), offlineMessages);
         rv_conversationlist.setAdapter(adapter);
         swipe_conversationlist = view.findViewById(R.id.swipe_conversationlist);
@@ -67,6 +79,10 @@ public class ChatListFragment extends BaseFragment {
                 getOfflineIMFromRemote();
             }
         });
+        layout_conversationlist = view.findViewById(R.id.layout_conversationlist);
+        if (headView != null) {
+            layout_conversationlist.addView(headView);
+        }
     }
 
     @Override
@@ -78,12 +94,6 @@ public class ChatListFragment extends BaseFragment {
     public void loadData() {
         getOfflineIMFromLocal();
         getOfflineIMFromRemote();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = activity;
     }
 
     /**
@@ -177,7 +187,7 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(activity.getApplicationContext());
+                        MTService.reqFriendInfo(context.getApplicationContext());
                     }
 
                     @Override
@@ -189,7 +199,7 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(activity.getApplicationContext());
+                        MTService.reqFriendInfo(context.getApplicationContext());
 
                         isRequest = false;
                     }
@@ -243,7 +253,7 @@ public class ChatListFragment extends BaseFragment {
 
         // 不是首次加载的话，如果离线消息中的人不在好友列表中，则获取好友信息
         if (!userInfoRsps.containsKey(messageBean.getUserId())) {
-            MTService.getUserInfo(activity.getApplicationContext(), messageBean.getUserId());
+            MTService.getUserInfo(context.getApplicationContext(), messageBean.getUserId());
         }
         // 存在好友关系，直接使用存储的好友关系
         else {
@@ -322,5 +332,9 @@ public class ChatListFragment extends BaseFragment {
             }
         }
         adapter.notifyDataSetChanged();
+    }
+
+    public void setHeadView(View headView) {
+        this.headView = headView;
     }
 }
