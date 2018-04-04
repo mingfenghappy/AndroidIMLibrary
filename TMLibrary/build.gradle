@@ -58,5 +58,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.alibaba:fastjson:1.2.34'
-    implementation 'com.tencent.wcdb:wcdb-android:1.0.6'
+    api 'com.tencent.wcdb:wcdb-android:1.0.6'
 }
