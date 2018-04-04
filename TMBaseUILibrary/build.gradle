@@ -1,5 +1,9 @@
 apply plugin: 'com.android.library'
 
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.renyu'
+
 android {
     compileSdkVersion 27
 
@@ -50,5 +54,6 @@ dependencies {
         exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
     }
     api 'com.github.renyu:AndroidImageLibrary:1.4.3'
-    api project(':TMLibrary')
+//    api project(':TMLibrary')
+    api 'com.github.r17171709:AndroidIMLibrary:v1.3'
 }
