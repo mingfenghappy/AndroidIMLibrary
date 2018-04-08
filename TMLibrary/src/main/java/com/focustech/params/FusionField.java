@@ -29,6 +29,9 @@ public class FusionField {
 	// 下载文件地址
 	public static String downloadUrl = "http://webim.house365.com/tm/file/download?";
 
+	// gost加密 key
+	public static String key32 = "=daAyeUKAWkun&umenkMbJYFzCeb=88d";
+
 	static {
 		try {
 			Class clazz = Class.forName("com.renyu.mt.params.InitParams");

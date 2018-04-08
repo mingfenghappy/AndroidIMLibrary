@@ -9,14 +9,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.UserInfoRsp;
+import com.focustech.params.FusionField;
+import com.focustech.tm.open.sdk.net.codec.GostDesBasae64Encrypter;
 import com.renyu.commonlibrary.commonutils.ACache;
-import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.mt.R;
 import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
@@ -105,11 +105,13 @@ public class SignInActivity extends BaseIMActivity {
         switch (view.getId()) {
             case R.id.btn_signin:
                 if (((MTApplication) getApplication()).connState == BroadcastBean.MTCommand.Conn &&
-                        !TextUtils.isEmpty(ed_username.getText().toString()) &&
-                        !TextUtils.isEmpty(ed_pwd.getText().toString())) {
+                        !TextUtils.isEmpty(ed_username.getText().toString())) {
                     // 删除旧数据
                     PlainTextDBHelper.getInstance(Utils.getApp()).clearAllInfo();
-                    MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(), ed_pwd.getText().toString());
+
+                    MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(),
+                            GostDesBasae64Encrypter.encode(ed_username.getText().toString(), FusionField.key32)
+                    );
                 }
                 break;
         }
