@@ -49,7 +49,7 @@ class ChatListActivity : BaseChatListActivity() {
     override fun initViews() = R.layout.activity_chatlist
 
     override fun onBackPressed() {
-        val intent = Intent(this, SignInActivity::class.java)
+        val intent = Intent(this, SplashActivity::class.java)
         intent.putExtra(CommonParams.TYPE, CommonParams.FINISH)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(intent)

@@ -40,13 +40,6 @@ public class SignInActivity extends BaseIMActivity {
 
     @Override
     public void initParams() {
-        // 初始化文件夹
-        FileUtils.createOrExistsDir(InitParams.IMAGE_PATH);
-        FileUtils.createOrExistsDir(InitParams.HOTFIX_PATH);
-        FileUtils.createOrExistsDir(InitParams.FILE_PATH);
-        FileUtils.createOrExistsDir(InitParams.LOG_PATH);
-        FileUtils.createOrExistsDir(InitParams.CACHE_PATH);
-
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -60,7 +53,11 @@ public class SignInActivity extends BaseIMActivity {
                         SPUtils.getInstance().put(CommonParams.SP_UNAME, ed_username.getText().toString());
                         SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
                         // 登录成功跳转首页
-                        startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
+                        Intent intent2 = new Intent(SignInActivity.this, SplashActivity.class);
+                        intent2.putExtra(CommonParams.TYPE, CommonParams.MAIN);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent2);
+                        finish();
                     }
                     if (bean.getCommand()== BroadcastBean.MTCommand.LoginRspERROR) {
                         Toast.makeText(SignInActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
@@ -68,22 +65,6 @@ public class SignInActivity extends BaseIMActivity {
                 }
             }
         };
-
-        if (CommonParams.isKickout) {
-            CommonParams.isKickout = false;
-            return;
-        }
-
-        if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null) {
-            // 在登录页的情况下发生回收会执行页面关闭
-            if (CommonParams.isRestore) {
-                finish();
-            }
-            // 登录成功跳转首页
-            else {
-                startActivity(new Intent(SignInActivity.this, ChatListActivity.class));
-            }
-        }
     }
 
     @Override
@@ -119,12 +100,6 @@ public class SignInActivity extends BaseIMActivity {
         closeCurrentReceiver();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        CommonParams.isRestore= false;
-    }
-
     @OnClick({R.id.btn_signin})
     public void onClick(View view) {
         switch (view.getId()) {
@@ -141,13 +116,11 @@ public class SignInActivity extends BaseIMActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.FINISH) {
-            finish();
-        }
-        if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.KICKOUT) {
-            CommonParams.isKickout = false;
-        }
+    public void onBackPressed() {
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.putExtra(CommonParams.TYPE, CommonParams.SIGNINBACK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 }

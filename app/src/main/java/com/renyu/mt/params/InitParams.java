@@ -7,5 +7,5 @@ public class InitParams {
     public static String VERSION = "1.00.01";
     public static String messageHeaderDomain = "FBS365";
     // 流程中控activity
-    public static String InitActivityName = "com.renyu.mt.activity.SignInActivity";
+    public static String InitActivityName = "com.renyu.mt.activity.SplashActivity";
 }

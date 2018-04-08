@@ -22,4 +22,8 @@ public class CommonParams {
     public static final int FINISH = 1;
     // 被踢下线
     public static final int KICKOUT = 2;
+    // 登录返回键返回
+    public static final int SIGNINBACK = 3;
+    // 去主页
+    public static final int MAIN = 4;
 }
