@@ -405,11 +405,11 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 插入消息
      * @param offlineMessage
      */
-    public void insertMessage(MessageBean offlineMessage) {
+    public boolean insertMessage(MessageBean offlineMessage) {
         synchronized (PlainTextDBHelper.class) {
             ArrayList<MessageBean> messageBeen=new ArrayList<>();
             messageBeen.add(offlineMessage);
-            insertMessages(messageBeen);
+            return insertMessages(messageBeen);
         }
     }
 
@@ -417,7 +417,8 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
      * 插入消息
      * @param offlineMessages
      */
-    public void insertMessages(ArrayList<MessageBean> offlineMessages) {
+    public boolean insertMessages(ArrayList<MessageBean> offlineMessages) {
+        boolean isExist = false;
         synchronized (PlainTextDBHelper.class) {
             for (int i = 0; i < offlineMessages.size(); i++) {
                 MessageBean offlineMessage=offlineMessages.get(offlineMessages.size()-1-i);
@@ -440,10 +441,15 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                     cv1.put(isRead, offlineMessage.getIsRead());
                     cv1.put(isVoicePlay, offlineMessage.getIsVoicePlay());
                     db.insert(MessageTable, null, cv1);
+                    isExist = false;
+                }
+                else {
+                    isExist = true;
                 }
                 cs.close();
             }
         }
+        return isExist;
     }
 
     /**

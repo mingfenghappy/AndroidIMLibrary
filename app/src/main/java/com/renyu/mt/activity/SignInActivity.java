@@ -51,7 +51,7 @@ public class SignInActivity extends BaseIMActivity {
                         ACache.get(Utils.getApp()).put("UserInfoRsp", userInfoRsp);
                         // 用户登录信息
                         SPUtils.getInstance().put(CommonParams.SP_UNAME, ed_username.getText().toString());
-                        SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
+                        SPUtils.getInstance().put(CommonParams.SP_PWD, GostDesBasae64Encrypter.encode(ed_username.getText().toString(), FusionField.key32));
                         // 登录成功跳转首页
                         Intent intent2 = new Intent(SignInActivity.this, SplashActivity.class);
                         intent2.putExtra(CommonParams.TYPE, CommonParams.MAIN);

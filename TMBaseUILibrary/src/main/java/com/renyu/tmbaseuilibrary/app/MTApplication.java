@@ -34,6 +34,9 @@ import com.renyu.tmbaseuilibrary.service.MTService;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 import com.renyu.tmbaseuilibrary.utils.VoiceUitls;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -217,30 +220,44 @@ abstract public class MTApplication extends MultiDexApplication {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
                         // 发送已读回执
                         MTService.hasReadMessage(MTApplication.this, messageBean.getFromSvrMsgId());
+
+                        // 试图从消息中获取用户昵称
+                        String userName = messageBean.getUserId();
+                        try {
+                            JSONObject jsonObject = new JSONObject(messageBean.getMsgMeta());
+                            if (!TextUtils.isEmpty(jsonObject.getString("s"))) {
+                                userName = jsonObject.getString("s");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                         // 下载语音文件
                         if (messageBean.getMessageType().equals("7")) {
                             // 下载完成语音文件之后，方可同步数据库与刷新页面
                             DownloadUtils.addFileAndDb(MTApplication.this, messageBean);
 
                             // 发送通知
-                            VoiceUitls.playNewMessage(messageBean.getUserId()+":[语音]",
-                                    messageBean.getUserId(), "[语音]",
+                            VoiceUitls.playNewMessage(userName+":[语音]",
+                                    userName, "[语音]",
                                     R.raw.ring_user_message_high, getNotificationIntent());
                         } else {
-                            PlainTextDBHelper.getInstance(MTApplication.this).insertMessage(messageBean);
-                            // 通知会话列表刷新以及会话详情刷新
-                            BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
-
-                            // 发送通知
-                            if (messageBean.getMessageType().equals("8")) {
-                                VoiceUitls.playNewMessage(messageBean.getUserId()+":[图片]",
-                                        messageBean.getUserId(), "[图片]",
-                                        R.raw.ring_user_message_high, getNotificationIntent());
-                            }
-                            else {
-                                VoiceUitls.playNewMessage(messageBean.getUserId()+":"+messageBean.getMsg(),
-                                        messageBean.getUserId(), messageBean.getMsg(),
-                                        R.raw.ring_user_message_high, getNotificationIntent());
+                            // 后台会循环发送相同消息
+                            boolean exist = PlainTextDBHelper.getInstance(MTApplication.this).insertMessage(messageBean);
+                            if (!exist) {
+                                // 通知会话列表刷新以及会话详情刷新
+                                BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
+                                // 发送通知
+                                if (messageBean.getMessageType().equals("8")) {
+                                    VoiceUitls.playNewMessage(userName+":[图片]",
+                                            userName, "[图片]",
+                                            R.raw.ring_user_message_high, getNotificationIntent());
+                                }
+                                else {
+                                    VoiceUitls.playNewMessage(userName+":"+messageBean.getMsg(),
+                                            userName, messageBean.getMsg(),
+                                            R.raw.ring_user_message_high, getNotificationIntent());
+                                }
                             }
                         }
                     }

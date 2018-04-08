@@ -40,7 +40,7 @@
                 android:id="@+id/aurora_tv_msgitem_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:autoLink="web"
+                android:autoLink="all"
                 android:layout_centerInParent="true"
                 android:gravity="center|left"
                 android:paddingLeft="6dp"

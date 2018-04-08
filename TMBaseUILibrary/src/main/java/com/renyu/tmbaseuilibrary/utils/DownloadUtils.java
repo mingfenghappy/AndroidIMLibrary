@@ -70,9 +70,11 @@ public class DownloadUtils {
                 Log.d("MTAPP", "isRenameOK:" + isRenameOK);
                 if (isRenameOK) {
                     // 更新数据库
-                    PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
-                    // 通知前台页面下载完成，可以更新
-                    BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
+                    boolean exist = PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
+                    if (!exist) {
+                        // 通知前台页面下载完成，可以更新
+                        BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
+                    }
                 }
             }
             else {
