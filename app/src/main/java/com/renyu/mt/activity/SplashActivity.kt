@@ -4,7 +4,9 @@ import android.Manifest
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
+import android.text.TextUtils
 import com.blankj.utilcode.util.FileUtils
+import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.Utils
 import com.renyu.commonlibrary.baseact.BaseActivity
 import com.renyu.commonlibrary.commonutils.ACache
@@ -70,11 +72,16 @@ class SplashActivity : BaseActivity() {
         FileUtils.createOrExistsDir(InitParams.CACHE_PATH)
 
         // 登录成功跳转首页
-        if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null && !CommonParams.isRestore) {
+        if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null
+                && !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
+                && !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))
+                && !CommonParams.isRestore) {
             startActivity(Intent(this@SplashActivity, ChatListActivity::class.java))
         }
         // 没有用户信息则执行登录操作
-        else if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") == null) {
+        else if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") == null
+                || TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
+                || TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))) {
             startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
         }
     }
