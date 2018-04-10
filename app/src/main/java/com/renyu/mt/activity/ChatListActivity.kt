@@ -2,6 +2,7 @@ package com.renyu.mt.activity
 
 import android.content.Intent
 import android.graphics.Color
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.renyu.mt.R
@@ -14,7 +15,7 @@ import com.renyu.tmuilibrary.fragment.ChatListFragment
  * Created by Administrator on 2018/3/21 0021.
  * 涉及到会话列表的可以参考此类的写法
  */
-class ChatListActivity : BaseChatListActivity() {
+class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSetListener {
 
     override fun setStatusBarColor() = Color.BLACK
 
@@ -36,7 +37,7 @@ class ChatListActivity : BaseChatListActivity() {
         }
         findViewById<LinearLayout>(R.id.layout_nav_right).addView(textView)
 
-        conversationFragment = ChatListFragment.getInstance(null)
+        conversationFragment = ChatListFragment()
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
@@ -47,6 +48,13 @@ class ChatListActivity : BaseChatListActivity() {
     }
 
     override fun initViews() = R.layout.activity_chatlist
+
+    override fun getHeadView(): View? {
+//        val view = LinearLayout(this)
+//        view.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(100f))
+//        view.backgroundColor = Color.BLUE
+        return null
+    }
 
     override fun onBackPressed() {
         val intent = Intent(this, SplashActivity::class.java)

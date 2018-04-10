@@ -1,5 +1,7 @@
 package com.renyu.tmuilibrary.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,12 +50,24 @@ public class ChatListFragment extends BaseFragment {
     // 是否正在请求接口数据
     boolean isRequest = false;
 
-    public View headView = null;
+    private OnHeaderViewSetListener headerViewSetListener;
 
-    public static ChatListFragment getInstance(View headView) {
-        ChatListFragment fragment = new ChatListFragment();
-        fragment.setHeadView(headView);
-        return fragment;
+    public interface OnHeaderViewSetListener {
+        View getHeadView();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        headerViewSetListener = (OnHeaderViewSetListener) context;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        headerViewSetListener = (OnHeaderViewSetListener) activity;
     }
 
     @Override
@@ -80,8 +94,8 @@ public class ChatListFragment extends BaseFragment {
             }
         });
         layout_conversationlist = view.findViewById(R.id.layout_conversationlist);
-        if (headView != null) {
-            layout_conversationlist.addView(headView);
+        if (headerViewSetListener != null && headerViewSetListener.getHeadView() != null) {
+            layout_conversationlist.addView(headerViewSetListener.getHeadView());
         }
     }
 
@@ -332,9 +346,5 @@ public class ChatListFragment extends BaseFragment {
             }
         }
         adapter.notifyDataSetChanged();
-    }
-
-    public void setHeadView(View headView) {
-        this.headView = headView;
     }
 }
