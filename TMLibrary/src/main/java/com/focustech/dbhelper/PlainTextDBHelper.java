@@ -628,6 +628,29 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * 获取所有未读消息数量
+     */
+    public int getAllUnreadMessageNum() {
+        int count = 0;
+
+        Cursor cs2=db.query(MessageTable, null, isRead+" =?", new String[]{"0"}, null, null, null);
+        cs2.moveToFirst();
+        if (cs2.getCount()>0) {
+            count += cs2.getCount();
+        }
+        cs2.close();
+
+        Cursor cs1=db.query(SystemMessageTable, null, isRead+" =?", new String[]{"0"}, null, null, null);
+        cs1.moveToFirst();
+        if (cs1.getCount()>0) {
+            count += cs1.getCount();
+        }
+        cs1.close();
+
+        return count;
+    }
+
+    /**
      * 删除好友关系
      * @param userId_
      */

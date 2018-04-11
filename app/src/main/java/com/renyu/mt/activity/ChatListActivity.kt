@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blankj.utilcode.util.Utils
+import com.focustech.dbhelper.PlainTextDBHelper
 import com.renyu.mt.R
 import com.renyu.tmbaseuilibrary.params.CommonParams
 import com.renyu.tmbaseuilibrary.utils.IntentWrapper
@@ -62,5 +64,10 @@ class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSe
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(intent)
         finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val unReadCount = PlainTextDBHelper.getInstance(Utils.getApp()).allUnreadMessageNum
     }
 }
