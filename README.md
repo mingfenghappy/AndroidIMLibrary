@@ -23,3 +23,7 @@
 + 中兴 锁屏加速受保护应用
 
 配合 android.support.v7.AlertDialog 引导用户将 App 加入白名单.
+
+
+### 待完善工作
+1. 发送消息时候检查IM的链接状态
