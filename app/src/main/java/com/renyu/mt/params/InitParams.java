@@ -8,4 +8,6 @@ public class InitParams {
     public static String messageHeaderDomain = "FBS365";
     // 流程中控activity
     public static String InitActivityName = "com.renyu.mt.activity.SplashActivity";
+    // fileprovider存储文件夹的名称
+    public static String StorageName = "mt";
 }

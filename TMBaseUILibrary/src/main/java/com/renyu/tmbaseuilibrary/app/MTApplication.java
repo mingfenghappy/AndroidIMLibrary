@@ -66,10 +66,17 @@ abstract public class MTApplication extends MultiDexApplication {
             // 初始化fresco
             Fresco.initialize(this, ImagePipelineConfigUtils.getDefaultImagePipelineConfig(this));
 
+            String storageName="mt";
+            try {
+                 Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+                 storageName = clazz.getField("StorageName").get(clazz).toString();
+            } catch(Exception e) {
+
+            }
             // 初始化相关配置参数
             // 项目根目录
             // 请注意修改xml文件夹下filepaths.xml中的external-path节点，此值需与ROOT_PATH值相同，作为fileprovider使用
-            InitParams.ROOT_PATH= Environment.getExternalStorageDirectory().getPath()+ File.separator + "mt";
+            InitParams.ROOT_PATH= Environment.getExternalStorageDirectory().getPath()+ File.separator + storageName;
             // 项目图片目录
             InitParams.IMAGE_PATH= InitParams.ROOT_PATH + File.separator + "image";
             // 项目文件目录
@@ -78,7 +85,7 @@ abstract public class MTApplication extends MultiDexApplication {
             InitParams.HOTFIX_PATH= InitParams.ROOT_PATH + File.separator + "hotfix";
             // 项目日志目录
             InitParams.LOG_PATH= InitParams.ROOT_PATH + File.separator + "log";
-            InitParams.LOG_NAME= "mt_log";
+            InitParams.LOG_NAME= storageName+"_log";
             // 缓存目录
             InitParams.CACHE_PATH= InitParams.ROOT_PATH + File.separator + "cache";
             // fresco缓存目录
