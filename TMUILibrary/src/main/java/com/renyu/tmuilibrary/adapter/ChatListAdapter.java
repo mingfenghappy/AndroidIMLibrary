@@ -90,11 +90,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
             }
             if (offlineMessages.get(position).getUserHeadType() != 0 &&
                     offlineMessages.get(position).getUserHeadId() != null) {
-                String faceCode = String.valueOf(offlineMessages.get(position).getUserHeadType());
-                String fileId = offlineMessages.get(position).getUserHeadId();
-                UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
-                String token=userInfoRsp.getToken();
-                Object avatar= AvatarUtils.displayImg(faceCode, fileId, token);
+                Object avatar= offlineMessages.get(position).getUserHeadId();
+                if (offlineMessages.get(position).getUserHeadId().indexOf("http")==-1) {
+                    String faceCode = String.valueOf(offlineMessages.get(position).getUserHeadType());
+                    String fileId = offlineMessages.get(position).getUserHeadId();
+                    UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
+                    String token=userInfoRsp.getToken();
+                    avatar= AvatarUtils.displayImg(faceCode, fileId, token);
+                }
                 request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
                         .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             }

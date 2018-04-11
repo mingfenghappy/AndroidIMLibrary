@@ -201,7 +201,9 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(context.getApplicationContext());
+                        for (int i = 0; i < offlineMessages.size(); i++) {
+                            MTService.getUserInfo(context.getApplicationContext(), offlineMessages.get(i).getFromUserId());
+                        }
                     }
 
                     @Override
@@ -213,7 +215,9 @@ public class ChatListFragment extends BaseFragment {
                         swipe_conversationlist.setRefreshing(false);
 
                         // 网络请求可能会需要获取好友关系数据以弥补信息不足部分
-                        MTService.reqFriendInfo(context.getApplicationContext());
+                        for (int i = 0; i < offlineMessages.size(); i++) {
+                            MTService.getUserInfo(context.getApplicationContext(), offlineMessages.get(i).getFromUserId());
+                        }
 
                         isRequest = false;
                     }

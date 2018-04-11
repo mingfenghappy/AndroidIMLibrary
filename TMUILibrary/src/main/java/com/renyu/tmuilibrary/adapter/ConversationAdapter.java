@@ -177,14 +177,24 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         UserInfoRsp userInfo=userInfoRsps.get(messages.get(position).getUserId());
         ImageRequest request;
         if (userInfo!=null) {
-            String faceCode = String.valueOf(userInfo.getUserHeadType().getNumber());
-            String fileId = userInfo.getUserHeadId();
-            // 判断是不是自己发送的
-            if (messages.get(position).getIsSend().equals("1")) {
-                faceCode = String.valueOf(currentUserInfo.getUserHeadType().getNumber());
-                fileId = currentUserInfo.getUserHeadId();
+            Object avatar;
+            if (userInfo.getUserHeadId().indexOf("http")==-1) {
+                String faceCode = String.valueOf(userInfo.getUserHeadType().getNumber());
+                String fileId = userInfo.getUserHeadId();
+                // 判断是不是自己发送的
+                if (messages.get(position).getIsSend().equals("1")) {
+                    faceCode = String.valueOf(currentUserInfo.getUserHeadType().getNumber());
+                    fileId = currentUserInfo.getUserHeadId();
+                }
+                avatar= AvatarUtils.displayImg(faceCode, fileId, token);
             }
-            Object avatar= AvatarUtils.displayImg(faceCode, fileId, token);
+            else {
+                avatar = userInfo.getUserHeadId();
+                // 判断是不是自己发送的
+                if (messages.get(position).getIsSend().equals("1")) {
+                    avatar = currentUserInfo.getUserHeadId();
+                }
+            }
             request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
                     .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(50), SizeUtils.dp2px(50))).build();
         }

@@ -53,14 +53,7 @@ abstract class BaseChatListActivity : BaseIMActivity() {
                         // 通知会话列表结束刷新
                         conversationFragment?.updateRead((intent.getSerializableExtra("broadcast") as BroadcastBean).serializable.toString())
                     }
-                    // 好友信息刷新（好友信息数据会单条多次返回，所以更新比较频繁。没有采用结束标志位，怕中断）
-                    if (bean.command == BroadcastBean.MTCommand.FriendInfoRsp) {
-                        val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as FriendInfoRsp
-                        // 插入或更新好友信息
-                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList(temp)
-                        // 通知会话列表刷新
-                        conversationFragment?.refreshOfflineUser(temp.friend)
-                    }
+                    // 聊天列表联系人信息更新
                     if (bean.command == BroadcastBean.MTCommand.UserInfoRsp) {
                         val userInfoRsp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as UserInfoRsp
                         // 未知用户个人信息刷新，通知会话列表刷新

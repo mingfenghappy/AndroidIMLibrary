@@ -46,7 +46,7 @@ class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSe
                 .commitAllowingStateLoss()
 
         // 开启白名单判断
-        IntentWrapper.whiteListMatters(this, null)
+//        IntentWrapper.whiteListMatters(this, null)
     }
 
     override fun initViews() = R.layout.activity_chatlist
