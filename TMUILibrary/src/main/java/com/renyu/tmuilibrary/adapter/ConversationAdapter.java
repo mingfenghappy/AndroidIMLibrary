@@ -35,10 +35,7 @@ import com.renyu.tmuilibrary.activity.ConversationActivity;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-
-import jp.wasabeef.fresco.processors.GrayscalePostprocessor;
 
 /**
  * Created by Administrator on 2017/7/24.
@@ -50,20 +47,24 @@ public class ConversationAdapter extends RecyclerView.Adapter {
     ArrayList<MessageBean> messages;
     boolean isGroup;
     String userId;
+    String userHeadId;
+    String userNickName;
+    int userHeadType;
     // 当前用户信息
     UserInfoRsp currentUserInfo;
-    // 聊天对象信息
-    HashMap<String, UserInfoRsp> userInfoRsps;
     // 当前正在播放的音频文件tag
     public String mediaPlayerTag=null;
 
-    public ConversationAdapter(Context context, ArrayList<MessageBean> messages, boolean isGroup, String userId) {
+    public ConversationAdapter(Context context, ArrayList<MessageBean> messages, boolean isGroup,
+                               String userId, String userHeadId, String userNickName, int userHeadType) {
         this.context = context;
         this.messages = messages;
         this.isGroup = isGroup;
         this.userId = userId;
+        this.userHeadId = userHeadId;
+        this.userNickName = userNickName;
+        this.userHeadType = userHeadType;
 
-        this.userInfoRsps = PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo();
         this.currentUserInfo= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
     }
 
@@ -174,34 +175,38 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             }
         }
         String token=currentUserInfo.getToken();
-        UserInfoRsp userInfo=userInfoRsps.get(messages.get(position).getUserId());
-        ImageRequest request;
-        if (userInfo!=null) {
-            Object avatar;
-            if (userInfo.getUserHeadId().indexOf("http")==-1) {
-                String faceCode = String.valueOf(userInfo.getUserHeadType().getNumber());
-                String fileId = userInfo.getUserHeadId();
-                // 判断是不是自己发送的
-                if (messages.get(position).getIsSend().equals("1")) {
-                    faceCode = String.valueOf(currentUserInfo.getUserHeadType().getNumber());
-                    fileId = currentUserInfo.getUserHeadId();
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("res:///"+R.drawable.default_avatar0))
+                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
+        // 判断是不是自己发送的
+        if (messages.get(position).getIsSend().equals("1")) {
+            if (!currentUserInfo.getUserHeadId().equals("")) {
+                Object avatar;
+                if (currentUserInfo.getUserHeadId().indexOf("http")==-1) {
+                    String faceCode = String.valueOf(currentUserInfo.getUserHeadType().getNumber());
+                    String fileId = currentUserInfo.getUserHeadId();
+                    avatar= AvatarUtils.displayImg(faceCode, fileId, token);
                 }
-                avatar= AvatarUtils.displayImg(faceCode, fileId, token);
-            }
-            else {
-                avatar = userInfo.getUserHeadId();
-                // 判断是不是自己发送的
-                if (messages.get(position).getIsSend().equals("1")) {
+                else {
                     avatar = currentUserInfo.getUserHeadId();
                 }
+                request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             }
-            request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
-                    .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(50), SizeUtils.dp2px(50))).build();
         }
         else {
-            request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("res:///"+R.drawable.default_avatar0))
-                    .setPostprocessor(new GrayscalePostprocessor())
-                    .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
+            if (!userHeadId.equals("")) {
+                Object avatar;
+                if (userHeadId.indexOf("http")==-1) {
+                    String faceCode = ""+userHeadType;
+                    String fileId = userHeadId;
+                    avatar= AvatarUtils.displayImg(faceCode, fileId, token);
+                }
+                else {
+                    avatar = userHeadId;
+                }
+                request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(avatar instanceof String?avatar.toString():"res:///"+Integer.parseInt(avatar.toString())))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
+            }
         }
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
@@ -209,8 +214,8 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
             ((ReceiverTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
-            if (userInfo!=null) {
-                ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setText(userInfo.getUserName());
+            if (!userNickName.equals("")) {
+                ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setText(userNickName);
             }
             else {
                 ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setText(userId);
@@ -229,8 +234,8 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
             ((ReceiverImageViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
-            if (userInfo!=null) {
-                ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_display_name.setText(userInfo.getUserName());
+            if (!userNickName.equals("")) {
+                ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_display_name.setText(userNickName);
             }
             else {
                 ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_display_name.setText(userId);
@@ -256,8 +261,8 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
             ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
-            if (userInfo!=null) {
-                ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setText(userInfo.getUserName());
+            if (!userNickName.equals("")) {
+                ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setText(userNickName);
             }
             else {
                 ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setText(userId);

@@ -91,6 +91,9 @@ public class ConversationActivity extends BaseIMActivity {
     UserInfoRsp currentUserInfo;
     // 聊天对方用户ID
     String chatUserId;
+    String chatUserHeadId;
+    String chatUserNickName;
+    int chatUserHeadType;
 
     // 页码
     int page=0;
@@ -117,8 +120,24 @@ public class ConversationActivity extends BaseIMActivity {
             return;
         }
 
+        // 构建聊天用户数据
         currentUserInfo = (UserInfoRsp) ACache.get(this).getAsObject("UserInfoRsp");
         chatUserId = getIntent().getStringExtra("UserId");
+        chatUserHeadId = getIntent().getStringExtra("UserHeadId");
+        chatUserNickName = getIntent().getStringExtra("UserNickName");
+        chatUserHeadType = getIntent().getIntExtra("UserHeadType", 0);
+        if (chatUserHeadId.equals("") || chatUserNickName.equals("") || chatUserHeadType == 0) {
+            UserInfoRsp tempUserInfoRsp = PlainTextDBHelper.getInstance(Utils.getApp()).getFriendsInfo().get(chatUserId);
+            if (tempUserInfoRsp != null && chatUserHeadId.equals("")) {
+                chatUserHeadId = tempUserInfoRsp.getUserHeadId();
+            }
+            if (tempUserInfoRsp != null && chatUserNickName.equals("")) {
+                chatUserNickName = tempUserInfoRsp.getUserNickName();
+            }
+            if (tempUserInfoRsp != null && chatUserHeadType == 0) {
+                chatUserHeadType = tempUserInfoRsp.getUserHeadType().getNumber();
+            }
+        }
 
         messageBeens=new ArrayList<>();
         ArrayList<MessageBean> temp=PlainTextDBHelper.getInstance(Utils.getApp()).getConversationByUser(chatUserId, page, pageSize);
@@ -129,7 +148,8 @@ public class ConversationActivity extends BaseIMActivity {
         rv_conversation.setHasFixedSize(true);
         LinearLayoutManager manager=new LinearLayoutManager(this);
         rv_conversation.setLayoutManager(manager);
-        adapter=new ConversationAdapter(this, messageBeens, getIntent().getBooleanExtra("isGroup", false), chatUserId);
+        adapter=new ConversationAdapter(this, messageBeens, getIntent().getBooleanExtra("isGroup", false),
+                chatUserId, chatUserHeadId, chatUserNickName, chatUserHeadType);
         rv_conversation.setAdapter(adapter);
         rv_conversation.post(new Runnable() {
             @Override

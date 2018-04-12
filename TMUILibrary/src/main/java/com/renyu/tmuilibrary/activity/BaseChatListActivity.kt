@@ -58,6 +58,9 @@ abstract class BaseChatListActivity : BaseIMActivity() {
                         val userInfoRsp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as UserInfoRsp
                         // 未知用户个人信息刷新，通知会话列表刷新
                         if (currentUserInfo!!.userId != userInfoRsp.userId) {
+                            // 插入好友数据
+                            PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList(userInfoRsp)
+                            // 刷新聊天列表
                             conversationFragment?.refreshOfflineUser(userInfoRsp)
                         }
                     }

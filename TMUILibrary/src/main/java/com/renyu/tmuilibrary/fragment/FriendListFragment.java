@@ -135,20 +135,19 @@ public class FriendListFragment extends BaseFragment {
         while (it.hasNext()) {
             Map.Entry<String, List<FriendStatusRsp>> entry=it.next();
             for (FriendStatusRsp friendStatusRsp : entry.getValue()) {
-                if (friendStatusRsp.getFriendInfoRsp().getFriend() == null) {
-                    continue;
-                }
-                if (friendStatusRsp.getFriendInfoRsp().getFriend().getUserId().equals(userInfoRsp.getUserId())) {
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setUserHeadId(userInfoRsp.getUserHeadId());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setEquipments(userInfoRsp.getEquipments());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setRole(userInfoRsp.getRole());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setUserSignature(userInfoRsp.getUserSignature());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setTmNum(userInfoRsp.getTmNum());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setNetIp(userInfoRsp.getNetIp());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setTimestamp(userInfoRsp.getTimestamp());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setUserHeadType(userInfoRsp.getUserHeadType());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setUserName(userInfoRsp.getUserName());
-                    friendStatusRsp.getFriendInfoRsp().getFriend().setUserNickName(userInfoRsp.getUserNickName());
+                if (friendStatusRsp.getFriendUserId().equals(userInfoRsp.getUserId())) {
+                    UserInfoRsp temp = new UserInfoRsp();
+                    temp.setUserHeadId(userInfoRsp.getUserHeadId());
+                    temp.setEquipments(userInfoRsp.getEquipments());
+                    temp.setRole(userInfoRsp.getRole());
+                    temp.setUserSignature(userInfoRsp.getUserSignature());
+                    temp.setTmNum(userInfoRsp.getTmNum());
+                    temp.setNetIp(userInfoRsp.getNetIp());
+                    temp.setTimestamp(userInfoRsp.getTimestamp());
+                    temp.setUserHeadType(userInfoRsp.getUserHeadType());
+                    temp.setUserName(userInfoRsp.getUserName());
+                    temp.setUserNickName(userInfoRsp.getUserNickName());
+                    friendStatusRsp.getFriendInfoRsp().setFriend(temp);
                     groupId=entry.getKey();
                     break outer;
                 }

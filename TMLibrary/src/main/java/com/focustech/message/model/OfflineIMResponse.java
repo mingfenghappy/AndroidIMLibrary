@@ -22,9 +22,9 @@ public class OfflineIMResponse {
     private String lastMsg;
     private int type;
     private int unloadCount;
-    private String userHeadId;
-    private int userHeadType;
-    private String userNickName;
+    private String userHeadId = "";
+    private int userHeadType = 0;
+    private String userNickName = "";
     private int userRole;
 
     public long getAddTime() {

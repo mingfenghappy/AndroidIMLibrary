@@ -44,6 +44,8 @@ abstract class BaseFriendListActivity : BaseIMActivity() {
                     }
                     if (bean.command == BroadcastBean.MTCommand.FriendInfoRsp) {
                         val temp = (intent.getSerializableExtra("broadcast") as BroadcastBean).serializable as FriendInfoRsp
+                        // 插入好友数据
+                        PlainTextDBHelper.getInstance(Utils.getApp()).insertFriendList(temp.friend)
                         // 刷新好友列表
                         friendListFragment?.refreshFriendInfo(temp.friend)
                     }

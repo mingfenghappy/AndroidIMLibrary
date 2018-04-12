@@ -103,7 +103,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
             }
             else {
                 request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("res:///"+R.drawable.default_avatar0))
-                        .setPostprocessor(new GrayscalePostprocessor())
                         .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
             }
         }
@@ -129,6 +128,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
 
                 Intent intent=new Intent(context, ConversationActivity.class);
                 intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
+                intent.putExtra("UserHeadId", offlineMessages.get(position_).getUserHeadId());
+                intent.putExtra("UserNickName", offlineMessages.get(position_).getUserNickName());
+                intent.putExtra("UserHeadType", offlineMessages.get(position_).getUserHeadType());
                 context.startActivity(intent);
             }
             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());

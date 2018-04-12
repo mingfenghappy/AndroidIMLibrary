@@ -32,8 +32,6 @@ import com.renyu.tmuilibrary.activity.ConversationActivity;
 
 import java.util.List;
 
-import jp.wasabeef.fresco.processors.GrayscalePostprocessor;
-
 /**
  * Created by Administrator on 2017/8/4.
  */
@@ -81,7 +79,6 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
         else {
             holder.tv_adapter_friendlist.setText(beans.get(position).getFriendUserId());
             request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("res:///"+R.drawable.default_avatar0))
-                    .setPostprocessor(new GrayscalePostprocessor())
                     .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(40), SizeUtils.dp2px(40))).build();
         }
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
@@ -93,6 +90,16 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
 
             Intent intent=new Intent(context, ConversationActivity.class);
             intent.putExtra("UserId", beans.get(position_).getFriendUserId());
+            if (beans.get(position_).getFriendInfoRsp() != null && beans.get(position_).getFriendInfoRsp().getFriend() != null) {
+                intent.putExtra("UserHeadId", beans.get(position_).getFriendInfoRsp().getFriend().getUserHeadId());
+                intent.putExtra("UserNickName", beans.get(position_).getFriendInfoRsp().getFriend().getUserNickName());
+                intent.putExtra("UserHeadType", beans.get(position_).getFriendInfoRsp().getFriend().getUserHeadType().getNumber());
+            }
+            else {
+                intent.putExtra("UserHeadId", "");
+                intent.putExtra("UserNickName", "");
+                intent.putExtra("UserHeadType", 0);
+            }
             context.startActivity(intent);
         });
     }
