@@ -22,6 +22,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
+import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.OfflineIMResponse;
 import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
@@ -76,16 +77,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
             holder.tv_adapter_conversationlist_name.setText(offlineMessages.get(position).getUserNickName()==null?
                     offlineMessages.get(position).getFromUserId():
                     offlineMessages.get(position).getUserNickName());
-            if (offlineMessages.get(position).getType()==0) {
+            if (MessageBean.getMessageTypeForCharList(offlineMessages.get(position)) == 0) {
                 holder.tv_adapter_conversationlist_msg.setText(FaceIconUtil.getInstance().replaceFaceMsg(offlineMessages.get(position).getLastMsg()));
             }
-            else if (offlineMessages.get(position).getType()==9) {
+            else if (MessageBean.getMessageTypeForCharList(offlineMessages.get(position)) == 9) {
                 holder.tv_adapter_conversationlist_msg.setText(FaceIconUtil.getInstance().replaceFaceMsg(offlineMessages.get(position).getLastMsg()));
             }
-            else if (offlineMessages.get(position).getType()==8) {
+            else if (MessageBean.getMessageTypeForCharList(offlineMessages.get(position)) == 8) {
                 holder.tv_adapter_conversationlist_msg.setText("[图片]");
             }
-            else if (offlineMessages.get(position).getType()==7) {
+            else if (MessageBean.getMessageTypeForCharList(offlineMessages.get(position)) == 7) {
                 holder.tv_adapter_conversationlist_msg.setText("[语音]");
             }
             if (offlineMessages.get(position).getUserHeadType() != 0 &&

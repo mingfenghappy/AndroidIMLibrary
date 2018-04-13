@@ -458,12 +458,12 @@ public class ConversationActivity extends BaseIMActivity {
                                bean.setFromSvrMsgId(offlineIMDetailRespons.getSvrMsgId());
                                bean.setMsg(offlineIMDetailRespons.getMsg());
                                bean.setMsgMeta(offlineIMDetailRespons.getMsgMeta());
-                               if (offlineIMDetailRespons.getMessageType() == 8 ||
-                                       offlineIMDetailRespons.getMessageType() == 7) {
+                               if (MessageBean.getMessageTypeForConversation(offlineIMDetailRespons) == 7 ||
+                                       MessageBean.getMessageTypeForConversation(offlineIMDetailRespons) == 8) {
                                    bean.setMsgType(Enums.MessageType.MULTI_MEDIA);
                                    try {
                                        JSONObject object = new JSONObject(offlineIMDetailRespons.getMsgMeta());
-                                       if (offlineIMDetailRespons.getMessageType() == 8) {
+                                       if (MessageBean.getMessageTypeForConversation(offlineIMDetailRespons) == 8) {
                                            if (object.has(MessageMeta.picid) && !"".equals(object.getString(MessageMeta.picid).trim())
                                                    && object.getString(MessageMeta.picid) != null) {
                                                // 添加媒体消息的fileId
@@ -478,7 +478,7 @@ public class ConversationActivity extends BaseIMActivity {
                                                bean.setLocalFileName(localfilename);
                                            }
                                        }
-                                       else if (offlineIMDetailRespons.getMessageType() == 7) {
+                                       else if (MessageBean.getMessageTypeForConversation(offlineIMDetailRespons) == 7) {
                                            if (object.has(MessageMeta.picid) && !"".equals(object.getString(MessageMeta.picid).trim())
                                                    && object.getString(MessageMeta.picid) != null) {
                                                // 添加媒体消息的fileId
@@ -498,7 +498,7 @@ public class ConversationActivity extends BaseIMActivity {
                                else {
                                    bean.setMsgType(Enums.MessageType.TEXT);
                                }
-                               bean.setMessageType(""+offlineIMDetailRespons.getMessageType());
+                               bean.setMessageType(""+MessageBean.getMessageTypeForConversation(offlineIMDetailRespons));
                                bean.setResend(Enums.Enable.DISABLE);
                                bean.setSvrMsgId(offlineIMDetailRespons.getSvrMsgId());
                                bean.setSync(Enums.Enable.ENABLE);

@@ -21,6 +21,7 @@ import com.focustech.message.model.SystemMessageBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
+import com.readystatesoftware.chuck.ChuckInterceptor;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
@@ -94,6 +95,7 @@ abstract public class MTApplication extends MultiDexApplication {
             // 初始化网络请求
             Retrofit2Utils retrofit2Utils = Retrofit2Utils.getInstance(CommonParams.HTTPURL);
             OkHttpClient.Builder baseBuilder = new OkHttpClient.Builder()
+                    .addInterceptor(new ChuckInterceptor(this))
                     .readTimeout(10, TimeUnit.SECONDS)
                     .writeTimeout(10, TimeUnit.SECONDS)
                     .connectTimeout(10, TimeUnit.SECONDS);

@@ -57,4 +57,6 @@ dependencies {
         exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
     }
     api project(':TMLibrary')
+    debugImplementation 'com.readystatesoftware.chuck:library:1.1.0'
+    releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
 }

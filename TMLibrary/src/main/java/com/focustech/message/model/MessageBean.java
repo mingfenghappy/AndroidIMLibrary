@@ -178,7 +178,7 @@ public class MessageBean implements Serializable {
                 // 接收普通文本
                 messageBean.setMessageType("0");
             }
-            if (m.getMsgType() == Enums.MessageType.AUTO_REPLY && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
+            else if (m.getMsgType() == Enums.MessageType.AUTO_REPLY && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
                 // 接收自动回复
                 messageBean.setMessageType("9");
             }
@@ -219,5 +219,65 @@ public class MessageBean implements Serializable {
             messageBean.setMessageType("0");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 聊天列表消息类型判断
+     * @param response
+     * @return
+     */
+    public static int getMessageTypeForCharList(OfflineIMResponse response) {
+        try {
+            JSONObject object = new JSONObject(response.getMsgMeta());
+            if (response.getType() == Enums.MessageType.TEXT.getNumber() && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
+                // 接收普通文本
+                return 0;
+            }
+            else if (response.getType() == Enums.MessageType.AUTO_REPLY.getNumber() && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
+                // 接收自动回复
+                return 9;
+            }
+            else if (response.getType() == Enums.MessageType.MULTI_MEDIA.getNumber() && object.getInt(MessageMeta.msgtype) == 0) {
+                // 接收图片
+                return 8;
+            }
+            else if (response.getType() == Enums.MessageType.MULTI_MEDIA.getNumber() && object.getInt(MessageMeta.msgtype) == 7) {
+                // 接收语音
+                return 7;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * 聊天列表消息类型判断
+     * @param response
+     * @return
+     */
+    public static int getMessageTypeForConversation(OfflineIMDetailResponse response) {
+        try {
+            JSONObject object = new JSONObject(response.getMsgMeta());
+            if (response.getType() == Enums.MessageType.TEXT.getNumber() && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
+                // 接收普通文本
+                return 0;
+            }
+            else if (response.getType() == Enums.MessageType.AUTO_REPLY.getNumber() && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
+                // 接收自动回复
+                return 9;
+            }
+            else if (response.getType() == Enums.MessageType.MULTI_MEDIA.getNumber() && object.getInt(MessageMeta.msgtype) == 0) {
+                // 接收图片
+                return 8;
+            }
+            else if (response.getType() == Enums.MessageType.MULTI_MEDIA.getNumber() && object.getInt(MessageMeta.msgtype) == 7) {
+                // 接收语音
+                return 7;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

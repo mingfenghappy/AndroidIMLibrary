@@ -10,7 +10,6 @@ public class OfflineIMDetailResponse {
      * addUserId : 6786
      * deleteFlag : 1
      * fromUserId : ttxPdzMAHf4
-     * messageType : 0
      * msg : 。
      * msgId : 4881423
      * msgMeta : {"ct":0,"fp":"","fs":0,"fc":0,"f":10,"fst":0,"ht":0,"exe":false,"fi":0,"mt":0,"pc":0,"pp":"{}","rfs":0,"t":0,"s":"wuhan"}
@@ -26,7 +25,6 @@ public class OfflineIMDetailResponse {
     private int addUserId;
     private int deleteFlag;
     private String fromUserId;
-    private int messageType;
     private String msg;
     private int msgId;
     private String msgMeta;
@@ -67,14 +65,6 @@ public class OfflineIMDetailResponse {
 
     public void setFromUserId(String fromUserId) {
         this.fromUserId = fromUserId;
-    }
-
-    public int getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(int messageType) {
-        this.messageType = messageType;
     }
 
     public String getMsg() {

@@ -26,6 +26,7 @@ public class OfflineIMResponse {
     private int userHeadType = 0;
     private String userNickName = "";
     private int userRole;
+    private String msgMeta;
 
     public long getAddTime() {
         return addTime;
@@ -97,5 +98,13 @@ public class OfflineIMResponse {
 
     public void setUserRole(int userRole) {
         this.userRole = userRole;
+    }
+
+    public String getMsgMeta() {
+        return msgMeta;
+    }
+
+    public void setMsgMeta(String msgMeta) {
+        this.msgMeta = msgMeta;
     }
 }
