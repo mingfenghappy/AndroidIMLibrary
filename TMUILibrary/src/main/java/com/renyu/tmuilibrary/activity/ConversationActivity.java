@@ -39,6 +39,7 @@ import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.MTService;
+import com.renyu.tmbaseuilibrary.utils.DetectDelEventEditText;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
 import com.renyu.tmbaseuilibrary.utils.RecordUtils;
@@ -75,7 +76,7 @@ public class ConversationActivity extends BaseIMActivity {
     KPSwitchPanelRelativeLayout kp_panel_root;
     ImageView iv_emoji;
     ImageView iv_sendvoice;
-    EditText edit_conversation;
+    DetectDelEventEditText edit_conversation;
     View layout_imagechoice;
     View layout_voicechoice;
     View layout_emojichoice;
@@ -181,6 +182,35 @@ public class ConversationActivity extends BaseIMActivity {
         iv_emoji = findViewById(R.id.iv_emoji);
         iv_sendvoice = findViewById(R.id.iv_sendvoice);
         edit_conversation = findViewById(R.id.edit_conversation);
+        edit_conversation.setDelListener(() -> {
+            // 点击删除键
+            String value = edit_conversation.getText().toString();
+            if (value.equals("")) {
+                return true;
+            }
+            int end = value.lastIndexOf("]");
+            // 如果最后一个字符是]，则进入表情判断
+            if (end == value.length()-1) {
+                int start = value.lastIndexOf("[");
+                String temp_ = value.substring(start+1, end);
+                String[] faceids = getResources().getStringArray(R.array.faceid);
+                boolean isEmoji = false;
+                for (String faceid : faceids) {
+                    if (faceid.equals(temp_)) {
+                        isEmoji = true;
+                        break;
+                    }
+                }
+                if (isEmoji) {
+                    edit_conversation.getText().delete(value.length()-(end+1-start), value.length());
+                    edit_conversation.setSelection(value.length()-(end+1-start));
+                    return true;
+                }
+            }
+            edit_conversation.getText().delete(value.length()-1, value.length());
+            edit_conversation.setSelection(value.length()-1);
+            return true;
+        });
         layout_record = findViewById(R.id.layout_record);
         iv_record = findViewById(R.id.iv_record);
         tv_record = findViewById(R.id.tv_record);
@@ -406,7 +436,7 @@ public class ConversationActivity extends BaseIMActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        //点击返回键的时候，如果面板开着，则隐藏面板
+        // 点击返回键的时候，如果面板开着，则隐藏面板
         if (event.getAction() == KeyEvent.ACTION_UP && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             if (kp_panel_root.getVisibility() != View.GONE) {
                 KPSwitchConflictUtil.hidePanelAndKeyboard(kp_panel_root);
