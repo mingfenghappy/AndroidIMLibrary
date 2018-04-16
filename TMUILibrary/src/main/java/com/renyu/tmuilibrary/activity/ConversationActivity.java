@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
-import android.os.Vibrator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,12 +41,12 @@ import com.renyu.tmbaseuilibrary.service.MTService;
 import com.renyu.tmbaseuilibrary.utils.DetectDelEventEditText;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
-import com.renyu.tmbaseuilibrary.utils.RecordUtils;
 import com.renyu.tmuilibrary.R;
 import com.renyu.tmuilibrary.adapter.ConversationAdapter;
 import com.renyu.tmuilibrary.adapter.FaceAdapter;
 import com.renyu.tmuilibrary.impl.IMBaseResponseList;
 import com.renyu.tmuilibrary.impl.RetrofitImpl;
+import com.renyu.tmuilibrary.view.VoiceRecorderView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,9 +81,7 @@ public class ConversationActivity extends BaseIMActivity {
     View layout_emojichoice;
     RecyclerView rv_panel_content;
     FaceAdapter faceAdapter;
-    RelativeLayout layout_record;
-    ImageView iv_record;
-    TextView tv_record;
+    VoiceRecorderView layout_record;
 
     ArrayList<MessageBean> messageBeens;
 
@@ -101,8 +97,6 @@ public class ConversationActivity extends BaseIMActivity {
     int page=0;
     int pageSize=20;
 
-    Vibrator mVibrator;
-    RecordUtils recordTool;
     MediaPlayer mediaPlayer;
 
     // 语音动画相关
@@ -216,51 +210,21 @@ public class ConversationActivity extends BaseIMActivity {
             edit_conversation.setSelection(value.length()-1);
             return true;
         });
-        layout_record = findViewById(R.id.layout_record);
-        iv_record = findViewById(R.id.iv_record);
-        tv_record = findViewById(R.id.tv_record);
         layout_imagechoice=kp_panel_root.findViewById(R.id.layout_imagechoice);
         layout_voicechoice=kp_panel_root.findViewById(R.id.layout_voicechoice);
-        final ImageView iv_record_click = layout_voicechoice.findViewById( R.id.iv_record_click );
-        final ImageView iv_record_bg1 = layout_voicechoice.findViewById( R.id.iv_record_bg1 );
-        final ImageView iv_record_bg2 = layout_voicechoice.findViewById( R.id.iv_record_bg2 );
-        layout_voicechoice.setOnTouchListener((view, motionEvent) -> {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    iv_record_click.setBackgroundResource(R.mipmap.click_pressed);
-                    iv_record_bg1.setBackgroundResource(R.mipmap.click_voice_pressed);
-                    iv_record_bg2.setBackgroundResource(R.mipmap.click_voice_pressed);
-                    mVibrator.vibrate(new long[]{ 100 , 50 }, -1);
-                    layout_record.setVisibility(View.VISIBLE);
-                    iv_record.setImageResource(R.mipmap.record_microphone);
-                    tv_record.setText("取消");
-                    recordTool.start();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (motionEvent.getY()<0) {
-                        iv_record.setImageResource(R.mipmap.record_cancel);
-                        tv_record.setText("松开手指，取消发送");
-                    }
-                    else {
-                        iv_record.setImageResource(R.mipmap.record_microphone);
-                        tv_record.setText("手指上滑，取消发送");
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    iv_record_click.setBackgroundResource(R.mipmap.click_normal);
-                    iv_record_bg1.setBackgroundResource(R.mipmap.click_voice_normal);
-                    iv_record_bg2.setBackgroundResource(R.mipmap.click_voice_normal);
-                    layout_record.setVisibility(View.GONE);
-                    if (motionEvent.getY()<0) {
-                        recordTool.stopRecorder(true);
-                    }
-                    else {
-                        recordTool.stopRecorder( false );
-                        mVibrator.cancel();
-                    }
-                    break;
-            }
-            return true;
+        layout_record = findViewById(R.id.layout_record);
+        layout_voicechoice.setOnTouchListener((v, event) -> {
+            // 关闭音频播放
+            recycleMedia();
+            // 关闭动画
+            stopVoicePlayAnimation(isSend);
+            return layout_record.onPressToSpeakBtnTouch(v, event,
+                    (voiceFilePath, voiceTimeLength) -> {
+                        File file=new File(voiceFilePath);
+                        if (file.exists()) {
+                            sendVoiceMessage(file);
+                        }
+                    });
         });
         layout_emojichoice=kp_panel_root.findViewById(R.id.layout_emojichoice);
         faceAdapter = new FaceAdapter(this, (value, res) -> {
@@ -299,17 +263,6 @@ public class ConversationActivity extends BaseIMActivity {
         });
         findViewById(R.id.btn_send_conversation).setOnClickListener(v -> sendTextMessage());
         findViewById(R.id.iv_image).setOnClickListener(v -> com.renyu.imagelibrary.commonutils.Utils.choicePic(ConversationActivity.this, 1, 1000));
-
-        // 震动功能初始化
-        mVibrator = (Vibrator) getApplication().getSystemService(VIBRATOR_SERVICE);
-        // 录音播放功能初始化，并设置自定义的监听事件
-        recordTool = new RecordUtils();
-        recordTool.setRecorderListener(path -> {
-            File file=new File(path);
-            if (file.exists()) {
-                sendVoiceMessage(file);
-            }
-        });
 
         receiver=new BroadcastReceiver() {
             @Override

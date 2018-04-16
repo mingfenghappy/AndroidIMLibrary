@@ -104,25 +104,13 @@
         android:layout_height="match_parent">
 
     </android.support.v7.widget.RecyclerView>
-    <RelativeLayout
+    <com.renyu.tmuilibrary.view.VoiceRecorderView
         android:id="@+id/layout_record"
         android:layout_width="176dp"
         android:layout_height="203dp"
-        android:layout_centerInParent="true"
-        android:background="#00ffffff"
-        android:visibility="gone" >
-        <ImageView
-            android:id="@+id/iv_record"
-            android:layout_width="176dp"
-            android:layout_height="183dp"
-            android:layout_alignParentTop="true" />
-        <TextView
-            android:id="@+id/tv_record"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="149dp"
-            android:textColor="#ffffff"
-            android:textSize="15sp" />
-    </RelativeLayout>
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dip">
+
+    </com.renyu.tmuilibrary.view.VoiceRecorderView>
 </cn.dreamtobe.kpswitch.widget.KPSwitchRootRelativeLayout>

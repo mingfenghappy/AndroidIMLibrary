@@ -1,5 +1,7 @@
 package com.focustech.message.model;
 
+import android.text.TextUtils;
+
 import com.focustech.message.params.MessageMeta;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.tm.open.sdk.messages.protobuf.Head;
@@ -227,6 +229,10 @@ public class MessageBean implements Serializable {
      * @return
      */
     public static int getMessageTypeForCharList(OfflineIMResponse response) {
+        // 在本地发送最后一条数据的情况下，选取type字段
+        if (TextUtils.isEmpty(response.getMsgMeta())) {
+            return response.getType();
+        }
         try {
             JSONObject object = new JSONObject(response.getMsgMeta());
             if (response.getType() == Enums.MessageType.TEXT.getNumber() && (object.getInt(MessageMeta.msgtype) == 0 || object.getInt(MessageMeta.msgtype) == 1)) {
