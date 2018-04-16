@@ -275,8 +275,8 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
             }
             ((ReceiverVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
-                // 播放语音
-                ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
+                // 播放语音和动画
+                ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", false);
                 // 更新数据库
                 PlainTextDBHelper.getInstance(Utils.getApp()).updateVoiceRead(messages.get(position).getSvrMsgId());
                 // 更新本地缓存
@@ -287,10 +287,10 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).getSvrMsgId()+"_voice");
             // 判断是否正在播放
             if (mediaPlayerTag!=null && mediaPlayerTag.equals(messages.get(position).getSvrMsgId()+"_voice")) {
-                ((ReceiverVoiceViewHolder) holder).iv_voice.setImageResource(R.drawable.default_avatar0);
+                ((ConversationActivity) context).startVoicePlayAnimation(((ReceiverVoiceViewHolder) holder).iv_voice, false);
             }
             else {
-                ((ReceiverVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatto_voice_playing);
+                ((ReceiverVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatfrom_voice_playing);
             }
             // 判断语音是否已读
             if (messages.get(position).getIsVoicePlay().equals("0")) {
@@ -371,7 +371,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 }
                 // 同步时远程拿下的文件
                 else {
-                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
+                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
                 }
             });
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
@@ -386,17 +386,17 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 播放语音
                 // 本地真实自己发送的文件
                 if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
-                    ((ConversationActivity) context).playMedia(messages.get(position).getLocalFileName(), messages.get(position).getSvrMsgId()+"_voice");
+                    ((ConversationActivity) context).playMedia(messages.get(position).getLocalFileName(), messages.get(position).getSvrMsgId()+"_voice", true);
                 }
                 // 同步时远程拿下的文件
                 else {
-                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice");
+                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
                 }
             });
             ((SendVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).getSvrMsgId()+"_voice");
             // 判断是否正在播放
             if (mediaPlayerTag!=null && mediaPlayerTag.equals(messages.get(position).getSvrMsgId()+"_voice")) {
-                ((SendVoiceViewHolder) holder).iv_voice.setImageResource(R.drawable.default_avatar0);
+                ((ConversationActivity) context).startVoicePlayAnimation(((SendVoiceViewHolder) holder).iv_voice, true);
             }
             else {
                 ((SendVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatto_voice_playing);

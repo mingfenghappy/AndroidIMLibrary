@@ -4,16 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -103,6 +104,10 @@ public class ConversationActivity extends BaseIMActivity {
     Vibrator mVibrator;
     RecordUtils recordTool;
     MediaPlayer mediaPlayer;
+
+    // 语音动画相关
+    AnimationDrawable voiceAnimation=null;
+    boolean isSend = false;
 
     @Override
     public void initParams() {
@@ -427,11 +432,9 @@ public class ConversationActivity extends BaseIMActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.UpdateRead, chatUserId);
 
         // 关闭音频播放
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+        recycleMedia();
+        // 关闭动画
+        stopVoicePlayAnimation(isSend);
     }
 
     @Override
@@ -704,32 +707,33 @@ public class ConversationActivity extends BaseIMActivity {
      * @param fileName
      * @param tag
      */
-    public void playMedia(String fileName, String tag) {
+    public void playMedia(String fileName, String tag, boolean isSend) {
         if (!new File(fileName).exists()) {
             return;
         }
+        // 停止上一个语音播放
+        stopVoicePlayAnimation(ConversationActivity.this.isSend);
+        ConversationActivity.this.isSend = isSend;
         recycleMedia();
         mediaPlayer = new MediaPlayer();
         try {
             mediaPlayer.setDataSource(fileName);
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    if (adapter.mediaPlayerTag!=null && rv_conversation.findViewWithTag(adapter.mediaPlayerTag)!=null) {
-                        ((ImageView) rv_conversation.findViewWithTag(adapter.mediaPlayerTag)).setImageResource(R.mipmap.ease_chatto_voice_playing);
-                        adapter.mediaPlayerTag=null;
-                    }
-                    else {
-                        adapter.mediaPlayerTag=null;
-                        adapter.notifyDataSetChanged();
-                    }
+            mediaPlayer.setOnCompletionListener(mediaPlayer -> {
+                if (adapter.mediaPlayerTag!=null && rv_conversation.findViewWithTag(adapter.mediaPlayerTag)!=null) {
+                    stopVoicePlayAnimation(isSend);
+                    adapter.mediaPlayerTag=null;
+                }
+                else {
+                    adapter.mediaPlayerTag=null;
+                    adapter.notifyDataSetChanged();
                 }
             });
             mediaPlayer.prepare();
             mediaPlayer.start();
             adapter.mediaPlayerTag=tag;
+            // 设置语音播放动画
             if (rv_conversation.findViewWithTag(adapter.mediaPlayerTag)!=null) {
-                ((ImageView) rv_conversation.findViewWithTag(adapter.mediaPlayerTag)).setImageResource(R.drawable.default_avatar0);
+                startVoicePlayAnimation(rv_conversation.findViewWithTag(adapter.mediaPlayerTag), isSend);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -745,14 +749,6 @@ public class ConversationActivity extends BaseIMActivity {
             mediaPlayer.release();
             mediaPlayer = null;
         }
-        if (adapter.mediaPlayerTag!=null && rv_conversation.findViewWithTag(adapter.mediaPlayerTag)!=null) {
-            adapter.mediaPlayerTag=null;
-            ((ImageView) rv_conversation.findViewWithTag(adapter.mediaPlayerTag)).setImageResource(R.mipmap.ease_chatto_voice_playing);
-        }
-        else {
-            adapter.mediaPlayerTag=null;
-            adapter.notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -766,6 +762,37 @@ public class ConversationActivity extends BaseIMActivity {
             }
             if (file!=null) {
                 sendPicMessage(file);
+            }
+        }
+    }
+
+    /**
+     * 播放语音
+     * @param isSend
+     */
+    public void startVoicePlayAnimation(ImageView voiceImageView, boolean isSend) {
+        if (!isSend) {
+            voiceImageView.setImageResource(R.drawable.voice_from_icon);
+        } else {
+            voiceImageView.setImageResource(R.drawable.voice_to_icon);
+        }
+        voiceAnimation = (AnimationDrawable) voiceImageView.getDrawable();
+        voiceAnimation.start();
+    }
+
+    /**
+     * 关闭语音
+     * @param isSend
+     */
+    public void stopVoicePlayAnimation(boolean isSend) {
+        if (voiceAnimation != null) {
+            voiceAnimation.stop();
+        }
+        if (!TextUtils.isEmpty(adapter.mediaPlayerTag) && rv_conversation.findViewWithTag(adapter.mediaPlayerTag) != null) {
+            if (!isSend) {
+                ((ImageView) rv_conversation.findViewWithTag(adapter.mediaPlayerTag)).setImageResource(R.mipmap.ease_chatfrom_voice_playing);
+            } else {
+                ((ImageView) rv_conversation.findViewWithTag(adapter.mediaPlayerTag)).setImageResource(R.mipmap.ease_chatto_voice_playing);
             }
         }
     }
