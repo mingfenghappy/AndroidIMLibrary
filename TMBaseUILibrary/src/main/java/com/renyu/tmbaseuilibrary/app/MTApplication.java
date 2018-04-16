@@ -109,6 +109,8 @@ abstract public class MTApplication extends MultiDexApplication {
             retrofit2Utils.addImageOKHttpClient(imageUploadOkBuilder.build());
             retrofit2Utils.imageBuild();
 
+            // 重置所有发送失败的消息
+            PlainTextDBHelper.getInstance(com.blankj.utilcode.util.Utils.getApp()).updateFailMessages();
             // 注册基础广播
             if (baseReceiver == null) {
                 Log.d("MTAPP", "注册基础广播");

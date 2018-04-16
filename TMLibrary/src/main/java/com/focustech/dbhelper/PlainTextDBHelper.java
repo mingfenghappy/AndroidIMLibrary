@@ -628,6 +628,23 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * 重置所有发送失败的消息
+     */
+    public void updateFailMessages() {
+        Cursor cs=db.query(MessageTable, null, sync+" =?", new String[]{"0"}, null, null, null);
+        cs.moveToFirst();
+        for (int i=0;i<cs.getCount();i++) {
+            cs.moveToPosition(i);
+
+            ContentValues cv=new ContentValues();
+            cv.put(sync, "1");
+            cv.put(resend, "1");
+            db.update(MessageTable, cv, svrMsgId+"=?", new String[]{cs.getString(cs.getColumnIndex("svrMsgId"))});
+        }
+        cs.close();
+    }
+
+    /**
      * 获取所有未读消息数量
      */
     public int getAllUnreadMessageNum() {

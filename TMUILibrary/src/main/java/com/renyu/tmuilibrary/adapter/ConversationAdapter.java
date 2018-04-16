@@ -306,11 +306,11 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(0+"\'\'");
             }
             else {
-                if (file.length()/1600 < 1) {
+                if (file.length()/1000 < 1) {
                     ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(1+"\'\'");
                 }
                 else {
-                    ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1600+"\'\'");
+                    ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1000+"\'\'");
                 }
             }
         }
@@ -405,7 +405,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             // 本地真实自己发送的文件
             if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
                 File file = new File(messages.get(position).getLocalFileName());
-                ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1600+"\'\'");
+                ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1000+"\'\'");
             }
             // 同步时远程拿下的文件
             else {
@@ -414,11 +414,11 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                     ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(0+"\'\'");
                 }
                 else {
-                    if (file.length()/1600 < 1) {
+                    if (file.length()/1000 < 1) {
                         ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(1+"\'\'");
                     }
                     else {
-                        ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1600+"\'\'");
+                        ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1000+"\'\'");
                     }
                 }
             }
