@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="13dp" >
+    android:paddingTop="30dp" >
     <TextView
         android:id="@+id/aurora_tv_msgitem_date"
         style="@style/chat_text_date_style"
@@ -12,16 +12,15 @@
         android:layout_height="wrap_content" />
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp" >
+        android:layout_height="wrap_content">
         <com.facebook.drawee.view.SimpleDraweeView
             xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/aurora_iv_msgitem_avatar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentRight="true"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="5dip"
+            android:layout_marginEnd="8dip"
             fresco:actualImageResource="@drawable/default_avatar0"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_avatar0"
@@ -34,34 +33,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/aurora_tv_msgitem_display_name"
-            android:layout_marginRight="5dip"
-            android:layout_toLeftOf="@id/aurora_iv_msgitem_avatar" >
+            android:layout_marginEnd="8dip"
+            android:layout_toStartOf="@id/aurora_iv_msgitem_avatar">
             <com.facebook.drawee.view.SimpleDraweeView
                 xmlns:fresco="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/aurora_iv_msgitem_photo"
-                android:layout_width="100dip"
-                android:layout_height="100dip"
+                android:layout_width="123dip"
+                android:layout_height="115dip"
                 fresco:actualImageResource="@drawable/default_avatar0"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:placeholderImage="@drawable/default_avatar0"
                 fresco:placeholderImageScaleType="centerCrop"
                 fresco:failureImage="@drawable/default_avatar0"
-                fresco:failureImageScaleType="centerCrop" />
+                fresco:failureImageScaleType="centerCrop"
+                fresco:roundedCornerRadius="15dp" />
         </RelativeLayout>
         <ImageView
             android:id="@+id/aurora_iv_msgitem_send_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/bubble"
-            android:clickable="true"
-            android:src="@drawable/ease_msg_state_failed_resend"
+            android:layout_marginEnd="12dip"
+            android:layout_toStartOf="@id/bubble"
+            android:src="@mipmap/ease_msg_state_failed_resend"
             android:visibility="gone" />
         <ProgressBar
             android:id="@+id/aurora_iv_msgitem_send_progress_bar"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="12dip"
             android:layout_toLeftOf="@id/bubble"
             android:visibility="gone" />
     </RelativeLayout>

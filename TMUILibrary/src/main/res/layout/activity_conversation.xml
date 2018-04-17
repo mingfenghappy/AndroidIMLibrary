@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cn.dreamtobe.kpswitch.widget.KPSwitchRootRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#f0f2f8">
     <LinearLayout
         android:id="@+id/layout_conversation_controll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dip" />
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
             android:orientation="horizontal">
             <com.renyu.tmbaseuilibrary.utils.DetectDelEventEditText
                 android:id="@+id/edit_conversation"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="5dip"
+                android:layout_marginStart="5dip"
                 android:layout_weight="1"
                 android:lineSpacingExtra="5dip"
                 android:background="@android:color/white"
@@ -28,9 +34,7 @@
                 android:id="@+id/btn_send_conversation"
                 android:layout_width="70dp"
                 android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:background="#0099ff"
-                android:clickable="true"
+                android:background="#dddee2"
                 android:gravity="center"
                 android:text="发送"
                 android:layout_marginRight="5dip"
@@ -38,42 +42,41 @@
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
         </LinearLayout>
-        <View
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="0.5dip"
-            android:background="#cccccc"></View>
-        <RelativeLayout
-            android:background="#ebebeb"
-            android:layout_width="match_parent"
-            android:layout_height="45dip">
-            <ImageView
-                android:id="@+id/iv_image"
-                android:layout_marginLeft="16dip"
-                android:src="@mipmap/ic_conversation_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"/>
-            <ImageView
-                android:id="@+id/iv_emoji"
-                android:layout_toRightOf="@id/iv_image"
-                android:layout_marginLeft="30dip"
-                android:src="@mipmap/ic_conversation_emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true" />
+            android:gravity="center"
+            android:layout_height="45dp">
             <ImageView
                 android:id="@+id/iv_sendvoice"
-                android:layout_toRightOf="@id/iv_emoji"
-                android:layout_marginLeft="30dip"
-                android:src="@mipmap/ic_conversation_image"
-                android:layout_width="wrap_content"
+                android:src="@mipmap/ic_conversation_voice"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"/>
-        </RelativeLayout>
+                android:layout_weight="1"/>
+            <ImageView
+                android:id="@+id/iv_image"
+                android:src="@mipmap/ic_conversation_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageView
+                android:id="@+id/iv_camera"
+                android:src="@mipmap/ic_conversation_camera"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageView
+                android:id="@+id/iv_emoji"
+                android:src="@mipmap/ic_conversation_emoji"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dip"
-            android:background="#cccccc"></View>
+            android:background="#cccccc" />
         <cn.dreamtobe.kpswitch.widget.KPSwitchPanelRelativeLayout
             android:id="@+id/kp_panel_root"
             android:layout_width="match_parent"
@@ -91,11 +94,12 @@
                 layout="@layout/panel_recordvoice" />
         </cn.dreamtobe.kpswitch.widget.KPSwitchPanelRelativeLayout>
     </LinearLayout>
+
     <include
         android:layout_width="match_parent"
         android:layout_height="44dip"
         android:id="@+id/nav_layout"
-        layout="@layout/view_nav"></include>
+        layout="@layout/view_nav" />
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_conversation"
         android:layout_above="@id/layout_conversation_controll"

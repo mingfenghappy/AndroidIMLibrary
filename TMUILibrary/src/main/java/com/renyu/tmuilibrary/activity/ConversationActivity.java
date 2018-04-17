@@ -9,7 +9,9 @@ import android.media.MediaPlayer;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -103,6 +105,9 @@ public class ConversationActivity extends BaseIMActivity {
     AnimationDrawable voiceAnimation=null;
     boolean isSend = false;
 
+    // 是否已经收起
+    boolean isExecuteCollapse = false;
+
     @Override
     public void initParams() {
         TextView textView=new TextView(ConversationActivity.this);
@@ -145,6 +150,18 @@ public class ConversationActivity extends BaseIMActivity {
         messageBeens.addAll(temp);
 
         rv_conversation = findViewById(R.id.rv_conversation);
+        rv_conversation.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                isExecuteCollapse = false;
+            }
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                if (!isExecuteCollapse) {
+                    isExecuteCollapse = true;
+                    KPSwitchConflictUtil.hidePanelAndKeyboard(kp_panel_root);
+                }
+            }
+            return false;
+        });
         rv_conversation.setHasFixedSize(true);
         LinearLayoutManager manager=new LinearLayoutManager(this);
         rv_conversation.setLayoutManager(manager);
@@ -181,6 +198,27 @@ public class ConversationActivity extends BaseIMActivity {
         iv_emoji = findViewById(R.id.iv_emoji);
         iv_sendvoice = findViewById(R.id.iv_sendvoice);
         edit_conversation = findViewById(R.id.edit_conversation);
+        edit_conversation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s.toString())) {
+                    findViewById(R.id.btn_send_conversation).setBackgroundColor(Color.parseColor("#dddee2"));
+                }
+                else {
+                    findViewById(R.id.btn_send_conversation).setBackgroundColor(Color.parseColor("#0099ff"));
+                }
+            }
+        });
         edit_conversation.setDelListener(() -> {
             // 点击删除键
             String value = edit_conversation.getText().toString();

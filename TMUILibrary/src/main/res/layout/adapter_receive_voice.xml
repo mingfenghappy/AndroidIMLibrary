@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="13dp" >
+    android:paddingTop="30dp" >
     <TextView
         android:id="@+id/aurora_tv_msgitem_date"
         style="@style/chat_text_date_style"
@@ -13,16 +13,14 @@
         android:layout_height="wrap_content" />
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp" >
+        android:layout_height="wrap_content">
         <com.facebook.drawee.view.SimpleDraweeView
             xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/aurora_iv_msgitem_avatar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="5dp"
+            android:layout_marginStart="8dip"
             fresco:actualImageResource="@drawable/default_avatar0"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_avatar0"
@@ -32,39 +30,37 @@
             fresco:roundAsCircle="true"/>
         <RelativeLayout
             android:id="@+id/bubble"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="65dip"
+            android:layout_height="45dip"
             android:layout_below="@+id/aurora_tv_msgitem_display_name"
-            android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/aurora_iv_msgitem_avatar"
-            android:background="@drawable/ease_chatfrom_bg" >
+            android:layout_marginStart="8dip"
+            android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
+            android:background="@mipmap/ic_conversation_left" >
             <ImageView
                 android:id="@+id/iv_voice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="12dp"
-                android:layout_centerInParent="true"
+                android:paddingLeft="12dp"
+                android:paddingRight="10dp"
+                android:layout_centerVertical="true"
                 android:src="@mipmap/ease_chatfrom_voice_playing" />
+            <TextView
+                android:id="@+id/aurora_tv_voice_length"
+                style="@style/chat_text_name_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dip"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"/>
         </RelativeLayout>
-        <TextView
-            android:id="@+id/aurora_tv_voice_length"
-            style="@style/chat_text_name_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/bubble"
-            android:layout_alignTop="@id/bubble"
-            android:gravity="center"
-            android:text="3&apos;&apos;"
-            tools:ignore="HardcodedText" />
         <ImageView
             android:id="@+id/aurora_iv_msgitem_read_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_alignTop="@id/bubble"
-            android:layout_toRightOf="@id/aurora_tv_voice_length"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dip"
+            android:layout_toRightOf="@id/bubble"
             android:src="@mipmap/ease_unread_dot" />
         <TextView
             android:id="@+id/aurora_tv_msgitem_display_name"
@@ -73,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
             android:textSize="13sp"
-            android:layout_toRightOf="@id/aurora_iv_msgitem_avatar"
+            android:layout_toRightOf="@id/bubble"
             android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>

@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.Utils;
@@ -35,6 +36,7 @@ import com.renyu.tmuilibrary.activity.ConversationActivity;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
 /**
@@ -211,7 +213,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         if (getItemViewType(position)==0) {
-            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
+            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((ReceiverTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
             if (!userNickName.equals("")) {
@@ -231,7 +233,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
         }
         else if (getItemViewType(position)==1) {
-            ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
+            ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((ReceiverImageViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
             if (!userNickName.equals("")) {
@@ -258,7 +260,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverImageViewHolder) holder).aurora_iv_msgitem_photo.setController(draweeController_);
         }
         else if (getItemViewType(position)==2) {
-            ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
+            ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
             if (!userNickName.equals("")) {
@@ -315,12 +317,12 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             }
         }
         else if (getItemViewType(position)==3) {
-            ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
+            ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
         }
         else if (getItemViewType(position)==4) {
-            ((SendImageViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
+            ((SendImageViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((SendImageViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).getSvrMsgId()+"_status");
             // 不需要重发则不显示图标
@@ -343,9 +345,20 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
             }
             // 加载本地图片
-            String filePath = messages.get(position).getLocalFileName();
-            ImageRequest request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file:///"+filePath))
-                    .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            String fileId_ = messages.get(position).getLocalFileName();
+            ImageRequest request_ = null;
+            // 加载本地图片
+            if (fileId_.indexOf(".") != -1) {
+                request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file:///"+fileId_))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            }
+            // 加载远程图片
+            else {
+                StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
+                sb.append("fileid=").append(fileId_).append("&type=").append("picture").append("&token=").append(token);
+                request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse(sb.toString()))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            }
             DraweeController draweeController_ = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(request_).setAutoPlayAnimations(true).build();
             ((SendImageViewHolder) holder).aurora_iv_msgitem_photo.setController(draweeController_);
@@ -354,7 +367,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             });
         }
         else if (getItemViewType(position)==5) {
-            ((SendVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(TimeUtils.millis2String(messages.get(position).getTimestamp(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())));
+            ((SendVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setTag(messages.get(position).getSvrMsgId()+"_status");
             // 不需要重发则不显示图标
@@ -572,5 +585,63 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             aurora_iv_msgitem_read_status = itemView.findViewById(R.id.aurora_iv_msgitem_read_status);
             bubble = itemView.findViewById(R.id.bubble);
         }
+    }
+
+    public static String getFriendlyTimeSpanByNow(long millis) {
+        long now = System.currentTimeMillis();
+        // 获取当天00:00
+        long wee = (now / TimeConstants.DAY) * TimeConstants.DAY - 8 * TimeConstants.HOUR;
+        if (millis >= wee+1000*3600*12) {
+            return String.format("下午%tR", millis);
+        } else if (millis >= wee) {
+            return String.format("上午%tR", millis);
+        } else if (millis >= wee - TimeConstants.DAY) {
+            return String.format("昨天 %tR", millis);
+        } else {
+            if (isSameDate(now, millis)) {
+                return String.format(TimeUtils.getChineseWeek(millis)+" %tR", millis);
+            }
+            else {
+                if (isSameYear(now, millis)) {
+                    return String.format(TimeUtils.millis2String(millis, new SimpleDateFormat("MM-dd", Locale.getDefault()))+" %tR", millis);
+                }
+                else {
+                    return String.format(TimeUtils.millis2String(millis, new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()))+" %tR", millis);
+                }
+            }
+        }
+    }
+
+    private static boolean isSameDate(long t1, long t2) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTimeInMillis(t1);
+        cal2.setTimeInMillis(t2);
+        int subYear = cal1.get(Calendar.YEAR)-cal2.get(Calendar.YEAR);
+        if(subYear == 0) {
+            if(cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+                return true;
+        }
+        else if(subYear==1 && cal2.get(Calendar.MONTH)==11) {
+            if(cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+                return true;
+        }
+        else if(subYear==-1 && cal1.get(Calendar.MONTH)==11) {
+            if(cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean isSameYear(long t1, long t2) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTimeInMillis(t1);
+        cal2.setTimeInMillis(t2);
+        int subYear = cal1.get(Calendar.YEAR)-cal2.get(Calendar.YEAR);
+        if(subYear == 0) {
+            return true;
+        }
+        return false;
     }
 }
