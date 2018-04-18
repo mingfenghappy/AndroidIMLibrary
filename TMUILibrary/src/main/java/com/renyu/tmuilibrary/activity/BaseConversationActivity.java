@@ -565,6 +565,9 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     private void sendTextMessage() {
+        if (TextUtils.isEmpty(edit_conversation.getText().toString())) {
+            return;
+        }
         if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
             Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
             return;
