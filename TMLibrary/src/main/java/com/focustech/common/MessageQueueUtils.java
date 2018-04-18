@@ -58,11 +58,11 @@ public class MessageQueueUtils {
 
     public void add(String cliSeqId) {
         Runnable runnable = () -> {
-            // 60s时间到了就判定发送失败
+            // 20s时间到了就判定发送失败
             remove(cliSeqId, false);
         };
         messages.put(cliSeqId, runnable);
-        looperHandler.postDelayed(runnable, 60*1000);
+        looperHandler.postDelayed(runnable, 20*1000);
     }
 
     /**

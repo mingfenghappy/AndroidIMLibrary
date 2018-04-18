@@ -355,7 +355,7 @@ public class BaseConversationActivity extends BaseIMActivity {
                             if (imageView!=null) {
                                 imageView.setVisibility(View.VISIBLE);
                             }
-                        }, 500);
+                        }, 800);
                     }
                     // 语音、图片上传失败之后刷新列表
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
