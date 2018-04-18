@@ -7,6 +7,9 @@ import com.renyu.tmuilibrary.R
 import com.renyu.tmuilibrary.activity.BaseConversationActivity
 import com.renyu.tmuilibrary.activity.UserDetailActivity
 
+/**
+ * 涉及到会话详情的可以参考此类的写法
+ */
 class ConversationActivity : BaseConversationActivity() {
 
     var layout_nav_right: LinearLayout? = null

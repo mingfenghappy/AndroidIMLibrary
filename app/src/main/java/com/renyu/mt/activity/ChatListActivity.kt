@@ -33,7 +33,7 @@ class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSe
 
         val textView = TextView(this)
         textView.text = "联系人"
-        textView.setOnClickListener { view ->
+        textView.setOnClickListener { _ ->
             val intent = Intent(this, FriendListActivity::class.java)
             startActivity(intent)
         }
