@@ -16,11 +16,11 @@
         <com.facebook.drawee.view.SimpleDraweeView
             xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/aurora_iv_msgitem_avatar"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="8dip"
+            android:layout_marginEnd="10dip"
             fresco:actualImageResource="@drawable/default_avatar0"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_avatar0"
@@ -31,7 +31,7 @@
         <RelativeLayout
             android:id="@+id/bubble"
             android:layout_width="65dip"
-            android:layout_height="45dip"
+            android:layout_height="42dp"
             android:layout_toStartOf="@id/aurora_iv_msgitem_avatar"
             android:layout_marginEnd="8dip"
             android:background="@mipmap/ic_conversation_right" >
@@ -46,9 +46,9 @@
             <ImageView
                 android:id="@+id/iv_voice"
                 android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:paddingLeft="12dp"
-                android:paddingRight="10dp"
+                android:layout_alignParentEnd="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@mipmap/ease_chatto_voice_playing" />
@@ -59,7 +59,7 @@
             android:layout_height="15dp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="12dip"
-            android:layout_toLeftOf="@id/bubble"
+            android:layout_toStartOf="@id/bubble"
             android:src="@mipmap/ease_msg_state_failed_resend"
             android:visibility="gone" />
         <ProgressBar
@@ -68,7 +68,8 @@
             android:layout_height="15dp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="12dip"
+            style="@style/pb_conversation_send"
             android:visibility="visible"
-            android:layout_toLeftOf="@id/bubble" />
+            android:layout_toStartOf="@id/bubble" />
     </RelativeLayout>
 </LinearLayout>

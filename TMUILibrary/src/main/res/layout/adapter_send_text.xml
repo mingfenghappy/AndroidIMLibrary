@@ -16,11 +16,11 @@
         <com.facebook.drawee.view.SimpleDraweeView
             xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/aurora_iv_msgitem_avatar"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="8dip"
+            android:layout_marginEnd="10dip"
             fresco:actualImageResource="@drawable/default_avatar0"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_avatar0"
@@ -42,8 +42,7 @@
                 android:autoLink="all"
                 android:layout_centerInParent="true"
                 android:gravity="center|left"
-                android:text="123123123213121"
-                android:minHeight="45dp"
+                android:minHeight="42dp"
                 android:lineSpacingExtra="2dp"
                 android:textColor="#000000"
                 android:maxWidth="225.0dip"
@@ -54,16 +53,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/bubble"
-            android:clickable="true"
+            android:layout_toStartOf="@id/bubble"
             android:src="@mipmap/ease_msg_state_failed_resend"
             android:visibility="gone" />
         <ProgressBar
             android:id="@+id/aurora_iv_msgitem_send_progress_bar"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/bubble"
-            android:visibility="gone" />
+            android:layout_marginEnd="12dip"
+            style="@style/pb_conversation_send"
+            android:visibility="gone"
+            android:layout_toStartOf="@id/bubble" />
     </RelativeLayout>
 </LinearLayout>

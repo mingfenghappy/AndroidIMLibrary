@@ -31,7 +31,7 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.tmbaseuilibrary.utils.AvatarUtils;
 import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
 import com.renyu.tmuilibrary.R;
-import com.renyu.tmuilibrary.activity.ConversationActivity;
+import com.renyu.tmuilibrary.activity.BaseConversationActivity;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -278,7 +278,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             }
             ((ReceiverVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
                 // 播放语音和动画
-                ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", false);
+                ((BaseConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", false);
                 // 更新数据库
                 PlainTextDBHelper.getInstance(Utils.getApp()).updateVoiceRead(messages.get(position).getSvrMsgId());
                 // 更新本地缓存
@@ -289,7 +289,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).getSvrMsgId()+"_voice");
             // 判断是否正在播放
             if (mediaPlayerTag!=null && mediaPlayerTag.equals(messages.get(position).getSvrMsgId()+"_voice")) {
-                ((ConversationActivity) context).startVoicePlayAnimation(((ReceiverVoiceViewHolder) holder).iv_voice, false);
+                ((BaseConversationActivity) context).startVoicePlayAnimation(((ReceiverVoiceViewHolder) holder).iv_voice, false);
             }
             else {
                 ((ReceiverVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatfrom_voice_playing);
@@ -334,7 +334,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             }
             ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setOnClickListener(view -> {
                 // 发送失败则通过点击进行重新发送
-                ((ConversationActivity) context).resendPicMessage(messages.get(position));
+                ((BaseConversationActivity) context).resendPicMessage(messages.get(position));
             });
             ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
             // 未发送完成则需要显示进度圈
@@ -380,11 +380,11 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setOnClickListener(view -> {
                 // 本地真实自己发送的文件
                 if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
-                    ((ConversationActivity) context).resendVoiceMessageState(messages.get(position));
+                    ((BaseConversationActivity) context).resendVoiceMessageState(messages.get(position));
                 }
                 // 同步时远程拿下的文件
                 else {
-                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
+                    ((BaseConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
                 }
             });
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
@@ -399,17 +399,17 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 播放语音
                 // 本地真实自己发送的文件
                 if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
-                    ((ConversationActivity) context).playMedia(messages.get(position).getLocalFileName(), messages.get(position).getSvrMsgId()+"_voice", true);
+                    ((BaseConversationActivity) context).playMedia(messages.get(position).getLocalFileName(), messages.get(position).getSvrMsgId()+"_voice", true);
                 }
                 // 同步时远程拿下的文件
                 else {
-                    ((ConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
+                    ((BaseConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
                 }
             });
             ((SendVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).getSvrMsgId()+"_voice");
             // 判断是否正在播放
             if (mediaPlayerTag!=null && mediaPlayerTag.equals(messages.get(position).getSvrMsgId()+"_voice")) {
-                ((ConversationActivity) context).startVoicePlayAnimation(((SendVoiceViewHolder) holder).iv_voice, true);
+                ((BaseConversationActivity) context).startVoicePlayAnimation(((SendVoiceViewHolder) holder).iv_voice, true);
             }
             else {
                 ((SendVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatto_voice_playing);
@@ -592,9 +592,9 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         // 获取当天00:00
         long wee = (now / TimeConstants.DAY) * TimeConstants.DAY - 8 * TimeConstants.HOUR;
         if (millis >= wee+1000*3600*12) {
-            return String.format("下午%tR", millis);
+            return String.format("下午 %tR", millis);
         } else if (millis >= wee) {
-            return String.format("上午%tR", millis);
+            return String.format("上午 %tR", millis);
         } else if (millis >= wee - TimeConstants.DAY) {
             return String.format("昨天 %tR", millis);
         } else {

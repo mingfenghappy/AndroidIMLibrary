@@ -28,7 +28,6 @@ import com.focustech.message.model.UserInfoRsp;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.tmbaseuilibrary.utils.AvatarUtils;
 import com.renyu.tmuilibrary.R;
-import com.renyu.tmuilibrary.activity.ConversationActivity;
 
 import java.util.List;
 
@@ -88,19 +87,28 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
             PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(beans.get(position_).getFriendUserId());
             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, beans.get(position_).getFriendUserId());
 
-            Intent intent=new Intent(context, ConversationActivity.class);
-            intent.putExtra("UserId", beans.get(position_).getFriendUserId());
-            if (beans.get(position_).getFriendInfoRsp() != null && beans.get(position_).getFriendInfoRsp().getFriend() != null) {
-                intent.putExtra("UserHeadId", beans.get(position_).getFriendInfoRsp().getFriend().getUserHeadId());
-                intent.putExtra("UserNickName", beans.get(position_).getFriendInfoRsp().getFriend().getUserNickName());
-                intent.putExtra("UserHeadType", beans.get(position_).getFriendInfoRsp().getFriend().getUserHeadType().getNumber());
+            try {
+                Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+                String conversationActivityName = clazz.getField("ConversationActivityName").get(clazz).toString();
+
+                Class conversationClass = Class.forName(conversationActivityName);
+
+                Intent intent=new Intent(context, conversationClass);
+                intent.putExtra("UserId", beans.get(position_).getFriendUserId());
+                if (beans.get(position_).getFriendInfoRsp() != null && beans.get(position_).getFriendInfoRsp().getFriend() != null) {
+                    intent.putExtra("UserHeadId", beans.get(position_).getFriendInfoRsp().getFriend().getUserHeadId());
+                    intent.putExtra("UserNickName", beans.get(position_).getFriendInfoRsp().getFriend().getUserNickName());
+                    intent.putExtra("UserHeadType", beans.get(position_).getFriendInfoRsp().getFriend().getUserHeadType().getNumber());
+                }
+                else {
+                    intent.putExtra("UserHeadId", "");
+                    intent.putExtra("UserNickName", "");
+                    intent.putExtra("UserHeadType", 0);
+                }
+                context.startActivity(intent);
+            } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+                e.printStackTrace();
             }
-            else {
-                intent.putExtra("UserHeadId", "");
-                intent.putExtra("UserNickName", "");
-                intent.putExtra("UserHeadType", 0);
-            }
-            context.startActivity(intent);
         });
     }
 

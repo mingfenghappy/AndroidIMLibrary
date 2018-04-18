@@ -16,10 +16,10 @@
         <com.facebook.drawee.view.SimpleDraweeView
             xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/aurora_iv_msgitem_avatar"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="8dip"
+            android:layout_marginStart="10dip"
             fresco:actualImageResource="@drawable/default_avatar0"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_avatar0"
@@ -41,9 +41,8 @@
                 android:autoLink="all"
                 android:layout_centerInParent="true"
                 android:gravity="center|left"
-                android:text="12312312312312"
                 android:lineSpacingExtra="2dp"
-                android:minHeight="45dp"
+                android:minHeight="42dp"
                 android:maxWidth="225.0dip"
                 android:textColor="#ff000000"
                 android:textSize="15sp" />
@@ -53,9 +52,9 @@
             style="@style/chat_text_name_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
             android:textSize="13sp"
-            android:layout_toRightOf="@id/aurora_iv_msgitem_avatar"
+            android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
             android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>

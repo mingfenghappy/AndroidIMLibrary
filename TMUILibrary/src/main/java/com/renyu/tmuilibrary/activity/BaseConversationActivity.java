@@ -69,9 +69,8 @@ import io.reactivex.disposables.Disposable;
  * Created by Administrator on 2017/7/24.
  */
 
-public class ConversationActivity extends BaseIMActivity {
+public class BaseConversationActivity extends BaseIMActivity {
 
-    LinearLayout layout_nav_right;
     RecyclerView rv_conversation;
     ConversationAdapter adapter;
     KPSwitchPanelRelativeLayout kp_panel_root;
@@ -88,12 +87,12 @@ public class ConversationActivity extends BaseIMActivity {
     ArrayList<MessageBean> messageBeens;
 
     // 当前用户信息
-    UserInfoRsp currentUserInfo;
+    public UserInfoRsp currentUserInfo;
     // 聊天对方用户ID
-    String chatUserId;
-    String chatUserHeadId;
-    String chatUserNickName;
-    int chatUserHeadType;
+    public String chatUserId;
+    public String chatUserHeadId;
+    public String chatUserNickName;
+    public int chatUserHeadType;
 
     // 页码
     int page=0;
@@ -110,16 +109,6 @@ public class ConversationActivity extends BaseIMActivity {
 
     @Override
     public void initParams() {
-        TextView textView=new TextView(ConversationActivity.this);
-        textView.setText("个人信息");
-        textView.setOnClickListener(view -> {
-            Intent intent=new Intent(ConversationActivity.this, UserDetailActivity.class);
-            intent.putExtra("UserId", chatUserId);
-            startActivity(intent);
-        });
-        layout_nav_right = findViewById(R.id.layout_nav_right);
-        layout_nav_right.addView(textView);
-
         // 存在回收之后再次回收，造成下线标志位出错
         if (checkNullInfo()) {
             return;
@@ -294,13 +283,13 @@ public class ConversationActivity extends BaseIMActivity {
             return false;
         });
         kp_panel_root.post(() -> {
-            int height=KeyboardUtil.getKeyboardHeight(ConversationActivity.this);
+            int height=KeyboardUtil.getKeyboardHeight(BaseConversationActivity.this);
             LinearLayout.LayoutParams params= (LinearLayout.LayoutParams) kp_panel_root.getLayoutParams();
             params.height=height;
             kp_panel_root.setLayoutParams(params);
         });
         findViewById(R.id.btn_send_conversation).setOnClickListener(v -> sendTextMessage());
-        findViewById(R.id.iv_image).setOnClickListener(v -> com.renyu.imagelibrary.commonutils.Utils.choicePic(ConversationActivity.this, 1, 1000));
+        findViewById(R.id.iv_image).setOnClickListener(v -> com.renyu.imagelibrary.commonutils.Utils.choicePic(BaseConversationActivity.this, 1, 1000));
 
         receiver=new BroadcastReceiver() {
             @Override
@@ -394,7 +383,7 @@ public class ConversationActivity extends BaseIMActivity {
 
     @Override
     public int initViews() {
-        return R.layout.activity_conversation;
+        return R.layout.activity_base_conversation;
     }
 
     @Override
@@ -545,7 +534,7 @@ public class ConversationActivity extends BaseIMActivity {
                                    StringBuilder sb = new StringBuilder(FusionField.downloadUrl);
                                    sb.append("fileid=").append(fileId).append("&type=").append("voice").append("&token=").append(token);
                                    // 单纯下载文件
-                                   DownloadUtils.addFile(ConversationActivity.this.getApplicationContext(), sb.toString(), fileId, bean.getSvrMsgId());
+                                   DownloadUtils.addFile(BaseConversationActivity.this.getApplicationContext(), sb.toString(), fileId, bean.getSvrMsgId());
                                }
                            }
                            // 更新数据库，回到第一页
@@ -703,8 +692,8 @@ public class ConversationActivity extends BaseIMActivity {
             return;
         }
         // 停止上一个语音播放
-        stopVoicePlayAnimation(ConversationActivity.this.isSend);
-        ConversationActivity.this.isSend = isSend;
+        stopVoicePlayAnimation(BaseConversationActivity.this.isSend);
+        BaseConversationActivity.this.isSend = isSend;
         recycleMedia();
         mediaPlayer = new MediaPlayer();
         try {

@@ -80,19 +80,15 @@ public abstract class BaseIMActivity extends BaseActivity {
                 CommonParams.isKickout = false;
                 try {
                     Class clazz = Class.forName("com.renyu.mt.params.InitParams");
-                    String SignInActivityName = clazz.getField("InitActivityName").get(clazz).toString();
+                    String initActivityName = clazz.getField("InitActivityName").get(clazz).toString();
 
-                    Class signInClass = Class.forName(SignInActivityName);
-                    Intent intent = new Intent(this, signInClass);
+                    Class initClass = Class.forName(initActivityName);
+                    Intent intent = new Intent(this, initClass);
                     intent.putExtra(CommonParams.TYPE, CommonParams.KICKOUT);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
                     finish();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (NoSuchFieldException e) {
+                } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
                     e.printStackTrace();
                 }
 

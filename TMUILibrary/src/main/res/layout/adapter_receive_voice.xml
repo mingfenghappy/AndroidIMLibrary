@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
@@ -17,10 +16,10 @@
         <com.facebook.drawee.view.SimpleDraweeView
             xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/aurora_iv_msgitem_avatar"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="8dip"
+            android:layout_marginStart="10dip"
             fresco:actualImageResource="@drawable/default_avatar0"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_avatar0"
@@ -31,7 +30,7 @@
         <RelativeLayout
             android:id="@+id/bubble"
             android:layout_width="65dip"
-            android:layout_height="45dip"
+            android:layout_height="42dp"
             android:layout_below="@+id/aurora_tv_msgitem_display_name"
             android:layout_marginStart="8dip"
             android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
@@ -40,8 +39,8 @@
                 android:id="@+id/iv_voice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingRight="10dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="10dp"
                 android:layout_centerVertical="true"
                 android:src="@mipmap/ease_chatfrom_voice_playing" />
             <TextView
@@ -50,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="8dip"
+                android:layout_marginEnd="8dip"
                 android:layout_alignParentEnd="true"
                 android:gravity="center"/>
         </RelativeLayout>
@@ -59,17 +58,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="12dip"
-            android:layout_toRightOf="@id/bubble"
+            android:layout_marginStart="12dip"
+            android:layout_toEndOf="@id/bubble"
             android:src="@mipmap/ease_unread_dot" />
         <TextView
             android:id="@+id/aurora_tv_msgitem_display_name"
             style="@style/chat_text_name_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
             android:textSize="13sp"
-            android:layout_toRightOf="@id/bubble"
+            android:layout_toEndOf="@id/bubble"
             android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>

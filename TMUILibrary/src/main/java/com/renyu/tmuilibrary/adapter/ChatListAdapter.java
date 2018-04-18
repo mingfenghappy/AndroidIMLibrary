@@ -29,7 +29,6 @@ import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.tmbaseuilibrary.utils.AvatarUtils;
 import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
 import com.renyu.tmuilibrary.R;
-import com.renyu.tmuilibrary.activity.ConversationActivity;
 import com.renyu.tmuilibrary.activity.SystemMessageActivity;
 
 import java.text.SimpleDateFormat;
@@ -127,12 +126,21 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
             else {
                 PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(offlineMessages.get(position_).getFromUserId());
 
-                Intent intent=new Intent(context, ConversationActivity.class);
-                intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
-                intent.putExtra("UserHeadId", offlineMessages.get(position_).getUserHeadId());
-                intent.putExtra("UserNickName", offlineMessages.get(position_).getUserNickName());
-                intent.putExtra("UserHeadType", offlineMessages.get(position_).getUserHeadType());
-                context.startActivity(intent);
+                try {
+                    Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+                    String conversationActivityName = clazz.getField("ConversationActivityName").get(clazz).toString();
+
+                    Class conversationClass = Class.forName(conversationActivityName);
+
+                    Intent intent=new Intent(context, conversationClass);
+                    intent.putExtra("UserId", offlineMessages.get(position_).getFromUserId());
+                    intent.putExtra("UserHeadId", offlineMessages.get(position_).getUserHeadId());
+                    intent.putExtra("UserNickName", offlineMessages.get(position_).getUserNickName());
+                    intent.putExtra("UserHeadType", offlineMessages.get(position_).getUserHeadType());
+                    context.startActivity(intent);
+                } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
             }
             BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.UpdateRead, offlineMessages.get(position_).getFromUserId());
         });
