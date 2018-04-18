@@ -190,7 +190,7 @@ abstract public class MTApplication extends MultiDexApplication {
                         ArrayList<MessageBean> tempOffline = (ArrayList<MessageBean>) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
                         // 发送已读回执
                         for (MessageBean messageBean : tempOffline) {
-                            MTService.hasReadOfflineMessage(MTApplication.this, messageBean.getFromSvrMsgId());
+                            MTService.hasReadOfflineMessage(MTApplication.this, messageBean.getSvrMsgId());
                         }
                         // 下载语音文件
                         for (MessageBean messageBean : tempOffline) {
@@ -228,7 +228,7 @@ abstract public class MTApplication extends MultiDexApplication {
                     if (bean.getCommand() == BroadcastBean.MTCommand.Message) {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
                         // 发送已读回执
-                        MTService.hasReadMessage(MTApplication.this, messageBean.getFromSvrMsgId());
+                        MTService.hasReadMessage(MTApplication.this, messageBean.getSvrMsgId());
 
                         // 试图从消息中获取用户昵称
                         String userName = messageBean.getUserId();

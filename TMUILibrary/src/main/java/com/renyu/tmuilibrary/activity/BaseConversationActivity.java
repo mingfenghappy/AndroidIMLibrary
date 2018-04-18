@@ -470,7 +470,6 @@ public class BaseConversationActivity extends BaseIMActivity {
                            for (OfflineIMDetailResponse offlineIMDetailRespons : temp) {
                                MessageBean bean=new MessageBean();
                                bean.setTimestamp(offlineIMDetailRespons.getAddTime());
-                               bean.setFromSvrMsgId(offlineIMDetailRespons.getSvrMsgId());
                                bean.setMsg(offlineIMDetailRespons.getMsg());
                                bean.setMsgMeta(offlineIMDetailRespons.getMsgMeta());
                                if (MessageBean.getMessageTypeForConversation(offlineIMDetailRespons) == 7 ||
@@ -580,7 +579,6 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setIsSend("1");
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
-        messageBean.setFromSvrMsgId("");
         messageBean.setSync(Enums.Enable.ENABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
         messageBean.setMessageType("0");
@@ -607,7 +605,6 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setUserId(chatUserId);
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
-        messageBean.setFromSvrMsgId("");
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
         messageBean.setMessageType("8");
@@ -633,7 +630,6 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setUserId(chatUserId);
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
-        messageBean.setFromSvrMsgId("");
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
         messageBean.setMessageType("7");

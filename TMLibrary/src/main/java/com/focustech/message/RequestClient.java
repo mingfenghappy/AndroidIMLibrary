@@ -36,8 +36,6 @@ public class RequestClient {
 
 	Context context;
 
-	private AtomicInteger mAtomicInteger = new AtomicInteger(1);
-
 	public RequestClient(Context context) {
 		this.context=context;
 		initConnector();
@@ -76,15 +74,6 @@ public class RequestClient {
 			connector.close();
 	}
 
-	public int getCliSeqId()
-	{
-		return mAtomicInteger.get();
-	}
-
-	public int setCliSeqId() {
-		return mAtomicInteger.addAndGet(1);
-	}
-
 	/**
 	 * 判断连接状态
 	 * @return
@@ -102,18 +91,18 @@ public class RequestClient {
 
 	public Head.TMHeadMessage getHead(String cmd) {
 		Head.TMHeadMessage.Builder builder = Head.TMHeadMessage.newBuilder();
-		builder.setCliSeqId(mAtomicInteger.get());
+		builder.setCliSeqId(Utils.getCliSeqId());
+		Utils.setCliSeqId();
 		builder.setCmd(cmd);
 		builder.setDomainName(FusionField.messageHeaderDomain);
 		builder.setVersion(FusionField.VERSION);
-		mAtomicInteger.addAndGet(1);
 		return builder.build();
 	}
 
 	private Head.TMHeadMessage getHead(String cmd, String serverMessageId) {
 		Head.TMHeadMessage.Builder builder = Head.TMHeadMessage.newBuilder();
-		builder.setCliSeqId(mAtomicInteger.get());
-		mAtomicInteger.addAndGet(1);
+		builder.setCliSeqId(Utils.getCliSeqId());
+		Utils.setCliSeqId();
 		builder.setCmd(cmd);
 		builder.setDomainName(FusionField.messageHeaderDomain);
 		builder.setVersion(FusionField.VERSION);
@@ -186,8 +175,8 @@ public class RequestClient {
 	 */
 	public void reqGetOfflineMessage() {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("GetOfflineMessageReq", getCliSeqId()));
-		setCliSeqId();
+		message.setHead(getHead("GetOfflineMessageReq", Utils.getCliSeqId()));
+		Utils.setCliSeqId();
 		Messages.GetOfflineMessageReq.Builder builder = Messages.GetOfflineMessageReq.newBuilder();
 		builder.setTimestamp(System.currentTimeMillis());
 		message.setBody(builder.build().toByteArray());
@@ -246,8 +235,8 @@ public class RequestClient {
 	 */
 	public void sendTextMessage(String toUserId, String msg, String userName) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", getCliSeqId()));
-		setCliSeqId();
+		message.setHead(getHead("Message", Utils.getCliSeqId()));
+		Utils.setCliSeqId();
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText(msg));
 		builder.setUserId(toUserId);
@@ -268,8 +257,8 @@ public class RequestClient {
 	 */
 	public void sendPicMessage(String toUserId, String filePath, String userName, String fileId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", getCliSeqId()));
-		setCliSeqId();
+		message.setHead(getHead("Message", Utils.getCliSeqId()));
+		Utils.setCliSeqId();
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText("/:b0"));
 		builder.setUserId(toUserId);
@@ -290,8 +279,8 @@ public class RequestClient {
 	 */
 	public void sendVoiceMessage(String toUserId, String filePath, String userName, String fileId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", getCliSeqId()));
-		setCliSeqId();
+		message.setHead(getHead("Message", Utils.getCliSeqId()));
+		Utils.setCliSeqId();
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText("[语音消息]"));
 		builder.setUserId(toUserId);
@@ -541,8 +530,8 @@ public class RequestClient {
 		request.setFileId(fileId);
 
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("GroupMessage", getCliSeqId()));
-		setCliSeqId();
+		message.setHead(getHead("GroupMessage", Utils.getCliSeqId()));
+		Utils.setCliSeqId();
 		Messages.GroupMessage.Builder builder = Messages.GroupMessage.newBuilder();
 		builder.setMsg(Utils.phraseSendText(request.getMsg()));
 		builder.setUserId(request.getFromUserId());
@@ -576,8 +565,8 @@ public class RequestClient {
 		request.setFileId(fileId);
 
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("GroupMessage", getCliSeqId()));
-		setCliSeqId();
+		message.setHead(getHead("GroupMessage", Utils.getCliSeqId()));
+		Utils.setCliSeqId();
 		Messages.GroupMessage.Builder builder = Messages.GroupMessage.newBuilder();
 		builder.setMsg(Utils.phraseSendText(request.getMsg()));
 		builder.setUserId(request.getFromUserId());

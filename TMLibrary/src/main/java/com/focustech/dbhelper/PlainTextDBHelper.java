@@ -57,7 +57,6 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     public final static String msgMeta="msgMeta";
     public final static String msgType="msgType";
     public final static String svrMsgId="svrMsgId";
-    public final static String fromSvrMsgId="fromSvrMsgId";
     // 消息发送成功/正在发送状态位
     public final static String sync="sync";
     // 消息是否需要重新发送
@@ -112,7 +111,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                 userId+" text, "+friendGroupId+" text, "+friendGroupName+" text, "+friendGroupType+" text);");
         db.execSQL("CREATE TABLE IF NOT EXISTS "+MessageTable+"("+ID+" integer primary key AUTOINCREMENT, "+
                 msg+" text, "+msgMeta+" text, "+msgType+" text, "+userId+" text, "+isSend+" text, "+isRead+" text, "+
-                isVoicePlay+" text, "+ timestamp+" text, "+svrMsgId+" text, "+fromSvrMsgId+" text, "+sync+" text, "+
+                isVoicePlay+" text, "+ timestamp+" text, "+svrMsgId+" text, "+sync+" text, "+
                 resend+" text, "+messageType+" text, "+localFileName+" text);");
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SystemMessageTable+"("+ID+" integer primary key AUTOINCREMENT, "+
                 userId+" text, "+userName+" text, "+isRead+" text, "+ext+" text, "+src+" text, "+timestamp+" text, "+
@@ -433,7 +432,6 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                     cv1.put(isSend, offlineMessage.getIsSend());
                     cv1.put(timestamp, ""+offlineMessage.getTimestamp());
                     cv1.put(svrMsgId, offlineMessage.getSvrMsgId());
-                    cv1.put(fromSvrMsgId, offlineMessage.getFromSvrMsgId());
                     cv1.put(sync, ""+offlineMessage.getSync().getNumber());
                     cv1.put(resend, ""+offlineMessage.getResend().getNumber());
                     cv1.put(messageType, offlineMessage.getMessageType());
@@ -568,7 +566,6 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
             messageBean.setUserId(userId);
             messageBean.setTimestamp(Long.parseLong(timestamp));
             messageBean.setSvrMsgId(svrMsgId);
-            messageBean.setFromSvrMsgId(fromSvrMsgId);
             messageBean.setSync(Enums.Enable.valueOf(Integer.parseInt(sync)));
             messageBean.setResend(Enums.Enable.valueOf(Integer.parseInt(resend)));
             messageBean.setMessageType(messageType);

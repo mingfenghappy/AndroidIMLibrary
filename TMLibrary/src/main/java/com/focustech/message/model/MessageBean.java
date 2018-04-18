@@ -23,7 +23,6 @@ public class MessageBean implements Serializable {
     String userId;                   // c -> s 代表接收方用户，s -> c 代表发送方用户
     long timestamp;                  // 客户端自己的NTP时间戳
     String svrMsgId;                 // 客户端需要--离线消息时会传递，用于客户端自己去重判断
-    String fromSvrMsgId;             // 媒体消息绑定svrMsgId
     Enums.Enable sync;               // 消息是否发送完成 已发送1 未发送0
     Enums.Enable resend;             // 是否是需要重发消息
     // 临时使用的数据
@@ -91,14 +90,6 @@ public class MessageBean implements Serializable {
         this.svrMsgId = svrMsgId;
     }
 
-    public String getFromSvrMsgId() {
-        return fromSvrMsgId;
-    }
-
-    public void setFromSvrMsgId(String fromSvrMsgId) {
-        this.fromSvrMsgId = fromSvrMsgId;
-    }
-
     public Enums.Enable getSync() {
         return sync;
     }
@@ -158,7 +149,7 @@ public class MessageBean implements Serializable {
     public static MessageBean parse(Messages.Message message, Head.TMHeadMessage headMessage) {
         MessageBean bean=new MessageBean();
         bean.setTimestamp(message.getTimestamp());
-        bean.setFromSvrMsgId(headMessage.getSvrSeqId());
+//        bean.setFromSvrMsgId(headMessage.getSvrSeqId());
         bean.setMsg(message.getMsg());
         bean.setMsgMeta(message.getMsgMeta());
         bean.setMsgType(message.getMsgType());

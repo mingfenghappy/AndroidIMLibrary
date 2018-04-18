@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -178,4 +179,16 @@ public class Utils {
         }
         return object.toString();
     }
+
+    // IM消息发送序号
+    private static AtomicInteger mAtomicInteger = new AtomicInteger(1);
+
+    public static int getCliSeqId() {
+        return mAtomicInteger.get();
+    }
+
+    public static int setCliSeqId() {
+        return mAtomicInteger.addAndGet(1);
+    }
+
 }
