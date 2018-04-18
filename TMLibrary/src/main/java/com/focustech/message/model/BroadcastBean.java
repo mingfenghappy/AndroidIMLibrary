@@ -11,10 +11,10 @@ import java.io.Serializable;
 
 public class BroadcastBean implements Serializable {
     public enum MTCommand implements Serializable {
-        HeartBeat,               // 自增，用于标志心跳包
-        Conn,                    // 自增，用于已连接
-        Conning,                 // 自增，用于标志发起连接
-        Disconn,                 // 自增，用于连接失败
+        HeartBeat,                   // 自增，用于标志心跳包
+        Conn,                        // 自增，用于已连接
+        Conning,                     // 自增，用于标志发起连接
+        Disconn,                     // 自增，用于连接失败
         LoginRsp,
         LoginRspERROR,
         UserInfoRsp,
@@ -24,14 +24,16 @@ public class BroadcastBean implements Serializable {
         GetOfflineMessageRsp,
         UpdateUserStatusNty,
         Message,
-        MessageSend,             // 自增，用于标志发送消息
-        MessageComp,             // 自增，用于标志消息发送完成
-        MessageReceive,          // 自增，用于标志消息接收完成，用于数据库操作完成后刷新列表使用
-        MessageUploadComp,       // 自增，用于标志发送的语音消息上传完成
-        MessageUploadFail,       // 自增，用于标志发送的语音消息上传失败
-        MessageDownloadComp,     // 自增，用于标志下载语音文件完成
+        MessageSend,                 // 自增，用于标志发送消息
+        MessageComp,                 // 自增，用于标志消息发送成功
+        MessageCompByConversation,   // 自增，用于回话详情标志消息发送成功
+        MessageFail,                 // 自增，用于标志消息发送失败
+        MessageFailByConversation,   // 自增，用于回话详情标志消息发送失败
+        MessageReceive,              // 自增，用于标志消息接收完成，用于数据库操作完成后刷新列表使用
+        MessageUploadFail,           // 自增，用于标志发送的语音消息上传失败
+        MessageDownloadComp,         // 自增，用于标志下载语音文件完成
         ReceptNty,
-        UpdateRead,              // 自增，用于标志未读消息清除
+        UpdateRead,                  // 自增，用于标志未读消息清除
         NewSysNty,
         GetFriendRuleRsp,
         DeleteFriendRsp,

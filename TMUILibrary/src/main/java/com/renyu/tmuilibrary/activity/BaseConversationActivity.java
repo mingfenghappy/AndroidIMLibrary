@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -318,29 +319,43 @@ public class BaseConversationActivity extends BaseIMActivity {
                             }
                         }
                     }
-                    // 当前用户发送消息之后刷新列表
-                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageSend) {
-                        MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        messageBeens.add(messageBean);
-                        adapter.notifyItemInserted(messageBeens.size()-1);
-                        if (!rv_conversation.canScrollVertically(1)) {
-                            rv_conversation.scrollToPosition(messageBeens.size()-1);
-                        }
-                    }
-                    // 语音、图片上传完成之后刷新列表
-                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadComp) {
-                        // 语音、图片上传完成之后刷新列表
-                        MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
+                    // 消息发送成功
+                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageCompByConversation) {
+                        Log.d("MTAPP", "收到发送的消息");
+                        String svrMsgId = ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable().toString();
                         for (MessageBean messageBeen : messageBeens) {
-                            if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
+                            if (messageBeen.getSvrMsgId().equals(svrMsgId)) {
                                 messageBeen.setSync(Enums.Enable.ENABLE);
-                                break;
+                                messageBeen.setResend(Enums.Enable.DISABLE);
                             }
                         }
-                        ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
-                        if (pb!=null) {
-                            pb.setVisibility(View.GONE);
+                        new Handler().postDelayed(() -> {
+                            ProgressBar pb=rv_conversation.findViewWithTag(svrMsgId+"_pb");
+                            if (pb!=null) {
+                                pb.setVisibility(View.GONE);
+                            }
+                        }, 500);
+
+                    }
+                    // 消息发送失败
+                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageFailByConversation) {
+                        String svrMsgId = ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable().toString();
+                        for (MessageBean messageBeen : messageBeens) {
+                            if (messageBeen.getSvrMsgId().equals(svrMsgId)) {
+                                messageBeen.setSync(Enums.Enable.ENABLE);
+                                messageBeen.setResend(Enums.Enable.ENABLE);
+                            }
                         }
+                        new Handler().postDelayed(() -> {
+                            ProgressBar pb=rv_conversation.findViewWithTag(svrMsgId+"_pb");
+                            if (pb!=null) {
+                                pb.setVisibility(View.GONE);
+                            }
+                            ImageView imageView=rv_conversation.findViewWithTag(svrMsgId+"_status");
+                            if (imageView!=null) {
+                                imageView.setVisibility(View.VISIBLE);
+                            }
+                        }, 500);
                     }
                     // 语音、图片上传失败之后刷新列表
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
@@ -352,14 +367,16 @@ public class BaseConversationActivity extends BaseIMActivity {
                                 break;
                             }
                         }
-                        ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
-                        if (pb!=null) {
-                            pb.setVisibility(View.GONE);
-                        }
-                        ImageView imageView=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_status");
-                        if (imageView!=null) {
-                            imageView.setVisibility(View.VISIBLE);
-                        }
+                        new Handler().postDelayed(() -> {
+                            ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
+                            if (pb!=null) {
+                                pb.setVisibility(View.GONE);
+                            }
+                            ImageView imageView=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_status");
+                            if (imageView!=null) {
+                                imageView.setVisibility(View.VISIBLE);
+                            }
+                        }, 500);
                     }
                     // 接口同步的文件如果下载完成，则刷新列表
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageDownloadComp) {
@@ -579,7 +596,7 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setIsSend("1");
         messageBean.setTimestamp(System.currentTimeMillis());
         messageBean.setSvrMsgId(MD5Utils.getMD5String(""+System.currentTimeMillis()));
-        messageBean.setSync(Enums.Enable.ENABLE);
+        messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
         messageBean.setMessageType("0");
         messageBean.setLocalFileName("");
@@ -589,6 +606,12 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setCliSeqId(cliSeqId);
         PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
+
+        messageBeens.add(messageBean);
+        adapter.notifyItemInserted(messageBeens.size()-1);
+        if (!rv_conversation.canScrollVertically(1)) {
+            rv_conversation.scrollToPosition(messageBeens.size()-1);
+        }
 
         // 发送消息
         MTService.sendTextMessage(this, chatUserId, edit_conversation.getText().toString(), currentUserInfo.getUserName(), cliSeqId);
@@ -619,6 +642,12 @@ public class BaseConversationActivity extends BaseIMActivity {
         PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
+        messageBeens.add(messageBean);
+        adapter.notifyItemInserted(messageBeens.size()-1);
+        if (!rv_conversation.canScrollVertically(1)) {
+            rv_conversation.scrollToPosition(messageBeens.size()-1);
+        }
+
         // 发送消息
         MTService.sendPicMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
@@ -648,6 +677,12 @@ public class BaseConversationActivity extends BaseIMActivity {
         PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
+        messageBeens.add(messageBean);
+        adapter.notifyItemInserted(messageBeens.size()-1);
+        if (!rv_conversation.canScrollVertically(1)) {
+            rv_conversation.scrollToPosition(messageBeens.size()-1);
+        }
+
         // 发送消息
         MTService.sendVoiceMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
@@ -656,7 +691,7 @@ public class BaseConversationActivity extends BaseIMActivity {
      * 重新发送语音消息
      * @param messageBean
      */
-    public void resendVoiceMessageState(MessageBean messageBean) {
+    public void resendVoiceMessage(MessageBean messageBean) {
         if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
             Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
             return;
@@ -694,6 +729,28 @@ public class BaseConversationActivity extends BaseIMActivity {
 
         // 发送消息
         MTService.sendPicMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
+    }
+
+    /**
+     * 重新发送文本消息
+     * @param messageBean
+     */
+    public void resendTextMessage(MessageBean messageBean) {
+        if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
+            Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // 修改数据库状态
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE, cliSeqId);
+        // 修改列表状态并刷新
+        messageBean.setSync(Enums.Enable.DISABLE);
+        messageBean.setResend(Enums.Enable.DISABLE);
+        adapter.notifyDataSetChanged();
+
+        // 发送消息
+        MTService.sendTextMessage(this, chatUserId, messageBean.getMsg(), currentUserInfo.getUserName(), cliSeqId);
     }
 
     /**

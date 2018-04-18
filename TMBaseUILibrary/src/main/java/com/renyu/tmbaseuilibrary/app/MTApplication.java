@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.focustech.common.MessageQueueUtils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.MessageBean;
@@ -109,6 +110,8 @@ abstract public class MTApplication extends MultiDexApplication {
             retrofit2Utils.addImageOKHttpClient(imageUploadOkBuilder.build());
             retrofit2Utils.imageBuild();
 
+            // 初始化消息队列
+            MessageQueueUtils.getInstance(this);
             // 重置所有发送失败的消息
             PlainTextDBHelper.getInstance(com.blankj.utilcode.util.Utils.getApp()).updateFailMessages();
             // 注册基础广播
@@ -270,11 +273,25 @@ abstract public class MTApplication extends MultiDexApplication {
                             }
                         }
                     }
-                    // 语音、图片上传完成之后更新表字段
-                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadComp) {
-                        // 语音、图片上传完成之后更新表字段
-                        MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE, "");
+                    // 消息发送成功
+                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageComp) {
+                        String cliSeqId = ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable().toString();
+                        if (!TextUtils.isEmpty(cliSeqId)) {
+                            // 更新会话列表
+                            BroadcastBean.sendBroadcast(MTApplication.this, BroadcastBean.MTCommand.MessageCompByConversation, PlainTextDBHelper.getInstance(MTApplication.this).findMsgIdByCliSeqId(cliSeqId));
+                            // 修改数据库中的值
+                            PlainTextDBHelper.getInstance(MTApplication.this).changeSendingMesaageState(cliSeqId, true);
+                        }
+                    }
+                    // 消息发送失败
+                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageFail) {
+                        String cliSeqId = ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable().toString();
+                        if (!TextUtils.isEmpty(cliSeqId)) {
+                            // 更新会话列表
+                            BroadcastBean.sendBroadcast(MTApplication.this, BroadcastBean.MTCommand.MessageFailByConversation, PlainTextDBHelper.getInstance(MTApplication.this).findMsgIdByCliSeqId(cliSeqId));
+                            // 修改数据库中的值
+                            PlainTextDBHelper.getInstance(MTApplication.this).changeSendingMesaageState(cliSeqId, false);
+                        }
                     }
                     // 语音、图片上传失败之后更新表字段
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {

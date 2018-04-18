@@ -2,7 +2,12 @@ package com.focustech.message;
 
 import android.content.Context;
 
+import com.focustech.common.MessageQueueUtils;
 import com.focustech.common.Utils;
+import com.focustech.message.group.GroupMsgRequest;
+import com.focustech.message.msg.MessageResponse;
+import com.focustech.message.msg.TMMessage;
+import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Contacts;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums.Enable;
@@ -17,14 +22,9 @@ import com.focustech.tm.open.sdk.messages.protobuf.User;
 import com.focustech.tm.open.sdk.net.base.NetConnector;
 import com.focustech.tm.open.sdk.net.base.TMConnection;
 import com.focustech.tm.open.sdk.net.base.TMMessageProcessorAdapter;
-import com.focustech.params.FusionField;
-import com.focustech.message.group.GroupMsgRequest;
-import com.focustech.message.msg.MessageResponse;
-import com.focustech.message.msg.TMMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 消息发送工具类
@@ -245,6 +245,8 @@ public class RequestClient {
 		builder.setSync(Enable.ENABLE);
 		message.setBody(builder.build().toByteArray());
 		TMConnection.getInstance(context).send(message);
+
+		MessageQueueUtils.getInstance(context).add(cliSeqId);
 	}
 
 	/**
@@ -266,6 +268,8 @@ public class RequestClient {
 		builder.setSync(Enable.ENABLE);
 		message.setBody(builder.build().toByteArray());
 		TMConnection.getInstance(context).send(message);
+
+		MessageQueueUtils.getInstance(context).add(cliSeqId);
 	}
 
 	/**
@@ -287,6 +291,8 @@ public class RequestClient {
 		builder.setSync(Enable.ENABLE);
 		message.setBody(builder.build().toByteArray());
 		TMConnection.getInstance(context).send(message);
+
+		MessageQueueUtils.getInstance(context).add(cliSeqId);
 	}
 
 	/**

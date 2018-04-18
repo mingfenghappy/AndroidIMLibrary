@@ -3,6 +3,7 @@ package com.focustech.message;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.focustech.common.MessageQueueUtils;
 import com.focustech.message.msg.TMMessage;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.FriendGroupRsp;
@@ -98,6 +99,8 @@ public class MTMessageHandlerAdapter implements IMessageHandler {
 			Messages.ReceptNty nty=Messages.ReceptNty.parseFrom(message.getBody());
 			ReceptNty receptNty=ReceptNty.parse(nty);
 			BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.ReceptNty, receptNty);
+
+			MessageQueueUtils.getInstance(context).remove(""+message.getHead().getCliSeqId(), true);
 		} catch (InvalidProtocolBufferException e) {
 			e.printStackTrace();
 		}

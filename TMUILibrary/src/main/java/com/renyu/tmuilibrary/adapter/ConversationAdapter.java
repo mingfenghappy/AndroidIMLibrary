@@ -320,11 +320,34 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
+
+            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).getSvrMsgId()+"_status");
+            // 不需要重发则不显示图标
+            if (messages.get(position).getResend()== Enums.Enable.DISABLE) {
+                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.GONE);
+            }
+            else {
+                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.VISIBLE);
+            }
+            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setOnClickListener(view -> {
+                // 发送失败则通过点击进行重新发送
+                ((BaseConversationActivity) context).resendTextMessage(messages.get(position));
+            });
+
+            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
+            // 未发送完成则需要显示进度圈
+            if (messages.get(position).getSync()== Enums.Enable.DISABLE) {
+                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
+            }
         }
         else if (getItemViewType(position)==4) {
             ((SendImageViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((SendImageViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).getSvrMsgId()+"_status");
+
             // 不需要重发则不显示图标
             if (messages.get(position).getResend()== Enums.Enable.DISABLE) {
                 ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.GONE);
@@ -336,6 +359,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 发送失败则通过点击进行重新发送
                 ((BaseConversationActivity) context).resendPicMessage(messages.get(position));
             });
+
             ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
             // 未发送完成则需要显示进度圈
             if (messages.get(position).getSync()== Enums.Enable.DISABLE) {
@@ -344,6 +368,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
             }
+
             // 加载本地图片
             String fileId_ = messages.get(position).getLocalFileName();
             ImageRequest request_ = null;
@@ -370,6 +395,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setTag(messages.get(position).getSvrMsgId()+"_status");
+
             // 不需要重发则不显示图标
             if (messages.get(position).getResend()== Enums.Enable.DISABLE) {
                 ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
@@ -380,13 +406,14 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setOnClickListener(view -> {
                 // 本地真实自己发送的文件
                 if (messages.get(position).getLocalFileName().indexOf(".amr") != -1) {
-                    ((BaseConversationActivity) context).resendVoiceMessageState(messages.get(position));
+                    ((BaseConversationActivity) context).resendVoiceMessage(messages.get(position));
                 }
                 // 同步时远程拿下的文件
                 else {
                     ((BaseConversationActivity) context).playMedia(InitParams.FILE_PATH+"/"+messages.get(position).getLocalFileName()+".amr", messages.get(position).getSvrMsgId()+"_voice", true);
                 }
             });
+
             ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getSvrMsgId()+"_pb");
             // 未发送完成则需要显示进度圈
             if (messages.get(position).getSync()== Enums.Enable.DISABLE) {
@@ -395,6 +422,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
             }
+
             ((SendVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
                 // 播放语音
                 // 本地真实自己发送的文件

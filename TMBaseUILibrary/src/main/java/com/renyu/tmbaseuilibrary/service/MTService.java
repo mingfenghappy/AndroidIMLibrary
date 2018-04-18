@@ -203,7 +203,6 @@ public class MTService extends Service {
                         else if (type.equals("voice")) {
                             client.sendVoiceMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"), cliSeqId);
                         }
-                        BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadComp, intent.getSerializableExtra("messageBean"));
                     }
                     else {
                         BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
