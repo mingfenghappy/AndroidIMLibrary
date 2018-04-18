@@ -22,7 +22,7 @@ public class MessageBean implements Serializable {
     Enums.MessageType msgType;       // 消息类型
     String userId;                   // c -> s 代表接收方用户，s -> c 代表发送方用户
     long timestamp;                  // 客户端自己的NTP时间戳
-    String svrMsgId;                 // 客户端需要--离线消息时会传递，用于客户端自己去重判断
+    String svrMsgId;                 // 消息ID
     Enums.Enable sync;               // 消息是否发送完成 已发送1 未发送0
     Enums.Enable resend;             // 是否是需要重发消息
     // 临时使用的数据
@@ -32,6 +32,7 @@ public class MessageBean implements Serializable {
     String isRead;                   // 消息是否已读  1:已读 0:未读
     String isVoicePlay;              // 语音消息是否已读  1:已读 0:未读
     String cliSeqId;                 // 发送消息顺序，用来做发送成功失败判断，接收端无需使用
+    String hasReadId;                // 用于同步消息已读的ID
 
     int count;                       // 未读消息数（仅会话列表使用）
 
@@ -155,10 +156,18 @@ public class MessageBean implements Serializable {
         this.cliSeqId = cliSeqId;
     }
 
+    public String getHasReadId() {
+        return hasReadId;
+    }
+
+    public void setHasReadId(String hasReadId) {
+        this.hasReadId = hasReadId;
+    }
+
     public static MessageBean parse(Messages.Message message, Head.TMHeadMessage headMessage) {
         MessageBean bean=new MessageBean();
         bean.setTimestamp(message.getTimestamp());
-//        bean.setFromSvrMsgId(headMessage.getSvrSeqId());
+        bean.setHasReadId(headMessage.getSvrSeqId());
         bean.setMsg(message.getMsg());
         bean.setMsgMeta(message.getMsgMeta());
         bean.setMsgType(message.getMsgType());

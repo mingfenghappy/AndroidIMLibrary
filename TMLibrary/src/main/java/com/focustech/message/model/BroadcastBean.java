@@ -24,7 +24,8 @@ public class BroadcastBean implements Serializable {
         GetOfflineMessageRsp,
         UpdateUserStatusNty,
         Message,
-        MessageSend,             // 自增，用于标志发送的消息完成
+        MessageSend,             // 自增，用于标志发送消息
+        MessageComp,             // 自增，用于标志消息发送完成
         MessageReceive,          // 自增，用于标志消息接收完成，用于数据库操作完成后刷新列表使用
         MessageUploadComp,       // 自增，用于标志发送的语音消息上传完成
         MessageUploadFail,       // 自增，用于标志发送的语音消息上传失败

@@ -235,7 +235,7 @@ public class RequestClient {
 	 */
 	public void sendTextMessage(String toUserId, String msg, String userName, String cliSeqId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", cliSeqId));
+		message.setHead(getHead("Message", Integer.parseInt(cliSeqId)));
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText(msg));
 		builder.setUserId(toUserId);
@@ -256,7 +256,7 @@ public class RequestClient {
 	 */
 	public void sendPicMessage(String toUserId, String filePath, String userName, String fileId, String cliSeqId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", cliSeqId));
+		message.setHead(getHead("Message", Integer.parseInt(cliSeqId)));
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText("/:b0"));
 		builder.setUserId(toUserId);
@@ -277,7 +277,7 @@ public class RequestClient {
 	 */
 	public void sendVoiceMessage(String toUserId, String filePath, String userName, String fileId, String cliSeqId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", cliSeqId));
+		message.setHead(getHead("Message", Integer.parseInt(cliSeqId)));
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText("[语音消息]"));
 		builder.setUserId(toUserId);
