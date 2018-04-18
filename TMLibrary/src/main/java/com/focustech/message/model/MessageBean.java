@@ -31,6 +31,7 @@ public class MessageBean implements Serializable {
     String isSend;                   // 1:发送 0:接收
     String isRead;                   // 消息是否已读  1:已读 0:未读
     String isVoicePlay;              // 语音消息是否已读  1:已读 0:未读
+    String cliSeqId;                 // 发送消息顺序，用来做发送成功失败判断，接收端无需使用
 
     int count;                       // 未读消息数（仅会话列表使用）
 
@@ -144,6 +145,14 @@ public class MessageBean implements Serializable {
 
     public void setIsVoicePlay(String isVoicePlay) {
         this.isVoicePlay = isVoicePlay;
+    }
+
+    public String getCliSeqId() {
+        return cliSeqId;
+    }
+
+    public void setCliSeqId(String cliSeqId) {
+        this.cliSeqId = cliSeqId;
     }
 
     public static MessageBean parse(Messages.Message message, Head.TMHeadMessage headMessage) {

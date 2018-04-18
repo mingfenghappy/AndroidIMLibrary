@@ -86,13 +86,13 @@ public class MTService extends Service {
                     client.getUserSettingsInfo();
                 }
                 if (intent.getStringExtra("type").equals("sendTextMessage")) {
-                    client.sendTextMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("msg"), intent.getStringExtra("userName"));
+                    client.sendTextMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("msg"), intent.getStringExtra("userName"), intent.getStringExtra("cliSeqId"));
                 }
                 if (intent.getStringExtra("type").equals("sendPicMessage")) {
-                    uploadFile(intent, "picture");
+                    uploadFile(intent, "picture", intent.getStringExtra("cliSeqId"));
                 }
                 if (intent.getStringExtra("type").equals("sendVoiceMessage")) {
-                    uploadFile(intent, "voice");
+                    uploadFile(intent, "voice", intent.getStringExtra("cliSeqId"));
                 }
                 // 获取系统消息
                 if (intent.getStringExtra("type").equals("getSysNtyReq")) {
@@ -176,7 +176,7 @@ public class MTService extends Service {
      * @param intent
      * @param type
      */
-    private void uploadFile(Intent intent, String type) {
+    private void uploadFile(Intent intent, String type, String cliSeqId) {
         File file = new File(intent.getStringExtra("filePath"));
         HashMap<String, File> fileHashMap = new HashMap<>();
         fileHashMap.put("file", file);
@@ -198,10 +198,10 @@ public class MTService extends Service {
                     JSONObject jsonObject = new JSONObject(string);
                     if (!TextUtils.isEmpty(jsonObject.getString("fileId"))) {
                         if (type.equals("picture")) {
-                            client.sendPicMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"));
+                            client.sendPicMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"), cliSeqId);
                         }
                         else if (type.equals("voice")) {
-                            client.sendVoiceMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"));
+                            client.sendVoiceMessage(intent.getStringExtra("toUserId"), intent.getStringExtra("filePath"), intent.getStringExtra("userName"), jsonObject.getString("fileId"), cliSeqId);
                         }
                         BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadComp, intent.getSerializableExtra("messageBean"));
                     }
@@ -336,12 +336,13 @@ public class MTService extends Service {
      * @param msg
      * @param userName
      */
-    public static void sendTextMessage(Context context, String toUserId, String msg, String userName) {
+    public static void sendTextMessage(Context context, String toUserId, String msg, String userName, String cliSeqId) {
         Intent intent=new Intent(context, MTService.class);
         intent.putExtra("type", "sendTextMessage");
         intent.putExtra("toUserId", toUserId);
         intent.putExtra("msg", msg);
         intent.putExtra("userName", userName);
+        intent.putExtra("cliSeqId", cliSeqId);
         context.startService(intent);
     }
 
@@ -352,12 +353,13 @@ public class MTService extends Service {
      * @param filePath
      * @param userName
      */
-    public static void sendPicMessage(Context context, String toUserId, String filePath, String userName, MessageBean messageBean) {
+    public static void sendPicMessage(Context context, String toUserId, String filePath, String userName, String cliSeqId, MessageBean messageBean) {
         Intent intent=new Intent(context, MTService.class);
         intent.putExtra("type", "sendPicMessage");
         intent.putExtra("toUserId", toUserId);
         intent.putExtra("filePath", filePath);
         intent.putExtra("userName", userName);
+        intent.putExtra("cliSeqId", cliSeqId);
         intent.putExtra("messageBean", messageBean);
         context.startService(intent);
     }
@@ -369,12 +371,13 @@ public class MTService extends Service {
      * @param filePath
      * @param userName
      */
-    public static void sendVoiceMessage(Context context, String toUserId, String filePath, String userName, MessageBean messageBean) {
+    public static void sendVoiceMessage(Context context, String toUserId, String filePath, String userName, String cliSeqId, MessageBean messageBean) {
         Intent intent=new Intent(context, MTService.class);
         intent.putExtra("type", "sendVoiceMessage");
         intent.putExtra("toUserId", toUserId);
         intent.putExtra("filePath", filePath);
         intent.putExtra("userName", userName);
+        intent.putExtra("cliSeqId", cliSeqId);
         intent.putExtra("messageBean", messageBean);
         context.startService(intent);
     }

@@ -233,10 +233,9 @@ public class RequestClient {
 	 * @param msg 发送的文本
 	 * @param userName 发送消息UserName
 	 */
-	public void sendTextMessage(String toUserId, String msg, String userName) {
+	public void sendTextMessage(String toUserId, String msg, String userName, String cliSeqId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", Utils.getCliSeqId()));
-		Utils.setCliSeqId();
+		message.setHead(getHead("Message", cliSeqId));
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText(msg));
 		builder.setUserId(toUserId);
@@ -255,10 +254,9 @@ public class RequestClient {
 	 * @param userName 发送消息UserName
 	 * @param fileId 上传成功文件ID
 	 */
-	public void sendPicMessage(String toUserId, String filePath, String userName, String fileId) {
+	public void sendPicMessage(String toUserId, String filePath, String userName, String fileId, String cliSeqId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", Utils.getCliSeqId()));
-		Utils.setCliSeqId();
+		message.setHead(getHead("Message", cliSeqId));
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText("/:b0"));
 		builder.setUserId(toUserId);
@@ -277,10 +275,9 @@ public class RequestClient {
 	 * @param userName 发送消息UserName
 	 * @param fileId 上传成功文件ID
 	 */
-	public void sendVoiceMessage(String toUserId, String filePath, String userName, String fileId) {
+	public void sendVoiceMessage(String toUserId, String filePath, String userName, String fileId, String cliSeqId) {
 		TMMessage message = new TMMessage();
-		message.setHead(getHead("Message", Utils.getCliSeqId()));
-		Utils.setCliSeqId();
+		message.setHead(getHead("Message", cliSeqId));
 		Message.Builder builder = Message.newBuilder();
 		builder.setMsg(Utils.phraseSendText("[语音消息]"));
 		builder.setUserId(toUserId);

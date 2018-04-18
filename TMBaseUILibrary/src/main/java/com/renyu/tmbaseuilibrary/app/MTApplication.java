@@ -274,12 +274,12 @@ abstract public class MTApplication extends MultiDexApplication {
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadComp) {
                         // 语音、图片上传完成之后更新表字段
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE);
+                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.ENABLE, "");
                     }
                     // 语音、图片上传失败之后更新表字段
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
                         MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE);
+                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE, "");
                     }
                     // 删除好友
                     if (bean.getCommand()== BroadcastBean.MTCommand.DeleteFriendRsp) {

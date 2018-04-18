@@ -588,7 +588,9 @@ public class BaseConversationActivity extends BaseIMActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        MTService.sendTextMessage(this, chatUserId, edit_conversation.getText().toString(), currentUserInfo.getUserName());
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        MTService.sendTextMessage(this, chatUserId, edit_conversation.getText().toString(), currentUserInfo.getUserName(), cliSeqId);
         edit_conversation.setText("");
     }
 
@@ -614,7 +616,9 @@ public class BaseConversationActivity extends BaseIMActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        MTService.sendPicMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), messageBean);
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        MTService.sendPicMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
     private void sendVoiceMessage(File file) {
@@ -640,7 +644,9 @@ public class BaseConversationActivity extends BaseIMActivity {
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        MTService.sendVoiceMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), messageBean);
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        MTService.sendVoiceMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
     /**
@@ -653,14 +659,16 @@ public class BaseConversationActivity extends BaseIMActivity {
             return;
         }
         // 修改数据库状态
-        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE, cliSeqId);
         // 修改列表状态并刷新
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
         adapter.notifyDataSetChanged();
 
         // 发送消息
-        MTService.sendVoiceMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), messageBean);
+        MTService.sendVoiceMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
     /**
@@ -673,14 +681,16 @@ public class BaseConversationActivity extends BaseIMActivity {
             return;
         }
         // 修改数据库状态
-        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE);
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        PlainTextDBHelper.getInstance(Utils.getApp()).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.DISABLE, Enums.Enable.DISABLE, cliSeqId);
         // 修改列表状态并刷新
         messageBean.setSync(Enums.Enable.DISABLE);
         messageBean.setResend(Enums.Enable.DISABLE);
         adapter.notifyDataSetChanged();
 
         // 发送消息
-        MTService.sendPicMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), messageBean);
+        MTService.sendPicMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
     /**

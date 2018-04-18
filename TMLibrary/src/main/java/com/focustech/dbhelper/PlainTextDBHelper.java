@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.focustech.message.model.FriendGroupRsp;
 import com.focustech.message.model.FriendInfoRsp;
 import com.focustech.message.model.FriendStatusRsp;
@@ -13,6 +12,7 @@ import com.focustech.message.model.OfflineIMDetailResponse;
 import com.focustech.message.model.OfflineIMResponse;
 import com.focustech.message.model.SystemMessageBean;
 import com.focustech.message.model.UserInfoRsp;
+import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.tencent.wcdb.Cursor;
 import com.tencent.wcdb.database.SQLiteDatabase;
 import com.tencent.wcdb.database.SQLiteOpenHelper;
@@ -57,6 +57,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     public final static String msgMeta="msgMeta";
     public final static String msgType="msgType";
     public final static String svrMsgId="svrMsgId";
+    public final static String cliSeqId="cliSeqId";
     // 消息发送成功/正在发送状态位
     public final static String sync="sync";
     // 消息是否需要重新发送
@@ -111,7 +112,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                 userId+" text, "+friendGroupId+" text, "+friendGroupName+" text, "+friendGroupType+" text);");
         db.execSQL("CREATE TABLE IF NOT EXISTS "+MessageTable+"("+ID+" integer primary key AUTOINCREMENT, "+
                 msg+" text, "+msgMeta+" text, "+msgType+" text, "+userId+" text, "+isSend+" text, "+isRead+" text, "+
-                isVoicePlay+" text, "+ timestamp+" text, "+svrMsgId+" text, "+sync+" text, "+
+                isVoicePlay+" text, "+ timestamp+" text, "+svrMsgId+" text, "+cliSeqId+" text, "+sync+" text, "+
                 resend+" text, "+messageType+" text, "+localFileName+" text);");
         db.execSQL("CREATE TABLE IF NOT EXISTS "+SystemMessageTable+"("+ID+" integer primary key AUTOINCREMENT, "+
                 userId+" text, "+userName+" text, "+isRead+" text, "+ext+" text, "+src+" text, "+timestamp+" text, "+
@@ -438,6 +439,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
                     cv1.put(localFileName, offlineMessage.getLocalFileName());
                     cv1.put(isRead, offlineMessage.getIsRead());
                     cv1.put(isVoicePlay, offlineMessage.getIsVoicePlay());
+                    cv1.put(cliSeqId, offlineMessage.getCliSeqId());
                     db.insert(MessageTable, null, cv1);
                     isExist = false;
                 }
@@ -549,7 +551,6 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
             String isSend=cs.getString(cs.getColumnIndex("isSend"));
             String timestamp=cs.getString(cs.getColumnIndex("timestamp"));
             String svrMsgId=cs.getString(cs.getColumnIndex("svrMsgId"));
-            String fromSvrMsgId=cs.getString(cs.getColumnIndex("fromSvrMsgId"));
             String sync=cs.getString(cs.getColumnIndex("sync"));
             String resend=cs.getString(cs.getColumnIndex("resend"));
             String messageType=cs.getString(cs.getColumnIndex("messageType"));
@@ -583,19 +584,6 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 修改发送状态
-     * @param svrMsgId_
-     * @param resendEnable 重发状态
-     * @param syncEnable 同步状态
-     */
-    public void updateSendState(String svrMsgId_, Enums.Enable resendEnable, Enums.Enable syncEnable) {
-        ContentValues cv=new ContentValues();
-        cv.put(resend, ""+resendEnable.getNumber());
-        cv.put(sync, ""+syncEnable.getNumber());
-        db.update(MessageTable, cv, svrMsgId+"=?", new String[]{svrMsgId_});
-    }
-
-    /**
      * 更新总消息已读状态
      * @param userId_
      */
@@ -625,7 +613,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 重置所有发送失败的消息
+     * 重置所有发送中的消息的状态
      */
     public void updateFailMessages() {
         Cursor cs=db.query(MessageTable, null, sync+" =?", new String[]{"0"}, null, null, null);
@@ -636,9 +624,62 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
             ContentValues cv=new ContentValues();
             cv.put(sync, "1");
             cv.put(resend, "1");
+            cv.put(cliSeqId, "");
             db.update(MessageTable, cv, svrMsgId+"=?", new String[]{cs.getString(cs.getColumnIndex("svrMsgId"))});
         }
         cs.close();
+    }
+
+    /**
+     * 修改发送中消息的状态
+     * @param cliSeqId_
+     * @param isOK
+     */
+    public void changeSendingMesaageState(String cliSeqId_, boolean isOK) {
+        ContentValues cv=new ContentValues();
+        if (isOK) {
+            cv.put(resend, "0");
+        }
+        else {
+            cv.put(resend, "1");
+        }
+        cv.put(sync, "1");
+        cv.put(cliSeqId, "");
+        db.update(MessageTable, cv, cliSeqId+"=?", new String[]{cliSeqId_});
+    }
+
+    /**
+     * 通过cliSeqId查找svrMsgId
+     * @param cliSeqId_
+     * @return
+     */
+    public String findMsgIdByCliSeqId(String cliSeqId_) {
+        String svrMsgId = null;
+
+        Cursor cs=db.query(MessageTable, null, cliSeqId+" =?", new String[]{cliSeqId_}, null, null, null);
+        cs.moveToFirst();
+        if (cs.getCount()>0) {
+            cs.moveToPosition(0);
+
+            svrMsgId=cs.getString(cs.getColumnIndex("svrMsgId"));
+        }
+        cs.close();
+
+        return svrMsgId;
+    }
+
+    /**
+     * 修改发送状态
+     * @param svrMsgId_
+     * @param resendEnable 重发状态
+     * @param syncEnable 同步状态
+     */
+    public void updateSendState(String svrMsgId_, Enums.Enable resendEnable, Enums.Enable syncEnable, String cliSeqId_) {
+        ContentValues cv=new ContentValues();
+        cv.put(resend, ""+resendEnable.getNumber());
+        cv.put(sync, ""+syncEnable.getNumber());
+        cv.put(cliSeqId, cliSeqId_);
+        db.update(MessageTable, cv, svrMsgId+"=?", new String[]{svrMsgId_});
     }
 
     /**
