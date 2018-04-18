@@ -3,6 +3,7 @@ package com.renyu.tmuilibrary.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
@@ -36,6 +37,7 @@ import com.focustech.params.FusionField;
 import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
+import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
@@ -61,6 +63,7 @@ import java.util.List;
 import cn.dreamtobe.kpswitch.util.KPSwitchConflictUtil;
 import cn.dreamtobe.kpswitch.util.KeyboardUtil;
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelRelativeLayout;
+import id.zelory.compressor.Compressor;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -77,7 +80,6 @@ public class BaseConversationActivity extends BaseIMActivity {
     ImageView iv_emoji;
     ImageView iv_sendvoice;
     DetectDelEventEditText edit_conversation;
-    View layout_imagechoice;
     View layout_voicechoice;
     View layout_emojichoice;
     RecyclerView rv_panel_content;
@@ -237,7 +239,6 @@ public class BaseConversationActivity extends BaseIMActivity {
             edit_conversation.setSelection(value.length()-1);
             return true;
         });
-        layout_imagechoice=kp_panel_root.findViewById(R.id.layout_imagechoice);
         layout_voicechoice=kp_panel_root.findViewById(R.id.layout_voicechoice);
         layout_record = findViewById(R.id.layout_record);
         layout_voicechoice.setOnTouchListener((v, event) -> {
@@ -290,6 +291,7 @@ public class BaseConversationActivity extends BaseIMActivity {
         });
         findViewById(R.id.btn_send_conversation).setOnClickListener(v -> sendTextMessage());
         findViewById(R.id.iv_image).setOnClickListener(v -> com.renyu.imagelibrary.commonutils.Utils.choicePic(BaseConversationActivity.this, 1, 1000));
+        findViewById(R.id.iv_camera).setOnClickListener( v -> com.renyu.imagelibrary.commonutils.Utils.takePicture(this, 1001));
 
         receiver=new BroadcastReceiver() {
             @Override
@@ -740,8 +742,15 @@ public class BaseConversationActivity extends BaseIMActivity {
             if (temp.size()>0) {
                 file=new File(temp.get(0));
             }
-            if (file!=null) {
-                sendPicMessage(file);
+            File cropFile = compress(file);
+            if (cropFile!=null) {
+                sendPicMessage(cropFile);
+            }
+        }
+        else if (requestCode == 1001 && resultCode == RESULT_OK) {
+            File cropFile = compress(new File(data.getExtras().getString("path")));
+            if (cropFile!=null) {
+                sendPicMessage(cropFile);
             }
         }
     }
@@ -775,5 +784,21 @@ public class BaseConversationActivity extends BaseIMActivity {
                 ((ImageView) rv_conversation.findViewWithTag(adapter.mediaPlayerTag)).setImageResource(R.mipmap.ease_chatto_voice_playing);
             }
         }
+    }
+
+    private File compress(File file) {
+        File cropFile = null;
+        try {
+            cropFile = new Compressor(getApplicationContext())
+                    .setMaxWidth(480)
+                    .setMaxHeight(800)
+                    .setQuality(80)
+                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .setDestinationDirectoryPath(InitParams.CACHE_PATH)
+                    .compressToFile(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cropFile;
     }
 }
