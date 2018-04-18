@@ -584,12 +584,13 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setMessageType("0");
         messageBean.setLocalFileName("");
         messageBean.setIsRead("1");
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        messageBean.setCliSeqId(cliSeqId);
         PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
-        com.focustech.common.Utils.setCliSeqId();
         MTService.sendTextMessage(this, chatUserId, edit_conversation.getText().toString(), currentUserInfo.getUserName(), cliSeqId);
         edit_conversation.setText("");
     }
@@ -612,12 +613,13 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setMessageType("8");
         messageBean.setLocalFileName(file.getPath());
         messageBean.setIsRead("1");
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        messageBean.setCliSeqId(cliSeqId);
         PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
-        com.focustech.common.Utils.setCliSeqId();
         MTService.sendPicMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
@@ -640,12 +642,13 @@ public class BaseConversationActivity extends BaseIMActivity {
         messageBean.setLocalFileName(file.getPath());
         messageBean.setIsRead("1");
         messageBean.setIsVoicePlay("1");
+        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
+        com.focustech.common.Utils.setCliSeqId();
+        messageBean.setCliSeqId(cliSeqId);
         PlainTextDBHelper.getInstance(Utils.getApp()).insertMessage(messageBean);
         BroadcastBean.sendBroadcast(this, BroadcastBean.MTCommand.MessageSend, messageBean);
 
         // 发送消息
-        String cliSeqId = ""+com.focustech.common.Utils.getCliSeqId();
-        com.focustech.common.Utils.setCliSeqId();
         MTService.sendVoiceMessage(this, chatUserId, file.getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
