@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.renyu.tmbaseuilibrary">
+
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
     <application>
         <service android:name=".service.HeartBeatService" />
         <service android:name=".service.MTService" />

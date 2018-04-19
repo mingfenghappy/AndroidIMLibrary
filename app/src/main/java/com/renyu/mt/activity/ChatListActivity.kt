@@ -9,7 +9,6 @@ import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.renyu.mt.R
 import com.renyu.tmbaseuilibrary.params.CommonParams
-import com.renyu.tmbaseuilibrary.utils.IntentWrapper
 import com.renyu.tmuilibrary.activity.BaseChatListActivity
 import com.renyu.tmuilibrary.fragment.ChatListFragment
 
@@ -44,9 +43,6 @@ class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSe
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
                 .commitAllowingStateLoss()
-
-        // 开启白名单判断
-//        IntentWrapper.whiteListMatters(this, null)
     }
 
     override fun initViews() = R.layout.activity_chatlist
