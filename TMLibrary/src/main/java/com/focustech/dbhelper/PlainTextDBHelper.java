@@ -679,6 +679,7 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
         cv.put(resend, ""+resendEnable.getNumber());
         cv.put(sync, ""+syncEnable.getNumber());
         cv.put(cliSeqId, cliSeqId_);
+        cv.put(timestamp, ""+System.currentTimeMillis());
         db.update(MessageTable, cv, svrMsgId+"=?", new String[]{svrMsgId_});
     }
 

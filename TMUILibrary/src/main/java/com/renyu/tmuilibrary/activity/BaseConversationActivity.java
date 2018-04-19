@@ -321,7 +321,7 @@ public class BaseConversationActivity extends BaseIMActivity {
                     }
                     // 消息发送成功
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageCompByConversation) {
-                        Log.d("MTAPP", "收到发送的消息");
+                        Log.d("MTAPP", "消息发送成功，页面刷新");
                         String svrMsgId = ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable().toString();
                         for (MessageBean messageBeen : messageBeens) {
                             if (messageBeen.getSvrMsgId().equals(svrMsgId)) {
@@ -338,6 +338,7 @@ public class BaseConversationActivity extends BaseIMActivity {
                     }
                     // 消息发送失败
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageFailByConversation) {
+                        Log.d("MTAPP", "消息发送失败，页面刷新");
                         String svrMsgId = ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable().toString();
                         for (MessageBean messageBeen : messageBeens) {
                             if (messageBeen.getSvrMsgId().equals(svrMsgId)) {
@@ -789,6 +790,11 @@ public class BaseConversationActivity extends BaseIMActivity {
             if (temp.size()>0) {
                 file=new File(temp.get(0));
             }
+            // 选择的是当前项目Cache目录下的图片
+            if (file.getParentFile().getPath().equals(InitParams.CACHE_PATH)) {
+                Toast.makeText(this, "图片选择有误", Toast.LENGTH_SHORT).show();
+                return;
+            }
             File cropFile = compress(file);
             if (cropFile!=null) {
                 sendPicMessage(cropFile);
@@ -843,7 +849,7 @@ public class BaseConversationActivity extends BaseIMActivity {
                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
                     .setDestinationDirectoryPath(InitParams.CACHE_PATH)
                     .compressToFile(file);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return cropFile;

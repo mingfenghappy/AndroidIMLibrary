@@ -234,6 +234,8 @@ public class RequestClient {
 	 * @param userName 发送消息UserName
 	 */
 	public void sendTextMessage(String toUserId, String msg, String userName, String cliSeqId) {
+		MessageQueueUtils.getInstance(context).add(cliSeqId);
+
 		TMMessage message = new TMMessage();
 		message.setHead(getHead("Message", Integer.parseInt(cliSeqId)));
 		Message.Builder builder = Message.newBuilder();
@@ -245,8 +247,6 @@ public class RequestClient {
 		builder.setSync(Enable.ENABLE);
 		message.setBody(builder.build().toByteArray());
 		TMConnection.getInstance(context).send(message);
-
-		MessageQueueUtils.getInstance(context).add(cliSeqId);
 	}
 
 	/**
@@ -257,6 +257,8 @@ public class RequestClient {
 	 * @param fileId 上传成功文件ID
 	 */
 	public void sendPicMessage(String toUserId, String filePath, String userName, String fileId, String cliSeqId) {
+		MessageQueueUtils.getInstance(context).add(cliSeqId);
+
 		TMMessage message = new TMMessage();
 		message.setHead(getHead("Message", Integer.parseInt(cliSeqId)));
 		Message.Builder builder = Message.newBuilder();
@@ -268,8 +270,6 @@ public class RequestClient {
 		builder.setSync(Enable.ENABLE);
 		message.setBody(builder.build().toByteArray());
 		TMConnection.getInstance(context).send(message);
-
-		MessageQueueUtils.getInstance(context).add(cliSeqId);
 	}
 
 	/**
@@ -280,6 +280,8 @@ public class RequestClient {
 	 * @param fileId 上传成功文件ID
 	 */
 	public void sendVoiceMessage(String toUserId, String filePath, String userName, String fileId, String cliSeqId) {
+		MessageQueueUtils.getInstance(context).add(cliSeqId);
+
 		TMMessage message = new TMMessage();
 		message.setHead(getHead("Message", Integer.parseInt(cliSeqId)));
 		Message.Builder builder = Message.newBuilder();
@@ -292,7 +294,6 @@ public class RequestClient {
 		message.setBody(builder.build().toByteArray());
 		TMConnection.getInstance(context).send(message);
 
-		MessageQueueUtils.getInstance(context).add(cliSeqId);
 	}
 
 	/**

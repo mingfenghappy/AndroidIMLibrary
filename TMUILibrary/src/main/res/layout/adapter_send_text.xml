@@ -50,10 +50,11 @@
         </RelativeLayout>
         <ImageView
             android:id="@+id/aurora_iv_msgitem_send_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@id/bubble"
+            android:layout_marginEnd="12dip"
             android:src="@mipmap/ease_msg_state_failed_resend"
             android:visibility="gone" />
         <ProgressBar
