@@ -26,6 +26,5 @@ class ConversationActivity : BaseConversationActivity() {
         }
         layout_nav_right = findViewById(R.id.layout_nav_right)
         layout_nav_right?.addView(textView)
-
     }
 }

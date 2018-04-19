@@ -119,17 +119,21 @@ abstract public class MTApplication extends MultiDexApplication {
                 Log.d("MTAPP", "注册基础广播");
                 openBaseReceiver();
             }
+
+            // 如果之前的服务已经开启，则关闭
+            if (ServiceUtils.isServiceRunning("com.renyu.tmbaseuilibrary.service.HeartBeatService")) {
+                Intent intent = new Intent(this, HeartBeatService.class);
+                stopService(intent);
+            }
             // 开启心跳服务并进行连接
-            if (!ServiceUtils.isServiceRunning("com.renyu.tmbaseuilibrary.service.HeartBeatService")) {
-                if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
-                    Intent intent = new Intent(this, HeartBeatService.class);
-                    intent.putExtra("smallIcon", R.drawable.ic_im_notification);
-                    intent.putExtra("largeIcon", R.drawable.ic_im_notification);
-                    startForegroundService(intent);
-                }
-                else {
-                    startService(new Intent(this, HeartBeatService.class));
-                }
+            if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+                Intent intent = new Intent(this, HeartBeatService.class);
+                intent.putExtra("smallIcon", R.drawable.ic_im_notification);
+                intent.putExtra("largeIcon", R.drawable.ic_im_notification);
+                startForegroundService(intent);
+            }
+            else {
+                startService(new Intent(this, HeartBeatService.class));
             }
         }
     }
