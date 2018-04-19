@@ -334,8 +334,7 @@ public class BaseConversationActivity extends BaseIMActivity {
                             if (pb!=null) {
                                 pb.setVisibility(View.GONE);
                             }
-                        }, 500);
-
+                        }, 1000);
                     }
                     // 消息发送失败
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageFailByConversation) {
@@ -355,28 +354,7 @@ public class BaseConversationActivity extends BaseIMActivity {
                             if (imageView!=null) {
                                 imageView.setVisibility(View.VISIBLE);
                             }
-                        }, 800);
-                    }
-                    // 语音、图片上传失败之后刷新列表
-                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
-                        MessageBean temp = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
-                        for (MessageBean messageBeen : messageBeens) {
-                            if (messageBeen.getSvrMsgId().equals(temp.getSvrMsgId())) {
-                                messageBeen.setSync(Enums.Enable.ENABLE);
-                                messageBeen.setResend(Enums.Enable.ENABLE);
-                                break;
-                            }
-                        }
-                        new Handler().postDelayed(() -> {
-                            ProgressBar pb=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_pb");
-                            if (pb!=null) {
-                                pb.setVisibility(View.GONE);
-                            }
-                            ImageView imageView=rv_conversation.findViewWithTag(temp.getSvrMsgId()+"_status");
-                            if (imageView!=null) {
-                                imageView.setVisibility(View.VISIBLE);
-                            }
-                        }, 500);
+                        }, 1000);
                     }
                     // 接口同步的文件如果下载完成，则刷新列表
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageDownloadComp) {
@@ -688,10 +666,10 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     /**
-     * 重新发送语音消息
+     * 重新发送文本消息
      * @param messageBean
      */
-    public void resendVoiceMessage(MessageBean messageBean) {
+    public void resendTextMessage(MessageBean messageBean) {
         if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
             Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
             return;
@@ -706,7 +684,7 @@ public class BaseConversationActivity extends BaseIMActivity {
         adapter.notifyDataSetChanged();
 
         // 发送消息
-        MTService.sendVoiceMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
+        MTService.sendTextMessage(this, chatUserId, messageBean.getMsg(), currentUserInfo.getUserName(), cliSeqId);
     }
 
     /**
@@ -732,10 +710,10 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     /**
-     * 重新发送文本消息
+     * 重新发送语音消息
      * @param messageBean
      */
-    public void resendTextMessage(MessageBean messageBean) {
+    public void resendVoiceMessage(MessageBean messageBean) {
         if (((MTApplication) getApplication()).connState != BroadcastBean.MTCommand.Conn) {
             Toast.makeText(this, "服务器未连接成功", Toast.LENGTH_SHORT).show();
             return;
@@ -750,7 +728,7 @@ public class BaseConversationActivity extends BaseIMActivity {
         adapter.notifyDataSetChanged();
 
         // 发送消息
-        MTService.sendTextMessage(this, chatUserId, messageBean.getMsg(), currentUserInfo.getUserName(), cliSeqId);
+        MTService.sendVoiceMessage(this, chatUserId, new File(messageBean.getLocalFileName()).getPath(), currentUserInfo.getUserName(), cliSeqId, messageBean);
     }
 
     /**

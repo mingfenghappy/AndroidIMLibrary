@@ -293,11 +293,6 @@ abstract public class MTApplication extends MultiDexApplication {
                             PlainTextDBHelper.getInstance(MTApplication.this).changeSendingMesaageState(cliSeqId, false);
                         }
                     }
-                    // 语音、图片上传失败之后更新表字段
-                    if (bean.getCommand() == BroadcastBean.MTCommand.MessageUploadFail) {
-                        MessageBean messageBean = (MessageBean) ((BroadcastBean) (intent.getSerializableExtra("broadcast"))).getSerializable();
-                        PlainTextDBHelper.getInstance(MTApplication.this).updateSendState(messageBean.getSvrMsgId(), Enums.Enable.ENABLE, Enums.Enable.ENABLE, "");
-                    }
                     // 删除好友
                     if (bean.getCommand()== BroadcastBean.MTCommand.DeleteFriendRsp) {
                         Toast.makeText(MTApplication.this, "删除好友成功", Toast.LENGTH_SHORT).show();

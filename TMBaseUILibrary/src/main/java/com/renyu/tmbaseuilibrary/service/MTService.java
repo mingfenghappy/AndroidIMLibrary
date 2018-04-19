@@ -205,17 +205,17 @@ public class MTService extends Service {
                         }
                     }
                     else {
-                        BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
+                        BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageFail, cliSeqId);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
+                    BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageFail, cliSeqId);
                 }
             }
 
             @Override
             public void onError() {
-                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageUploadFail, intent.getSerializableExtra("messageBean"));
+                BroadcastBean.sendBroadcast(MTService.this, BroadcastBean.MTCommand.MessageFail, cliSeqId);
             }
         }, (currentBytesCount, totalBytesCount) -> {
 
