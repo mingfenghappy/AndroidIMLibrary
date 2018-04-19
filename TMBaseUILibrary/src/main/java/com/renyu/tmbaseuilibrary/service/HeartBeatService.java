@@ -49,6 +49,12 @@ public class HeartBeatService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // 修正sendCount指令
+        if (intent.getIntExtra("from", -1) == 1) {
+            sendCount = 0;
+            return super.onStartCommand(intent, flags, startId);
+        }
+
         if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
             NotificationUtils.getNotificationCenter(getApplicationContext()).showStartForeground(
                     this,
@@ -64,8 +70,7 @@ public class HeartBeatService extends Service {
             Log.d("MTAPP", "初始化线程池");
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
             scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
-                if (((MTApplication) getApplicationContext()).connState != BroadcastBean.MTCommand.Conn ||
-                        sendCount == 0) {
+                if (((MTApplication) getApplicationContext()).connState != BroadcastBean.MTCommand.Conn || sendCount == 0) {
                     // 重置相关数据
                     sendCount = 1;
                     failureTime = System.currentTimeMillis() + FusionField.heartBeatSendInterval*1000*FusionField.retryTime;

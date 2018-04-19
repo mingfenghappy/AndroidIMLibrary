@@ -21,7 +21,6 @@ import com.focustech.message.model.MessageBean;
 import com.focustech.message.model.SystemMessageBean;
 import com.focustech.message.model.UserInfoRsp;
 import com.focustech.params.FusionField;
-import com.focustech.tm.open.sdk.messages.protobuf.Enums;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.commonutils.Utils;
@@ -135,6 +134,10 @@ abstract public class MTApplication extends MultiDexApplication {
             else {
                 startService(new Intent(this, HeartBeatService.class));
             }
+
+//            if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
+//                NetworkJobService.scheduleJob();
+//            }
         }
     }
 
