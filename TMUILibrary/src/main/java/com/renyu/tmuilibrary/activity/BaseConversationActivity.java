@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
@@ -43,9 +44,9 @@ import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.MTService;
-import com.renyu.tmbaseuilibrary.view.DetectDelEventEditText;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
+import com.renyu.tmbaseuilibrary.view.DetectDelEventEditText;
 import com.renyu.tmuilibrary.R;
 import com.renyu.tmuilibrary.adapter.ConversationAdapter;
 import com.renyu.tmuilibrary.adapter.FaceAdapter;
@@ -840,12 +841,16 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     private File compress(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getPath(), options);
+
         File cropFile = null;
         try {
             cropFile = new Compressor(getApplicationContext())
-                    .setMaxWidth(480)
-                    .setMaxHeight(800)
-                    .setQuality(80)
+                    .setMaxWidth(options.outWidth/2)
+                    .setMaxHeight(options.outHeight/2)
+                    .setQuality(70)
                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
                     .setDestinationDirectoryPath(InitParams.CACHE_PATH)
                     .compressToFile(file);
