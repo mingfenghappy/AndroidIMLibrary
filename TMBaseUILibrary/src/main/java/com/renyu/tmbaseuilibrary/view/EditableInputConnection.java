@@ -1,4 +1,4 @@
-package com.renyu.tmbaseuilibrary.utils;
+package com.renyu.tmbaseuilibrary.view;
 
 import android.content.Context;
 import android.os.Bundle;

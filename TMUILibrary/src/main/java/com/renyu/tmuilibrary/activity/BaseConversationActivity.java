@@ -43,7 +43,7 @@ import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.MTService;
-import com.renyu.tmbaseuilibrary.utils.DetectDelEventEditText;
+import com.renyu.tmbaseuilibrary.view.DetectDelEventEditText;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 import com.renyu.tmbaseuilibrary.utils.FaceIconUtil;
 import com.renyu.tmuilibrary.R;

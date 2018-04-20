@@ -17,7 +17,7 @@ public class InitParams {
     // 自定义的会话详情activity
     public static String ConversationActivityName = "com.renyu.mt.activity.ConversationActivity";
     // 广播action标志名称
-    public static String actionName = "MT";
+    public static String actionName = "MTDemo";
 
     // 自定义的踢下线逻辑
     public static void kickoutFunc() {

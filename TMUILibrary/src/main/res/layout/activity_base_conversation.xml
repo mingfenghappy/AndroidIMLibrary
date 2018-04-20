@@ -18,7 +18,7 @@
             android:layout_marginStart="7dp"
             android:layout_marginEnd="7dp"
             android:orientation="horizontal">
-            <com.renyu.tmbaseuilibrary.utils.DetectDelEventEditText
+            <com.renyu.tmbaseuilibrary.view.DetectDelEventEditText
                 android:id="@+id/edit_conversation"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

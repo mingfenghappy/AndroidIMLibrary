@@ -12,7 +12,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.SPUtils;
-import com.blankj.utilcode.util.ServiceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.focustech.common.MessageQueueUtils;
 import com.focustech.dbhelper.PlainTextDBHelper;
@@ -23,7 +22,6 @@ import com.focustech.message.model.UserInfoRsp;
 import com.focustech.params.FusionField;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
-import com.renyu.commonlibrary.commonutils.Utils;
 import com.renyu.commonlibrary.network.HttpsUtils;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
@@ -32,7 +30,7 @@ import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.HeartBeatService;
 import com.renyu.tmbaseuilibrary.service.MTService;
 import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
-import com.renyu.tmbaseuilibrary.utils.VoiceUitls;
+import com.renyu.tmbaseuilibrary.utils.CommonUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,7 +65,7 @@ public abstract class MTApplication extends MultiDexApplication {
             e.printStackTrace();
         }
 
-        String processName= Utils.getProcessName(android.os.Process.myPid());
+        String processName= com.renyu.commonlibrary.commonutils.Utils.getProcessName(android.os.Process.myPid());
         if (processName.equals(getPackageName())) {
             // 初始化工具库
             com.blankj.utilcode.util.Utils.init(this);
@@ -129,7 +127,7 @@ public abstract class MTApplication extends MultiDexApplication {
             }
 
             // 如果之前的服务已经开启，则关闭
-            if (ServiceUtils.isServiceRunning("com.renyu.tmbaseuilibrary.service.HeartBeatService")) {
+            if (CommonUtils.isServiceRunning("com.renyu.tmbaseuilibrary.service.HeartBeatService")) {
                 Intent intent = new Intent(this, HeartBeatService.class);
                 stopService(intent);
             }
@@ -239,7 +237,7 @@ public abstract class MTApplication extends MultiDexApplication {
                         BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
 
                         // 发送通知
-                        VoiceUitls.playNewMessage("系统消息:"+SystemMessageBean.getSystemMsgContent(messageBean),
+                        CommonUtils.playNewMessage("系统消息:"+SystemMessageBean.getSystemMsgContent(messageBean),
                                 "系统消息", SystemMessageBean.getSystemMsgContent(messageBean),
                                 R.raw.ring_system_message_high, getNotificationIntent());
                     }
@@ -266,7 +264,7 @@ public abstract class MTApplication extends MultiDexApplication {
                             DownloadUtils.addFileAndDb(MTApplication.this, messageBean);
 
                             // 发送通知
-                            VoiceUitls.playNewMessage(userName+":[语音]",
+                            CommonUtils.playNewMessage(userName+":[语音]",
                                     userName, "[语音]",
                                     R.raw.ring_user_message_high, getNotificationIntent());
                         } else {
@@ -277,12 +275,12 @@ public abstract class MTApplication extends MultiDexApplication {
                                 BroadcastBean.sendBroadcast(context, BroadcastBean.MTCommand.MessageReceive, messageBean);
                                 // 发送通知
                                 if (messageBean.getMessageType().equals("8")) {
-                                    VoiceUitls.playNewMessage(userName+":[图片]",
+                                    CommonUtils.playNewMessage(userName+":[图片]",
                                             userName, "[图片]",
                                             R.raw.ring_user_message_high, getNotificationIntent());
                                 }
                                 else {
-                                    VoiceUitls.playNewMessage(userName+":"+messageBean.getMsg(),
+                                    CommonUtils.playNewMessage(userName+":"+messageBean.getMsg(),
                                             userName, messageBean.getMsg(),
                                             R.raw.ring_user_message_high, getNotificationIntent());
                                 }
@@ -388,7 +386,7 @@ public abstract class MTApplication extends MultiDexApplication {
             case Disconn:
                 state = "连接失败";
         }
-        VoiceUitls.playNoVoiceMessage("提示", "APP在线情况", state);
+        CommonUtils.playNoVoiceMessage("提示", "APP在线情况", state);
     }
 
     abstract public Intent getNotificationIntent();
