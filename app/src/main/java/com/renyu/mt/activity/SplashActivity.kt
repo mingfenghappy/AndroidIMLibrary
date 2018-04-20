@@ -34,6 +34,12 @@ class SplashActivity : BaseActivity() {
             CommonParams.isKickout = false
             // 重置回收标志位
             CommonParams.isRestore = false
+
+            val clazz = Class.forName("com.renyu.mt.params.InitParams")
+            // 加载自定义的踢下线方法
+            val kickoutFuncMethod = clazz.getDeclaredMethod("kickoutFunc")
+            kickoutFuncMethod.invoke(null)
+
             startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
             return
         }
