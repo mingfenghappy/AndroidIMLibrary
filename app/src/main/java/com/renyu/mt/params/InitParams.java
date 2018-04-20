@@ -3,6 +3,7 @@ package com.renyu.mt.params;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
+import com.renyu.mt.R;
 
 /**
  * 参数配置位置，因为通过反射，所以一定要类名位置写对
@@ -18,6 +19,8 @@ public class InitParams {
     public static String ConversationActivityName = "com.renyu.mt.activity.ConversationActivity";
     // 广播action标志名称
     public static String actionName = "MTDemo";
+    // 通知栏图片
+    public static int notificationIcon = R.mipmap.ic_launcher;
 
     // 自定义的踢下线逻辑
     public static void kickoutFunc() {

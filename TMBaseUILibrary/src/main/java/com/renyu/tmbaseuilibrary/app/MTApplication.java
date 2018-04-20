@@ -29,8 +29,8 @@ import com.renyu.tmbaseuilibrary.R;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
 import com.renyu.tmbaseuilibrary.service.HeartBeatService;
 import com.renyu.tmbaseuilibrary.service.MTService;
-import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 import com.renyu.tmbaseuilibrary.utils.CommonUtils;
+import com.renyu.tmbaseuilibrary.utils.DownloadUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -128,15 +128,11 @@ public abstract class MTApplication extends MultiDexApplication {
 
             // 如果之前的服务已经开启，则关闭
             if (CommonUtils.isServiceRunning("com.renyu.tmbaseuilibrary.service.HeartBeatService")) {
-                Intent intent = new Intent(this, HeartBeatService.class);
-                stopService(intent);
+                stopService(new Intent(this, HeartBeatService.class));
             }
             // 开启心跳服务并进行连接
             if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
-                Intent intent = new Intent(this, HeartBeatService.class);
-                intent.putExtra("smallIcon", R.drawable.ic_im_notification);
-                intent.putExtra("largeIcon", R.drawable.ic_im_notification);
-                startForegroundService(intent);
+                startForegroundService(new Intent(this, HeartBeatService.class));
             }
             else {
                 startService(new Intent(this, HeartBeatService.class));

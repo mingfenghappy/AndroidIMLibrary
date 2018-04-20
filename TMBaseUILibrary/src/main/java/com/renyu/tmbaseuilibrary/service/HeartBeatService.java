@@ -50,9 +50,17 @@ public class HeartBeatService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // 修正sendCount指令
-        if (intent.getIntExtra("from", -1) == 1) {
+        if (intent!=null && intent.getIntExtra("from", -1) == 1) {
             sendCount = 0;
             return super.onStartCommand(intent, flags, startId);
+        }
+
+        int notificationIcon = 0;
+        try {
+            Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+            notificationIcon = Integer.parseInt(clazz.getField("notificationIcon").get(clazz).toString());
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
         }
 
         if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
@@ -62,8 +70,8 @@ public class HeartBeatService extends Service {
                     "Push Service",
                     "Push Service",
                     Color.WHITE,
-                    intent.getExtras().getInt("smallIcon"),
-                    intent.getExtras().getInt("largeIcon"),
+                    notificationIcon,
+                    notificationIcon,
                     1000);
         }
         if(null==scheduledThreadPoolExecutor){
