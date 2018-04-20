@@ -6,8 +6,12 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application>
-        <service android:name=".service.HeartBeatService" />
-        <service android:name=".service.MTService" />
+        <service android:name=".service.HeartBeatService"
+            android:enabled="true"
+            android:exported="false" />
+        <service android:name=".service.MTService"
+            android:enabled="true"
+            android:exported="false" />
         <service
             android:name=".service.NetworkJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
