@@ -61,7 +61,7 @@ public class UserDetailActivity extends BaseIMActivity {
         receiver =new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("MT")) {
+                if (intent.getAction().equals(actionName)) {
                     BroadcastBean bean= (BroadcastBean) intent.getSerializableExtra("broadcast");
                     // 收到好友列表信息，刷新好友关系
                     if (bean.getCommand() == BroadcastBean.MTCommand.FriendGroupsRsp) {

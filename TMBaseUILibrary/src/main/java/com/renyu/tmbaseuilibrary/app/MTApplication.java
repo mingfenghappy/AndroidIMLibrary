@@ -47,16 +47,25 @@ import okhttp3.OkHttpClient;
  * Created by Administrator on 2017/7/7.
  */
 
-abstract public class MTApplication extends MultiDexApplication {
+public abstract class MTApplication extends MultiDexApplication {
 
     // 连接状态
     public BroadcastBean.MTCommand connState = BroadcastBean.MTCommand.Disconn;
     // 基础广播
     public BroadcastReceiver baseReceiver = null;
 
+    String actionName = "";
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        try {
+            Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+            actionName = clazz.getField("actionName").get(clazz).toString();
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
 
         String processName= Utils.getProcessName(android.os.Process.myPid());
         if (processName.equals(getPackageName())) {
@@ -149,7 +158,7 @@ abstract public class MTApplication extends MultiDexApplication {
         baseReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("MT")) {
+                if (intent.getAction().equals(actionName)) {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conn) {
                         connState = BroadcastBean.MTCommand.Conn;
@@ -350,7 +359,7 @@ abstract public class MTApplication extends MultiDexApplication {
             }
         };
         IntentFilter filter = new IntentFilter();
-        filter.addAction("MT");
+        filter.addAction(actionName);
         registerReceiver(baseReceiver, filter);
     }
 

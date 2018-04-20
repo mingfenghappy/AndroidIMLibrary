@@ -48,7 +48,7 @@ public class SystemMessageActivity extends BaseIMActivity {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("MT")) {
+                if (intent.getAction().equals(actionName)) {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     if (bean.getCommand() == BroadcastBean.MTCommand.MessageReceive) {
                         // 过滤掉非系统消息

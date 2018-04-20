@@ -297,7 +297,7 @@ public class BaseConversationActivity extends BaseIMActivity {
         receiver=new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("MT")) {
+                if (intent.getAction().equals(actionName)) {
                     BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                     // 因为断线或者回收造成的登录成功
                     if (bean.getCommand() == BroadcastBean.MTCommand.LoginRsp) {

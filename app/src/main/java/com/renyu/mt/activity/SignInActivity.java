@@ -14,10 +14,9 @@ import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.UserInfoRsp;
-import com.focustech.params.FusionField;
-import com.focustech.tm.open.sdk.net.codec.GostDesBasae64Encrypter;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
+import com.renyu.mt.params.InitParams;
 import com.renyu.tmbaseuilibrary.app.MTApplication;
 import com.renyu.tmbaseuilibrary.base.BaseIMActivity;
 import com.renyu.tmbaseuilibrary.params.CommonParams;
@@ -43,7 +42,7 @@ public class SignInActivity extends BaseIMActivity {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("MT")) {
+                if (intent.getAction().equals(InitParams.actionName)) {
                     BroadcastBean bean= (BroadcastBean) intent.getSerializableExtra("broadcast");
                     // 此处为当前用户登录后返回的信息
                     if (bean.getCommand()== BroadcastBean.MTCommand.UserInfoRsp) {

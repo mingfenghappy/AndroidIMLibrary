@@ -27,8 +27,8 @@ abstract class BaseFriendListActivity : BaseIMActivity() {
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent?.action == "MT") {
-                    val bean = intent.getSerializableExtra("broadcast") as BroadcastBean
+                if (intent?.action == actionName) {
+                    val bean = intent!!.getSerializableExtra("broadcast") as BroadcastBean
                     // 获取好友关系组数据
                     if (bean.command == BroadcastBean.MTCommand.FriendGroupsRsp) {
                         // 清除所有好友组关系数据

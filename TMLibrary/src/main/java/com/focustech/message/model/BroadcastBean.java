@@ -64,12 +64,20 @@ public class BroadcastBean implements Serializable {
     }
 
     public static void sendBroadcast(Context context, MTCommand command, Serializable serializable) {
+        String actionName = "";
+        try {
+            Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+            actionName = clazz.getField("actionName").get(clazz).toString();
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
         BroadcastBean bean=new BroadcastBean();
         bean.setCommand(command);
         bean.setSerializable(serializable);
         Intent intent=new Intent();
         intent.putExtra("broadcast", bean);
-        intent.setAction("MT");
+        intent.setAction(actionName);
         context.sendBroadcast(intent);
     }
 }
