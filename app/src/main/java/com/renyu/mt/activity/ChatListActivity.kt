@@ -8,7 +8,6 @@ import android.widget.TextView
 import com.blankj.utilcode.util.Utils
 import com.focustech.dbhelper.PlainTextDBHelper
 import com.renyu.mt.R
-import com.renyu.tmbaseuilibrary.params.CommonParams
 import com.renyu.tmuilibrary.activity.BaseChatListActivity
 import com.renyu.tmuilibrary.fragment.ChatListFragment
 
