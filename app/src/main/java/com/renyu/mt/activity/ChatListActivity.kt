@@ -55,11 +55,16 @@ class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSe
     }
 
     override fun onBackPressed() {
-        val intent = Intent(this, SplashActivity::class.java)
-        intent.putExtra(CommonParams.TYPE, CommonParams.FINISH)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+//        val intent = Intent(this, SplashActivity::class.java)
+//        intent.putExtra(CommonParams.TYPE, CommonParams.FINISH)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+//        startActivity(intent)
+//        finish()
+
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.addCategory(Intent.CATEGORY_HOME)
         startActivity(intent)
-        finish()
     }
 
     override fun onResume() {

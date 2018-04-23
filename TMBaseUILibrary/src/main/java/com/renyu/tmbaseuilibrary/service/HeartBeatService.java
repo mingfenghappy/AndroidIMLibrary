@@ -32,6 +32,8 @@ public class HeartBeatService extends Service {
     // 下一次认定连接断开的截止时间
     long failureTime=0;
 
+    String actionName = "";
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -42,8 +44,15 @@ public class HeartBeatService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        try {
+            Class clazz = Class.forName("com.renyu.mt.params.InitParams");
+            actionName = clazz.getField("actionName").get(clazz).toString();
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
         IntentFilter filter=new IntentFilter();
-        filter.addAction("MT");
+        filter.addAction(actionName);
         registerReceiver(registerReceiver, filter);
     }
 
@@ -122,7 +131,7 @@ public class HeartBeatService extends Service {
     BroadcastReceiver registerReceiver=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("MT")) {
+            if (intent.getAction().equals(actionName)) {
                 BroadcastBean bean = (BroadcastBean) intent.getSerializableExtra("broadcast");
                 if (bean.getCommand() == BroadcastBean.MTCommand.HeartBeat ||
                         bean.getCommand() == BroadcastBean.MTCommand.Conn) {

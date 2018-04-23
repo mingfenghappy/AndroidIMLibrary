@@ -235,7 +235,7 @@ public abstract class MTApplication extends MultiDexApplication {
                         // 发送通知
                         CommonUtils.playNewMessage("系统消息:"+SystemMessageBean.getSystemMsgContent(messageBean),
                                 "系统消息", SystemMessageBean.getSystemMsgContent(messageBean),
-                                R.raw.ring_system_message_high, getNotificationIntent());
+                                R.raw.ring_system_message_high, getNotificationIntent("-1"));
                     }
                     // 收到新消息
                     if (bean.getCommand() == BroadcastBean.MTCommand.Message) {
@@ -262,7 +262,7 @@ public abstract class MTApplication extends MultiDexApplication {
                             // 发送通知
                             CommonUtils.playNewMessage(userName+":[语音]",
                                     userName, "[语音]",
-                                    R.raw.ring_user_message_high, getNotificationIntent());
+                                    R.raw.ring_user_message_high, getNotificationIntent(messageBean.getUserId()));
                         } else {
                             // 后台会循环发送相同消息
                             boolean exist = PlainTextDBHelper.getInstance(MTApplication.this).insertMessage(messageBean);
@@ -273,12 +273,12 @@ public abstract class MTApplication extends MultiDexApplication {
                                 if (messageBean.getMessageType().equals("8")) {
                                     CommonUtils.playNewMessage(userName+":[图片]",
                                             userName, "[图片]",
-                                            R.raw.ring_user_message_high, getNotificationIntent());
+                                            R.raw.ring_user_message_high, getNotificationIntent(messageBean.getUserId()));
                                 }
                                 else {
                                     CommonUtils.playNewMessage(userName+":"+messageBean.getMsg(),
                                             userName, messageBean.getMsg(),
-                                            R.raw.ring_user_message_high, getNotificationIntent());
+                                            R.raw.ring_user_message_high, getNotificationIntent(messageBean.getUserId()));
                                 }
                             }
                         }
@@ -385,5 +385,5 @@ public abstract class MTApplication extends MultiDexApplication {
         CommonUtils.playNoVoiceMessage("提示", "APP在线情况", state);
     }
 
-    abstract public Intent getNotificationIntent();
+    abstract public Intent getNotificationIntent(String userId);
 }

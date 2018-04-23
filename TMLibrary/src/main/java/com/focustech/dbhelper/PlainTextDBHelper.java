@@ -303,6 +303,48 @@ public class PlainTextDBHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * 根据用户ID获取用户信息
+     * @param userid
+     * @return
+     */
+    public UserInfoRsp getFriendsInfoById(String userid) {
+        UserInfoRsp userInfoRsp = null;
+
+        Cursor cs= db.query(UserInfoRspTable, null, userId+"=?", new String[]{userid}, null, null, null);
+        cs.moveToFirst();
+        if (cs.getCount()>0) {
+            cs.moveToPosition(0);
+            String userId_=cs.getString(cs.getColumnIndex(userId));
+            String userName_=cs.getString(cs.getColumnIndex(userName));
+            String token_=cs.getString(cs.getColumnIndex(token));
+            String userNickName_=cs.getString(cs.getColumnIndex(userNickName));
+            String userSignature_=cs.getString(cs.getColumnIndex(userSignature));
+            String HeadType_=cs.getString(cs.getColumnIndex(HeadType));
+            String userHeadId_=cs.getString(cs.getColumnIndex(userHeadId));
+            String netIp_=cs.getString(cs.getColumnIndex(netIp));
+            String timestamp_=cs.getString(cs.getColumnIndex(timestamp));
+            String tmNum_=cs.getString(cs.getColumnIndex(tmNum));
+            String role_=cs.getString(cs.getColumnIndex(role));
+
+            // 组合数据
+            userInfoRsp=new UserInfoRsp();
+            userInfoRsp.setUserId(userId_);
+            userInfoRsp.setUserName(userName_);
+            userInfoRsp.setToken(token_);
+            userInfoRsp.setUserNickName(userNickName_);
+            userInfoRsp.setUserSignature(userSignature_);
+            userInfoRsp.setUserHeadType(Enums.HeadType.valueOf(Integer.parseInt(HeadType_)));
+            userInfoRsp.setUserHeadId(userHeadId_);
+            userInfoRsp.setNetIp(netIp_);
+            userInfoRsp.setTimestamp(Long.parseLong(timestamp_));
+            userInfoRsp.setTmNum(Long.parseLong(tmNum_));
+            userInfoRsp.setRole(Integer.parseInt(role_));
+        }
+        cs.close();
+        return userInfoRsp;
+    }
+
+    /**
      * 获取用户组信息
      * @return
      */
