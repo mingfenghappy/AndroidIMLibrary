@@ -165,15 +165,12 @@ public abstract class MTApplication extends MultiDexApplication {
                                     SPUtils.getInstance().getString(CommonParams.SP_UNAME),
                                     SPUtils.getInstance().getString(CommonParams.SP_PWD));
                         }
-                        changeNotificationState();
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Disconn) {
                         connState = BroadcastBean.MTCommand.Disconn;
-                        changeNotificationState();
                     }
                     if (bean.getCommand() == BroadcastBean.MTCommand.Conning) {
                         connState = BroadcastBean.MTCommand.Conning;
-                        changeNotificationState();
                     }
                     // 登录成功
                     if (bean.getCommand()== BroadcastBean.MTCommand.LoginRsp) {
@@ -365,24 +362,6 @@ public abstract class MTApplication extends MultiDexApplication {
             unregisterReceiver(baseReceiver);
             baseReceiver = null;
         }
-    }
-
-    /**
-     * 通知App连接状态发生改变
-     */
-    public void changeNotificationState() {
-        String state = "未知状态";
-        switch (connState) {
-            case Conn:
-                state = "连接成功";
-                break;
-            case Conning:
-                state = "正在连接";
-                break;
-            case Disconn:
-                state = "连接失败";
-        }
-        CommonUtils.playNoVoiceMessage("提示", "APP在线情况", state);
     }
 
     abstract public Intent getNotificationIntent(String userId);
