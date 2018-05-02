@@ -18,12 +18,11 @@ import com.renyu.tmbaseuilibrary.params.CommonParams
  * 中控页使用
  */
 class SplashActivity : BaseActivity() {
-    var permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    private var permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.RECORD_AUDIO)
+            Manifest.permission.READ_PHONE_STATE)
 
     override fun setStatusBarColor() = Color.BLACK
 
