@@ -14,6 +14,8 @@ import com.blankj.utilcode.util.Utils;
 import com.focustech.dbhelper.PlainTextDBHelper;
 import com.focustech.message.model.BroadcastBean;
 import com.focustech.message.model.UserInfoRsp;
+import com.focustech.params.FusionField;
+import com.focustech.tm.open.sdk.net.codec.GostDesBasae64Encrypter;
 import com.renyu.commonlibrary.commonutils.ACache;
 import com.renyu.mt.R;
 import com.renyu.mt.params.InitParams;
@@ -50,8 +52,8 @@ public class SignInActivity extends BaseIMActivity {
                         ACache.get(Utils.getApp()).put("UserInfoRsp", userInfoRsp);
                         // 用户登录信息
                         SPUtils.getInstance().put(CommonParams.SP_UNAME, ed_username.getText().toString());
-                        SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
-//                        SPUtils.getInstance().put(CommonParams.SP_PWD, GostDesBasae64Encrypter.encode(ed_username.getText().toString(), FusionField.key32));
+//                        SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
+                        SPUtils.getInstance().put(CommonParams.SP_PWD, GostDesBasae64Encrypter.encode(ed_username.getText().toString(), FusionField.key32));
                         // 登录成功跳转首页
                         Intent intent2 = new Intent(SignInActivity.this, SplashActivity.class);
                         intent2.putExtra(CommonParams.TYPE, CommonParams.MAIN);
@@ -109,11 +111,11 @@ public class SignInActivity extends BaseIMActivity {
                     // 删除旧数据
                     PlainTextDBHelper.getInstance(Utils.getApp()).clearAllInfo();
 
-//                    MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(),
-//                            GostDesBasae64Encrypter.encode(ed_username.getText().toString(), FusionField.key32));
-
                     MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(),
-                            ed_pwd.getText().toString());
+                            GostDesBasae64Encrypter.encode(ed_username.getText().toString(), FusionField.key32));
+
+//                    MTService.reqLogin(getApplicationContext(), ed_username.getText().toString(),
+//                            ed_pwd.getText().toString());
                 }
                 break;
         }
