@@ -37,24 +37,16 @@ android {
         maxProcessCount 8
         javaMaxHeapSize "8g"
     }
-}
 
-configurations.all {
-    resolutionStrategy {
-        force "com.github.renyu:AndroidCommonLibrary:1.12.2"
-    }
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
-    api fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    api 'com.hyphenate:hyphenate-sdk:3.4.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api('com.github.renyu:AndroidCommonLibrary:1.12.2') {
-        exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
-    }
-    api('com.github.renyu:AndroidImageLibrary:1.4.7') {
-        exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
-    }
-    api project(':TMLibrary')
 }

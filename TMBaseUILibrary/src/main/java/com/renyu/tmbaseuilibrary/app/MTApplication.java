@@ -53,6 +53,7 @@ public abstract class MTApplication extends MultiDexApplication {
     public BroadcastReceiver baseReceiver = null;
 
     String actionName = "";
+    String storageName = "mt";
 
     @Override
     public void onCreate() {
@@ -61,6 +62,7 @@ public abstract class MTApplication extends MultiDexApplication {
         try {
             Class clazz = Class.forName("com.renyu.mt.params.InitParams");
             actionName = clazz.getField("actionName").get(clazz).toString();
+            storageName = clazz.getField("StorageName").get(clazz).toString();
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -73,13 +75,6 @@ public abstract class MTApplication extends MultiDexApplication {
             // 初始化fresco
             Fresco.initialize(this, ImagePipelineConfigUtils.getDefaultImagePipelineConfig(this));
 
-            String storageName="mt";
-            try {
-                 Class clazz = Class.forName("com.renyu.mt.params.InitParams");
-                 storageName = clazz.getField("StorageName").get(clazz).toString();
-            } catch(Exception e) {
-
-            }
             // 初始化相关配置参数
             // 项目根目录
             // 请注意修改xml文件夹下filepaths.xml中的external-path节点，此值需与ROOT_PATH值相同，作为fileprovider使用
@@ -109,12 +104,6 @@ public abstract class MTApplication extends MultiDexApplication {
             baseBuilder.hostnameVerifier((s, sslSession) -> true).sslSocketFactory(sslParams.sSLSocketFactory, sslParams.trustManager);
             retrofit2Utils.addBaseOKHttpClient(baseBuilder.build());
             retrofit2Utils.baseBuild();
-            OkHttpClient.Builder imageUploadOkBuilder = new OkHttpClient.Builder()
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .writeTimeout(30, TimeUnit.SECONDS)
-                    .connectTimeout(30, TimeUnit.SECONDS);
-            retrofit2Utils.addImageOKHttpClient(imageUploadOkBuilder.build());
-            retrofit2Utils.imageBuild();
 
             // 初始化消息队列
             MessageQueueUtils.getInstance(this);
@@ -349,6 +338,7 @@ public abstract class MTApplication extends MultiDexApplication {
                 }
             }
         };
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(actionName);
         registerReceiver(baseReceiver, filter);

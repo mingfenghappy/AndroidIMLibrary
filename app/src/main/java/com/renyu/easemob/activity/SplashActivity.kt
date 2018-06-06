@@ -1,4 +1,4 @@
-package com.renyu.mt.activity
+package com.renyu.easemob.activity
 
 import android.Manifest
 import android.content.Intent
@@ -7,19 +7,17 @@ import android.os.Build
 import android.text.TextUtils
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.SPUtils
-import com.blankj.utilcode.util.Utils
 import com.renyu.commonlibrary.baseact.BaseActivity
-import com.renyu.commonlibrary.commonutils.ACache
 import com.renyu.commonlibrary.impl.OnPermissionCheckedImpl
 import com.renyu.commonlibrary.params.InitParams
 import com.renyu.commonlibrary.views.permission.PermissionActivity
+import com.renyu.easemobuilibrary.params.CommonParams
+import com.renyu.mt.MainActivity
 import com.renyu.mt.R
-import com.renyu.tmbaseuilibrary.params.CommonParams
+import com.renyu.mt.activity.ChatListActivity
 
-/**
- * 中控页使用
- */
 class SplashActivity : BaseActivity() {
+
     private var permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -30,27 +28,11 @@ class SplashActivity : BaseActivity() {
 
     override fun setStatusBarTranslucent() = 0
 
+    override fun loadData() {
+
+    }
+
     override fun initParams() {
-        if (CommonParams.isKickout) {
-            CommonParams.isKickout = false
-            // 重置回收标志位
-            CommonParams.isRestore = false
-
-            val clazz = Class.forName("com.renyu.mt.params.InitParams")
-            // 加载自定义的踢下线方法
-            val kickoutFuncMethod = clazz.getDeclaredMethod("kickoutFunc")
-            kickoutFuncMethod.invoke(null)
-
-            startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
-            return
-        }
-
-        // 发生回收，若执行返回操作则执行页面关闭
-        if (CommonParams.isRestore) {
-            finish()
-            return
-        }
-
         if (Build.VERSION_CODES.M <= Build.VERSION.SDK_INT) {
             PermissionActivity.gotoActivity(this, permissions, "请授予SD卡读写权限与定位权限", object : OnPermissionCheckedImpl {
                 override fun denied() {
@@ -67,6 +49,8 @@ class SplashActivity : BaseActivity() {
         }
     }
 
+    override fun initViews() = R.layout.activity_splash
+
     private fun grant() {
         // 初始化文件夹
         FileUtils.createOrExistsDir(InitParams.IMAGE_PATH)
@@ -76,31 +60,15 @@ class SplashActivity : BaseActivity() {
         FileUtils.createOrExistsDir(InitParams.CACHE_PATH)
 
         // 登录成功跳转首页
-        if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") != null
-                && !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
-                && !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))
-                && !CommonParams.isRestore) {
+        if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
+                && !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))) {
             startActivity(Intent(this@SplashActivity, ChatListActivity::class.java))
         }
         // 没有用户信息则执行登录操作
-        else if (ACache.get(Utils.getApp()).getAsObject("UserInfoRsp") == null
-                || TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
+        else if (TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
                 || TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))) {
             startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
         }
-    }
-
-    override fun loadData() {
-
-    }
-
-    override fun initViews() = R.layout.activity_splash
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // 重置回收标志位
-        CommonParams.isRestore = false
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -116,7 +84,7 @@ class SplashActivity : BaseActivity() {
             finish()
         }
         if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.MAIN) {
-            startActivity(Intent(this@SplashActivity, ChatListActivity::class.java))
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
         }
     }
 }

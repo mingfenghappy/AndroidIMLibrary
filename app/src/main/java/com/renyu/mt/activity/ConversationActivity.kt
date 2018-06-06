@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Build
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.renyu.commonlibrary.impl.OnPermissionCheckedImpl
+import com.renyu.commonlibrary.views.permission.PermissionActivity
 import com.renyu.tmuilibrary.R
 import com.renyu.tmuilibrary.activity.BaseConversationActivity
 import com.renyu.tmuilibrary.activity.UserDetailActivity
@@ -35,13 +37,9 @@ class ConversationActivity : BaseConversationActivity() {
         layout_nav_right?.addView(textView)
 
         if (Build.VERSION_CODES.M <= Build.VERSION.SDK_INT) {
-            checkPermission(permissions, "请授予SD卡读写权限与录音权限", object : OnPermissionCheckedListener {
-                override fun checked(flag: Boolean) {
-
-                }
-
+            PermissionActivity.gotoActivity(this, permissions, "请授予SD卡读写权限与录音权限", object : OnPermissionCheckedImpl {
                 override fun denied() {
-
+                    finish()
                 }
 
                 override fun grant() {
