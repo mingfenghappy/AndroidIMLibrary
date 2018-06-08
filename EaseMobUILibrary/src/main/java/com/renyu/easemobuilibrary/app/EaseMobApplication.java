@@ -91,7 +91,7 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             // 开启环信广播监听
             EaseMobUtils.registerMessageListener();
             // 设置消息监听
-            EMMessageManager.registerMessageListener();
+            EMMessageManager.registerMessageListener(this);
 
         }
     }

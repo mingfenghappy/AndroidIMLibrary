@@ -11,8 +11,10 @@ import android.widget.LinearLayout;
 
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.easemobuilibrary.R;
+import com.renyu.easemobuilibrary.adapter.ChatListAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +26,10 @@ public class ChatListFragment extends BaseFragment {
     SwipeRefreshLayout swipe_conversationlist;
     LinearLayout layout_conversationlist;
     RecyclerView rv_conversationlist;
+    ChatListAdapter adapter;
+
+    // 离线消息
+    ArrayList<EMMessage> offlineMessages;
 
     private OnHeaderViewSetListener headerViewSetListener;
 
@@ -45,6 +51,8 @@ public class ChatListFragment extends BaseFragment {
 
     @Override
     public void initParams() {
+        offlineMessages=new ArrayList<>();
+
         rv_conversationlist = view.findViewById(R.id.rv_conversationlist);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setSmoothScrollbarEnabled(true);
@@ -52,6 +60,16 @@ public class ChatListFragment extends BaseFragment {
         rv_conversationlist.setLayoutManager(manager);
         rv_conversationlist.setNestedScrollingEnabled(false);
         rv_conversationlist.setHasFixedSize(true);
+        adapter=new ChatListAdapter(getActivity(), offlineMessages);
+        rv_conversationlist.setAdapter(adapter);
+        swipe_conversationlist = view.findViewById(R.id.swipe_conversationlist);
+        swipe_conversationlist.setOnRefreshListener(() -> {
+            loadConversationList();
+        });
+        layout_conversationlist = view.findViewById(R.id.layout_conversationlist);
+        if (headerViewSetListener != null && headerViewSetListener.getHeadView() != null) {
+            layout_conversationlist.addView(headerViewSetListener.getHeadView());
+        }
     }
 
     @Override
@@ -64,7 +82,7 @@ public class ChatListFragment extends BaseFragment {
         loadConversationList();
     }
 
-    protected List<EMConversation> loadConversationList(){
+    private void loadConversationList() {
         Map<String, EMConversation> conversations = EMClient.getInstance().chatManager().getAllConversations();
         List<Pair<Long, EMConversation>> sortList = new ArrayList<>();
         synchronized (conversations) {
@@ -79,11 +97,12 @@ public class ChatListFragment extends BaseFragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        List<EMConversation> list = new ArrayList<>();
+        offlineMessages.clear();
         for (Pair<Long, EMConversation> sortItem : sortList) {
-            list.add(sortItem.second);
+            offlineMessages.add(sortItem.second.getLastMessage());
         }
-        return list;
+        adapter.notifyDataSetChanged();
+        swipe_conversationlist.setRefreshing(false);
     }
 
     private void sortConversationByLastChatTime(List<Pair<Long, EMConversation>> conversationList) {
@@ -96,5 +115,10 @@ public class ChatListFragment extends BaseFragment {
                 return -1;
             }
         });
+    }
+
+    public void refresh() {
+        loadConversationList();
+        adapter.notifyDataSetChanged();
     }
 }

@@ -1,5 +1,6 @@
 package com.renyu.easemoblibrary.manager;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.hyphenate.EMCallBack;
@@ -7,10 +8,9 @@ import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMCmdMessageBody;
 import com.hyphenate.chat.EMConversation;
-import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMMessage;
-import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.exceptions.HyphenateException;
+import com.renyu.easemoblibrary.model.BroadcastBean;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -217,7 +217,7 @@ public class EMMessageManager {
     /**
      * 设置消息监听
      */
-    public static void registerMessageListener() {
+    public static void registerMessageListener(Context context) {
         EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
             @Override
             public void onMessageRead(List<EMMessage> messages) {
@@ -240,13 +240,8 @@ public class EMMessageManager {
             public void onMessageReceived(List<EMMessage> messages) {
                 // 收到消息
                 Log.d("EaseMobUtils", "onMessageReceived");
-                for (int i=0 ; i<messages.size() ; i++) {
-                    if (messages.get(i).getBody() instanceof EMTextMessageBody) {
-                        ((EMTextMessageBody) messages.get(i).getBody()).getMessage();
-                    }
-                    if (messages.get(i).getBody() instanceof EMImageMessageBody) {
-                        ((EMImageMessageBody) messages.get(0).getBody()).getLocalUrl();
-                    }
+                for (EMMessage message : messages) {
+                    BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
                 }
             }
 

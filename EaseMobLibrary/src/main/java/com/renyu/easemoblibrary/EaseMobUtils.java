@@ -67,12 +67,12 @@ public class EaseMobUtils {
         EMClient.getInstance().login(id, password, new EMCallBack() {
             @Override
             public void onSuccess() {
-                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.LoginRsp, null);
+                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.LoginRsp);
             }
 
             @Override
             public void onError(int code, String error) {
-                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.LoginRspERROR, null);
+                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.LoginRspERROR);
             }
 
             @Override

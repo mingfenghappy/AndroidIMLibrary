@@ -91,7 +91,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
             if (offlineMessages.get(position).getUserHeadType() != 0 &&
                     offlineMessages.get(position).getUserHeadId() != null) {
                 Object avatar= offlineMessages.get(position).getUserHeadId();
-                if (offlineMessages.get(position).getUserHeadId().indexOf("http")==-1) {
+                if (!offlineMessages.get(position).getUserHeadId().contains("http")) {
                     String faceCode = String.valueOf(offlineMessages.get(position).getUserHeadType());
                     String fileId = offlineMessages.get(position).getUserHeadId();
                     UserInfoRsp userInfoRsp= (UserInfoRsp) ACache.get(context).getAsObject("UserInfoRsp");
@@ -151,7 +151,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
         return offlineMessages.size();
     }
 
-    public class ConversationListHolder extends RecyclerView.ViewHolder {
+    class ConversationListHolder extends RecyclerView.ViewHolder {
 
         LinearLayout layout_adapter_conversationlist;
         SimpleDraweeView iv_adapter_conversationlist;
@@ -172,7 +172,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
         }
     }
 
-    public static String getFriendlyTimeSpanByNow(long millis) {
+    private static String getFriendlyTimeSpanByNow(long millis) {
         long now = System.currentTimeMillis();
         // 获取当天00:00
         long wee = (now / TimeConstants.DAY) * TimeConstants.DAY - 8 * TimeConstants.HOUR;
