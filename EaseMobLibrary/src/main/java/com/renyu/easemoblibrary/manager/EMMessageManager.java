@@ -15,6 +15,8 @@ import com.renyu.easemoblibrary.model.BroadcastBean;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -199,14 +201,24 @@ public class EMMessageManager {
         message.setMessageStatusCallback(new EMCallBack() {
             @Override
             public void onSuccess() {
+                // 将之前发送的那条数据的文本发送时间进行调整，以保证发送时间与最初时间相同
+                message.setMsgTime(message.localTime());
+                // 修改文件发送状态
                 message.setStatus(EMMessage.Status.SUCCESS);
-                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
+                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageSend, message);
+
+                EMMessageManager.removeSendingMessage(message.getMsgId());
             }
 
             @Override
             public void onError(int code, String error) {
+                // 将之前发送的那条数据的文本发送时间进行调整，以保证发送时间与最初时间相同
+                message.setMsgTime(message.localTime());
+                // 修改文件发送状态
                 message.setStatus(EMMessage.Status.FAIL);
-                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
+                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageSend, message);
+
+                EMMessageManager.removeSendingMessage(message.getMsgId());
             }
 
             @Override
@@ -382,9 +394,53 @@ public class EMMessageManager {
     }
 
     /**
+     * 更新消息，消息的内容会被保存到本地
+     * @param message
+     */
+    public static void updateMessage(EMMessage message) {
+        EMClient.getInstance().chatManager().updateMessage(message);
+    }
+
+    /**
+     * 保存用户app生成的消息，比如系统提示 消息会存到内存中的conversation和数据库
+     * @param message
+     */
+    public static void saveMessage(EMMessage message) {
+        EMClient.getInstance().chatManager().saveMessage(message);
+    }
+
+
+    /**
      * 同步加载所有的会话，并且每条会话读入EMChatOptions.getNumberOfMessagesLoaded()条消息, 默认是20条以保持兼容
      */
     public static void loadAllConversations() {
         EMClient.getInstance().chatManager().loadAllConversations();
+    }
+
+    static List<String> sendingMessages = Collections.synchronizedList(new ArrayList<String>());
+
+    /**
+     * 添加正在发送消息
+     * @return
+     */
+    public static void addSendingMessage(String msgId) {
+        sendingMessages.add(msgId);
+    }
+
+    /**
+     * 是否正在发送消息
+     * @param msgId
+     * @return
+     */
+    public static boolean isSendingMessage(String msgId) {
+        return sendingMessages.contains(msgId);
+    }
+
+    /**
+     * 删除正在发送消息
+     * @param msgId
+     */
+    public static void removeSendingMessage(String msgId) {
+        sendingMessages.remove(msgId);
     }
 }

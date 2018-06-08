@@ -182,19 +182,20 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(((EMTextMessageBody) messages.get(position).getBody()).getMessage());
-            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).getMsgId()+"_status");
-            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).getMsgId()+"_pb");
+            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).localTime()+"_status");
+            ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).localTime()+"_pb");
 
             // 发送失败显示图标
             if (messages.get(position).status() == EMMessage.Status.FAIL) {
-                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.GONE);
+                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.VISIBLE);
             }
             else {
-                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.VISIBLE);
+                ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.GONE);
             }
 
             // 未发送完成则需要显示进度圈
-            if (messages.get(position).status() == EMMessage.Status.INPROGRESS) {
+            if (messages.get(position).status() == EMMessage.Status.INPROGRESS ||
+                    messages.get(position).status() == EMMessage.Status.CREATE) {
                 ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.VISIBLE);
             }
             else {
@@ -206,6 +207,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 EMMessage temp = messages.get(position);
                 temp.setStatus(EMMessage.Status.INPROGRESS);
                 EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
+                notifyItemChanged(position);
             });
         }
     }

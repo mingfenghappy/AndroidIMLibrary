@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -212,18 +211,24 @@ public class BaseConversationActivity extends BaseIMActivity {
                             }
                         }
                     }
-                    // 消息发送成功或失败
-                    if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.MessageReceive ||
-                            intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.MessageSend) {
+                    // 消息发送成功或失败刷新列表
+                    if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.MessageSend) {
                         EMMessage emMessage = intent.getParcelableExtra(BroadcastBean.PARCELABLE);
-                        for (EMMessage messageBeen : messageBeens) {
-                            if (messageBeen.getMsgId().equals(emMessage.getMsgId())) {
-                                messageBeen.setStatus(emMessage.status());
-                            }
-                        }
                         if (emMessage.status() == EMMessage.Status.SUCCESS) {
                             new Handler().postDelayed(() -> {
-                                ProgressBar pb=rv_conversation.findViewWithTag(emMessage.getMsgId()+"_pb");
+                                // 找到已存在的那条数据，调整它的文本发送时间，以保证发送时间与最初时间相同
+                                for (EMMessage messageBeen : messageBeens) {
+                                    if (messageBeen.getMsgId().equals(emMessage.getMsgId())) {
+                                        messageBeen.setMsgTime(emMessage.localTime());
+                                        messageBeen.setStatus(emMessage.status());
+                                        // 更新缓存
+                                        EMMessageManager.saveMessage(messageBeen);
+                                        // 更新数据库
+                                        EMMessageManager.updateMessage(messageBeen);
+                                    }
+                                }
+
+                                ProgressBar pb=rv_conversation.findViewWithTag(emMessage.localTime()+"_pb");
                                 if (pb!=null) {
                                     pb.setVisibility(View.GONE);
                                 }
@@ -231,11 +236,11 @@ public class BaseConversationActivity extends BaseIMActivity {
                         }
                         if (emMessage.status() == EMMessage.Status.FAIL) {
                             new Handler().postDelayed(() -> {
-                                ProgressBar pb=rv_conversation.findViewWithTag(emMessage.getMsgId()+"_pb");
+                                ProgressBar pb=rv_conversation.findViewWithTag(emMessage.localTime()+"_pb");
                                 if (pb!=null) {
                                     pb.setVisibility(View.GONE);
                                 }
-                                ImageView imageView=rv_conversation.findViewWithTag(emMessage.getMsgId()+"_status");
+                                ImageView imageView=rv_conversation.findViewWithTag(emMessage.localTime()+"_status");
                                 if (imageView!=null) {
                                     imageView.setVisibility(View.VISIBLE);
                                 }
@@ -307,6 +312,7 @@ public class BaseConversationActivity extends BaseIMActivity {
     private void initMessages() {
         this.messageBeens.clear();
         List<EMMessage> msgs = EMMessageManager.getAllMessages(chatUserId);
+        checkCreateAndInProgress(msgs);
         this.messageBeens.addAll(msgs);
         int msgCount = msgs != null ? msgs.size() : 0;
         if (msgCount < pagesize) {
@@ -314,7 +320,9 @@ public class BaseConversationActivity extends BaseIMActivity {
             if (msgs != null && msgs.size() > 0) {
                 msgId = msgs.get(0).getMsgId();
             }
-            this.messageBeens.addAll(0, EMMessageManager.getConversationByStartMsgId(chatUserId, msgId, pagesize - msgCount));
+            List<EMMessage> msgs2 = EMMessageManager.getConversationByStartMsgId(chatUserId, msgId, pagesize - msgCount);
+            checkCreateAndInProgress(msgs2);
+            this.messageBeens.addAll(0, msgs2);
         }
     }
 
@@ -323,25 +331,41 @@ public class BaseConversationActivity extends BaseIMActivity {
                 chatUserId,
                 EMMessageManager.getAllMessages(chatUserId).size() == 0 ? "" : EMMessageManager.getAllMessages(chatUserId).get(0).getMsgId(),
                 pagesize);
+        checkCreateAndInProgress(messages);
         this.messageBeens.addAll(0, messages);
         adapter.notifyItemRangeInserted(0, messages.size());
+    }
+
+    /**
+     * 发送过程中出现异常导致发送失败，发送状态并未修改，所以在此处进行检查、修改
+     * @param msgs2
+     */
+    private void checkCreateAndInProgress(List<EMMessage> msgs2) {
+        for (EMMessage msg : msgs2) {
+            if ((msg.status() == EMMessage.Status.CREATE || msg.status() == EMMessage.Status.INPROGRESS) &&
+                    !EMMessageManager.isSendingMessage(msg.getMsgId())) {
+                msg.setStatus(EMMessage.Status.FAIL);
+            }
+        }
     }
 
     private void sendTextMessage() {
         if (TextUtils.isEmpty(edit_conversation.getText().toString())) {
             return;
         }
+        // 刷新列表
         EMMessage message = EMMessageManager.prepareTxtEMMessage(edit_conversation.getText().toString(), chatUserId);
-        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
-        BroadcastBean.sendBroadcast(this, BroadcastBean.EaseMobCommand.MessageSend);
-
-        edit_conversation.setText("");
-        message.setStatus(EMMessage.Status.INPROGRESS);
         messageBeens.add(message);
         adapter.notifyItemInserted(messageBeens.size()-1);
+        // 移动列表位置
         if (!rv_conversation.canScrollVertically(1)) {
             rv_conversation.scrollToPosition(messageBeens.size()-1);
         }
+        // 重置文本框
+        edit_conversation.setText("");
+        // 发送
+        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
+        EMMessageManager.addSendingMessage(message.getMsgId());
     }
 
     private void sendPicMessage(File file) {
