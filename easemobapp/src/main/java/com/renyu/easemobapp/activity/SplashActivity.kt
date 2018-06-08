@@ -1,4 +1,4 @@
-package com.renyu.easemob.activity
+package com.renyu.easemobapp.activity
 
 import android.Manifest
 import android.content.Intent
@@ -11,10 +11,10 @@ import com.renyu.commonlibrary.baseact.BaseActivity
 import com.renyu.commonlibrary.impl.OnPermissionCheckedImpl
 import com.renyu.commonlibrary.params.InitParams
 import com.renyu.commonlibrary.views.permission.PermissionActivity
+import com.renyu.easemobapp.R
+import com.renyu.easemoblibrary.manager.EMMessageManager
+import com.renyu.easemoblibrary.manager.GroupManager
 import com.renyu.easemobuilibrary.params.CommonParams
-import com.renyu.mt.MainActivity
-import com.renyu.mt.R
-import com.renyu.mt.activity.ChatListActivity
 
 class SplashActivity : BaseActivity() {
 
@@ -62,6 +62,10 @@ class SplashActivity : BaseActivity() {
         // 登录成功跳转首页
         if (!TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME))
                 && !TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD))) {
+            // 保证进入主页面后本地会话和群组都 load 完毕。
+            GroupManager.loadAllGroups()
+            EMMessageManager.loadAllConversations()
+
             startActivity(Intent(this@SplashActivity, ChatListActivity::class.java))
         }
         // 没有用户信息则执行登录操作
@@ -84,7 +88,11 @@ class SplashActivity : BaseActivity() {
             finish()
         }
         if (intent.getIntExtra(CommonParams.TYPE, -1) == CommonParams.MAIN) {
-            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            // 保证进入主页面后本地会话和群组都 load 完毕。
+            GroupManager.loadAllGroups()
+            EMMessageManager.loadAllConversations()
+
+            startActivity(Intent(this@SplashActivity, ChatListActivity::class.java))
         }
     }
 }

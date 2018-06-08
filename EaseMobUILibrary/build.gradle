@@ -1,5 +1,9 @@
 apply plugin: 'com.android.library'
 
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
 apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.renyu'
@@ -47,6 +51,8 @@ configurations.all {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.anko:anko:$anko_version"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -56,5 +62,7 @@ dependencies {
     api('com.github.renyu:AndroidImageLibrary:1.4.7') {
         exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
     }
+    // JKeyboardPanelSwitch  For resolve the layout conflict when keybord & panel are switching (Android键盘面板冲突 布局闪动处理方案)
+    api 'cn.dreamtobe.kpswitch:library:1.6.1'
     api project(':EaseMobLibrary')
 }

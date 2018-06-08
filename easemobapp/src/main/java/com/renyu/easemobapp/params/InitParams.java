@@ -1,9 +1,9 @@
-package com.renyu.easemob.params;
+package com.renyu.easemobapp.params;
 
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
-import com.renyu.mt.R;
+import com.renyu.easemobapp.R;
 
 /**
  * 参数配置位置，因为通过反射，所以一定要类名位置写对

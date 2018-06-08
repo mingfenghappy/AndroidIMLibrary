@@ -1,1 +1,1 @@
-include ':app', ':TMLibrary', ':TMBaseUILibrary', ':TMUILibrary', ':EaseMobLibrary', ':EaseMobUILibrary'
+include ':app', ':TMLibrary', ':TMBaseUILibrary', ':TMUILibrary', ':EaseMobLibrary', ':EaseMobUILibrary', ':easemobapp'

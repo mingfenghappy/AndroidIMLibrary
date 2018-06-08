@@ -1,4 +1,4 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     defaultConfig {
-//        applicationId "com.renyu.mt"
+        applicationId "com.renyu.easemobapp"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
@@ -50,18 +50,5 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     // butterknife
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    implementation project(':TMUILibrary')
-    //    implementation 'com.github.r17171709.AndroidIMLibrary:TMBaseUILibrary:v1.8'
-    //    implementation 'com.github.r17171709.AndroidIMLibrary:TMLibrary:v1.8'
-    //    implementation 'com.github.r17171709.AndroidIMLibrary:TMUILibrary:v1.8'
-    //    api('com.github.renyu:AndroidCommonLibrary:1.11.9')
-    //    api ('com.github.renyu:AndroidImageLibrary:1.4.3') {
-    //        exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
-    //    }
-    //    // fresco-processors  An Android image processor library providing a variety of image transformations for Fresco.
-    //    api('jp.wasabeef:fresco-processors:2.1.0') {
-    //        exclude group: 'com.facebook.fresco', module: 'fresco'
-    //    }
-    //    // JKeyboardPanelSwitch  For resolve the layout conflict when keybord & panel are switching (Android键盘面板冲突 布局闪动处理方案)
-    //    api 'cn.dreamtobe.kpswitch:library:1.6.1'
+    implementation project(':EaseMobUILibrary')
 }

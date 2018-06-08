@@ -35,7 +35,7 @@ public abstract class EaseMobApplication extends MultiDexApplication {
         super.onCreate();
 
         try {
-            Class clazz = Class.forName("com.renyu.easemob.params.InitParams");
+            Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
             actionName = clazz.getField("actionName").get(clazz).toString();
             storageName = clazz.getField("StorageName").get(clazz).toString();
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {

@@ -1,8 +1,9 @@
-package com.renyu.easemob
+package com.renyu.easemobapp
 
 import android.graphics.Color
 import com.renyu.commonlibrary.baseact.BaseActivity
-import com.renyu.mt.R
+import com.renyu.easemoblibrary.manager.EMMessageManager
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
     override fun setStatusBarColor() = Color.BLACK
@@ -14,7 +15,9 @@ class MainActivity : BaseActivity() {
     }
 
     override fun initParams() {
-
+        btn_chattext.setOnClickListener {
+            EMMessageManager.sendSingleMessage(EMMessageManager.prepareTxtEMMessage("from local", "admin"))
+        }
     }
 
     override fun initViews() = R.layout.activity_main

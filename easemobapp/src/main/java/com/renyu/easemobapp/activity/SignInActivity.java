@@ -1,4 +1,4 @@
-package com.renyu.easemob.activity;
+package com.renyu.easemobapp.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,14 +10,12 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.Utils;
-import com.renyu.easemob.params.InitParams;
+import com.renyu.easemobapp.params.InitParams;
 import com.renyu.easemoblibrary.EaseMobUtils;
-import com.renyu.easemoblibrary.manager.EMMessageManager;
-import com.renyu.easemoblibrary.manager.GroupManager;
 import com.renyu.easemoblibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.base.BaseIMActivity;
 import com.renyu.easemobuilibrary.params.CommonParams;
-import com.renyu.mt.R;
+import com.renyu.easemobapp.R;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -39,9 +37,6 @@ public class SignInActivity extends BaseIMActivity {
                         // 用户登录信息
                         SPUtils.getInstance().put(CommonParams.SP_UNAME, ed_username.getText().toString());
                         SPUtils.getInstance().put(CommonParams.SP_PWD, ed_pwd.getText().toString());
-                        // 保证进入主页面后本地会话和群组都 load 完毕。
-                        GroupManager.loadAllGroups();
-                        EMMessageManager.loadAllConversations();
                         // 登录成功跳转首页
                         Intent intent2 = new Intent(SignInActivity.this, SplashActivity.class);
                         intent2.putExtra(CommonParams.TYPE, CommonParams.MAIN);

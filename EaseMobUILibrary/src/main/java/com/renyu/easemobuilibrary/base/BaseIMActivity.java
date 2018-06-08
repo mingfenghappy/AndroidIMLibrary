@@ -39,7 +39,7 @@ public abstract class BaseIMActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         // 广播action标志名称设置
         try {
-            Class clazz = Class.forName("com.renyu.easemob.params.InitParams");
+            Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
             actionName = clazz.getField("actionName").get(clazz).toString();
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
@@ -72,7 +72,7 @@ public abstract class BaseIMActivity extends BaseActivity {
             dialog.setOnDialogPosListener(() -> {
                 CommonParams.isKickout = false;
                 try {
-                    Class clazz = Class.forName("com.renyu.easemob.params.InitParams");
+                    Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
 
                     // 加载自定义的踢下线方法
                     Method kickoutFuncMethod = clazz.getDeclaredMethod("kickoutFunc");

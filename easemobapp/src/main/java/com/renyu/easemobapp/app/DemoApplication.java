@@ -1,4 +1,4 @@
-package com.renyu.easemob.app;
+package com.renyu.easemobapp.app;
 
 import android.content.Intent;
 

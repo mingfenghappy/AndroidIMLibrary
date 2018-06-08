@@ -19,7 +19,7 @@ public class BroadcastBean {
     public static void sendBroadcast(Context context, EaseMobCommand command, Parcelable parcelable) {
         String actionName = "";
         try {
-            Class clazz = Class.forName("com.renyu.easemob.params.InitParams");
+            Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
             actionName = clazz.getField("actionName").get(clazz).toString();
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
