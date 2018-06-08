@@ -1,6 +1,7 @@
 package com.renyu.easemobuilibrary.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -99,6 +100,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
         }
         holder.layout_adapter_conversationlist.setOnClickListener(view -> {
             EMMessageManager.markAllMessagesAsRead(uid);
+            BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.UpdateRead);
 
             try {
                 Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
@@ -106,16 +108,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
 
                 Class conversationClass = Class.forName(conversationActivityName);
 
-//                Intent intent=new Intent(context, conversationClass);
-//                intent.putExtra("UserId", messages.get(position_).getFromUserId());
-//                intent.putExtra("UserHeadId", messages.get(position_).getUserHeadId());
-//                intent.putExtra("UserNickName", messages.get(position_).getUserNickName());
-//                intent.putExtra("UserHeadType", messages.get(position_).getUserHeadType());
-//                context.startActivity(intent);
+                Intent intent=new Intent(context, conversationClass);
+                intent.putExtra("UserId", uid);
+                intent.putExtra("isGroup", false);
+                context.startActivity(intent);
             } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
             }
-            BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.UpdateRead);
         });
     }
 

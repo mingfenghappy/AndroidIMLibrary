@@ -123,28 +123,28 @@ public class EMMessageManager {
         message.setAcked(true);
     }
 
-    public static void sendSingleMessage(EMMessage emMessage) {
-        sendMessage(emMessage, null, null);
+    public static void sendSingleMessage(Context context, EMMessage emMessage) {
+        sendMessage(context, emMessage, null, null);
     }
 
-    public static void sendSingleMessage(EMMessage emMessage, HashMap<String, Object> attributes) {
-        sendMessage(emMessage, null, attributes);
+    public static void sendSingleMessage(Context context, EMMessage emMessage, HashMap<String, Object> attributes) {
+        sendMessage(context, emMessage, null, attributes);
     }
 
-    public static void sendGroupMessage(EMMessage emMessage) {
-        sendMessage(emMessage, EMMessage.ChatType.GroupChat, null);
+    public static void sendGroupMessage(Context context, EMMessage emMessage) {
+        sendMessage(context, emMessage, EMMessage.ChatType.GroupChat, null);
     }
 
-    public static void sendGroupMessage(EMMessage emMessage, HashMap<String, Object> attributes) {
-        sendMessage(emMessage, EMMessage.ChatType.GroupChat, attributes);
+    public static void sendGroupMessage(Context context, EMMessage emMessage, HashMap<String, Object> attributes) {
+        sendMessage(context, emMessage, EMMessage.ChatType.GroupChat, attributes);
     }
 
-    public static void sendChatRoomMessage(EMMessage emMessage) {
-        sendMessage(emMessage, EMMessage.ChatType.ChatRoom, null);
+    public static void sendChatRoomMessage(Context context, EMMessage emMessage) {
+        sendMessage(context, emMessage, EMMessage.ChatType.ChatRoom, null);
     }
 
-    public static void sendChatRoomMessage(EMMessage emMessage, HashMap<String, Object> attributes) {
-        sendMessage(emMessage, EMMessage.ChatType.ChatRoom, attributes);
+    public static void sendChatRoomMessage(Context context, EMMessage emMessage, HashMap<String, Object> attributes) {
+        sendMessage(context, emMessage, EMMessage.ChatType.ChatRoom, attributes);
     }
 
     /**
@@ -153,7 +153,7 @@ public class EMMessageManager {
      * @param chatType 如果是群聊，设置chattype，默认是单聊
      * @param attributes 扩展消息
      */
-    private static void sendMessage(EMMessage message, EMMessage.ChatType chatType, HashMap<String, Object> attributes) {
+    private static void sendMessage(final Context context, EMMessage message, EMMessage.ChatType chatType, HashMap<String, Object> attributes) {
         if (attributes != null && attributes.size() > 0) {
             Iterator<Map.Entry<String, Object>> iterator = attributes.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -186,7 +186,7 @@ public class EMMessageManager {
             message.setChatType(chatType);
         }
 
-        registerMessageStatusCallback(message);
+        registerMessageStatusCallback(context, message);
 
         EMClient.getInstance().chatManager().sendMessage(message);
     }
@@ -195,21 +195,22 @@ public class EMMessageManager {
      * 监听消息发送状态
      * @param message 消息体
      */
-    private static void registerMessageStatusCallback(final EMMessage message) {
+    private static void registerMessageStatusCallback(final Context context, final EMMessage message) {
         message.setMessageStatusCallback(new EMCallBack() {
             @Override
             public void onSuccess() {
-                Log.d("EaseMobUtils", "registerMessageStatusCallback onSuccess 数量" + EMMessageManager.getAllMessages(message.getTo()).size());
+                message.setStatus(EMMessage.Status.SUCCESS);
+                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
             }
 
             @Override
             public void onError(int code, String error) {
-                Log.d("EaseMobUtils", "registerMessageStatusCallback onError 数量" + EMMessageManager.getAllMessages(message.getTo()).size());
+                message.setStatus(EMMessage.Status.FAIL);
+                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
             }
 
             @Override
             public void onProgress(int progress, String status) {
-                Log.d("EaseMobUtils", "registerMessageStatusCallback onProgress 数量" + EMMessageManager.getAllMessages(message.getTo()).size());
             }
         });
     }

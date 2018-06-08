@@ -12,9 +12,9 @@ public class InitParams {
     // fileprovider存储文件夹的名称
     public static String StorageName = "mt";
     // 自定义的流程中控activity
-    public static String InitActivityName = "com.renyu.mt.activity.SplashActivity";
+    public static String InitActivityName = "com.renyu.easemobapp.activity.SplashActivity";
     // 自定义的会话详情activity
-    public static String ConversationActivityName = "com.renyu.mt.activity.ConversationActivity";
+    public static String ConversationActivityName = "com.renyu.easemobapp.activity.ConversationActivity";
     // 广播action标志名称
     public static String actionName = "MTDemo";
     // 通知栏图片

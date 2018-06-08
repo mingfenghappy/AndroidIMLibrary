@@ -507,7 +507,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         TextView aurora_tv_msgitem_display_name;
         TextView aurora_tv_msgitem_message;
 
-        public ReceiverTextViewHolder(View itemView) {
+        ReceiverTextViewHolder(View itemView) {
             super(itemView);
 
             aurora_tv_msgitem_date = itemView.findViewById(R.id.aurora_tv_msgitem_date);
@@ -523,7 +523,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         TextView aurora_tv_msgitem_display_name;
         SimpleDraweeView aurora_iv_msgitem_photo;
 
-        public ReceiverImageViewHolder(View itemView) {
+        ReceiverImageViewHolder(View itemView) {
             super(itemView);
 
             aurora_tv_msgitem_date = itemView.findViewById(R.id.aurora_tv_msgitem_date);
@@ -542,7 +542,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         ImageView aurora_iv_msgitem_read_status;
         RelativeLayout bubble;
 
-        public ReceiverVoiceViewHolder(View itemView) {
+        ReceiverVoiceViewHolder(View itemView) {
             super(itemView);
 
             aurora_tv_msgitem_date = itemView.findViewById(R.id.aurora_tv_msgitem_date);
@@ -562,7 +562,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         ProgressBar aurora_iv_msgitem_send_progress_bar;
         TextView aurora_tv_msgitem_message;
 
-        public SendTextViewHolder(View itemView) {
+        SendTextViewHolder(View itemView) {
             super(itemView);
 
             aurora_tv_msgitem_date = itemView.findViewById(R.id.aurora_tv_msgitem_date);
@@ -581,7 +581,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         ProgressBar aurora_iv_msgitem_send_progress_bar;
         RelativeLayout bubble;
 
-        public SendImageViewHolder(View itemView) {
+        SendImageViewHolder(View itemView) {
             super(itemView);
 
             aurora_tv_msgitem_date = itemView.findViewById(R.id.aurora_tv_msgitem_date);
@@ -602,7 +602,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         ImageView aurora_iv_msgitem_read_status;
         RelativeLayout bubble;
 
-        public SendVoiceViewHolder(View itemView) {
+        SendVoiceViewHolder(View itemView) {
             super(itemView);
 
             aurora_tv_msgitem_date = itemView.findViewById(R.id.aurora_tv_msgitem_date);
@@ -615,7 +615,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public static String getFriendlyTimeSpanByNow(long millis) {
+    private static String getFriendlyTimeSpanByNow(long millis) {
         long now = System.currentTimeMillis();
         // 获取当天00:00
         long wee = (now / TimeConstants.DAY) * TimeConstants.DAY - 8 * TimeConstants.HOUR;

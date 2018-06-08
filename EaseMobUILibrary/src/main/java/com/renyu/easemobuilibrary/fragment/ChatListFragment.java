@@ -29,7 +29,7 @@ public class ChatListFragment extends BaseFragment {
     ChatListAdapter adapter;
 
     // 离线消息
-    ArrayList<EMMessage> offlineMessages;
+    ArrayList<EMMessage> messages;
 
     private OnHeaderViewSetListener headerViewSetListener;
 
@@ -51,7 +51,7 @@ public class ChatListFragment extends BaseFragment {
 
     @Override
     public void initParams() {
-        offlineMessages=new ArrayList<>();
+        messages=new ArrayList<>();
 
         rv_conversationlist = view.findViewById(R.id.rv_conversationlist);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -60,7 +60,7 @@ public class ChatListFragment extends BaseFragment {
         rv_conversationlist.setLayoutManager(manager);
         rv_conversationlist.setNestedScrollingEnabled(false);
         rv_conversationlist.setHasFixedSize(true);
-        adapter=new ChatListAdapter(getActivity(), offlineMessages);
+        adapter=new ChatListAdapter(getActivity(), messages);
         rv_conversationlist.setAdapter(adapter);
         swipe_conversationlist = view.findViewById(R.id.swipe_conversationlist);
         swipe_conversationlist.setOnRefreshListener(() -> {
@@ -97,9 +97,9 @@ public class ChatListFragment extends BaseFragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        offlineMessages.clear();
+        messages.clear();
         for (Pair<Long, EMConversation> sortItem : sortList) {
-            offlineMessages.add(sortItem.second.getLastMessage());
+            messages.add(sortItem.second.getLastMessage());
         }
         adapter.notifyDataSetChanged();
         swipe_conversationlist.setRefreshing(false);
