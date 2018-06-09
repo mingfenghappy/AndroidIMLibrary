@@ -32,6 +32,7 @@ import com.hyphenate.chat.EMVideoMessageBody;
 import com.hyphenate.chat.EMVoiceMessageBody;
 import com.renyu.easemoblibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
+import com.renyu.easemobuilibrary.activity.BaseConversationActivity;
 import com.renyu.easemobuilibrary.params.CommonParams;
 
 import java.io.File;
@@ -278,6 +279,124 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((SendImageViewHolder) holder).bubble.setOnClickListener(view -> {
 
             });
+        }
+        else if (getItemViewType(position)==4) {
+            ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
+            ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
+            ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setText(messages.get(position).getFrom());
+            // 如果是群组则显示用户昵称或者userId
+            if (isGroup) {
+                ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((ReceiverVoiceViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
+            }
+
+            ((ReceiverVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
+                // 播放语音和动画
+                ((BaseConversationActivity) context).playMedia(
+                        ((EMVoiceMessageBody) messages.get(position).getBody()).getLocalUrl(),
+                        messages.get(position).localTime()+"_voice",
+                        false);
+                // 更新数据库
+                EMMessageManager.setVoiceMessageListened(messages.get(position));
+                // 更新本地缓存
+                messages.get(position).setListened(true);
+                // 刷新视图
+                ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
+            });
+
+            ((ReceiverVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).localTime()+"_voice");
+            // 判断是否正在播放
+            if (mediaPlayerTag!=null && mediaPlayerTag.equals(messages.get(position).localTime()+"_voice")) {
+                ((BaseConversationActivity) context).startVoicePlayAnimation(((ReceiverVoiceViewHolder) holder).iv_voice, false);
+            }
+            else {
+                ((ReceiverVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatfrom_voice_playing);
+            }
+
+            // 判断语音是否已读
+            if (messages.get(position).isListened()) {
+                ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
+            }
+            else {
+                ((ReceiverVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.VISIBLE);
+            }
+
+            // 音频播放时间秒数
+            File file = new File(((EMVoiceMessageBody) messages.get(position).getBody()).getLocalUrl());
+            if (file == null) {
+                ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(0+"\'\'");
+            }
+            else {
+                if (file.length()/1000 < 1) {
+                    ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(1+"\'\'");
+                }
+                else {
+                    ((ReceiverVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1000+"\'\'");
+                }
+            }
+        }
+        else if (getItemViewType(position)==5) {
+            ((SendVoiceViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
+            ((SendVoiceViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
+            ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setTag(messages.get(position).localTime()+"_status");
+
+            // 发送失败显示图标
+            if (messages.get(position).status() == EMMessage.Status.FAIL) {
+                ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setVisibility(View.GONE);
+            }
+            ((SendVoiceViewHolder) holder).aurora_iv_msgitem_read_status.setOnClickListener(view -> {
+                // 发送失败则通过点击进行重新发送
+                EMMessage temp = messages.get(position);
+                temp.setStatus(EMMessage.Status.INPROGRESS);
+                EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
+                notifyItemChanged(position);
+            });
+
+            ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).localTime()+"_pb");
+            // 未发送完成则需要显示进度圈
+            if (messages.get(position).status() == EMMessage.Status.INPROGRESS ||
+                    messages.get(position).status() == EMMessage.Status.CREATE) {
+                ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((SendVoiceViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
+            }
+
+            ((SendVoiceViewHolder) holder).bubble.setOnClickListener(view -> {
+                // 播放语音
+                ((BaseConversationActivity) context).playMedia(
+                        ((EMVoiceMessageBody) messages.get(position).getBody()).getLocalUrl(),
+                        messages.get(position).localTime()+"_voice",
+                        true);
+            });
+
+            ((SendVoiceViewHolder) holder).iv_voice.setTag(messages.get(position).localTime()+"_voice");
+            // 判断是否正在播放
+            if (mediaPlayerTag!=null && mediaPlayerTag.equals(messages.get(position).localTime()+"_voice")) {
+                ((BaseConversationActivity) context).startVoicePlayAnimation(((SendVoiceViewHolder) holder).iv_voice, true);
+            }
+            else {
+                ((SendVoiceViewHolder) holder).iv_voice.setImageResource(R.mipmap.ease_chatto_voice_playing);
+            }
+
+            // 音频播放时间秒数
+            File file = new File(((EMVoiceMessageBody) messages.get(position).getBody()).getLocalUrl());
+            if (file == null) {
+                ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(0+"\'\'");
+            }
+            else {
+                if (file.length()/1000 < 1) {
+                    ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(1+"\'\'");
+                }
+                else {
+                    ((SendVoiceViewHolder) holder).aurora_tv_voice_length.setText(file.length()/1000+"\'\'");
+                }
+            }
         }
     }
 

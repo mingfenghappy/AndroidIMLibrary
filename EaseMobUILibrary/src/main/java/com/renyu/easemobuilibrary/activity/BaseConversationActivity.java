@@ -383,7 +383,16 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     private void sendVoiceMessage(File file) {
-
+        EMMessage message = EMMessageManager.prepareVoiceEMMessage(file.getPath(), (int) (file.length()/1000), chatUserId);
+        messageBeens.add(message);
+        adapter.notifyItemInserted(messageBeens.size()-1);
+        // 移动列表位置
+        if (!rv_conversation.canScrollVertically(1)) {
+            rv_conversation.scrollToPosition(messageBeens.size()-1);
+        }
+        // 发送
+        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
+        EMMessageManager.addSendingMessage(message.getMsgId());
     }
 
     /**

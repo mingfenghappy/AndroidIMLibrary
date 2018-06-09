@@ -409,6 +409,13 @@ public class EMMessageManager {
         EMClient.getInstance().chatManager().saveMessage(message);
     }
 
+    /**
+     * 设置消息为已听，一般用于语音消息
+     * @param message
+     */
+    public static void setVoiceMessageListened(EMMessage message) {
+        EMClient.getInstance().chatManager().setVoiceMessageListened(message);
+    }
 
     /**
      * 同步加载所有的会话，并且每条会话读入EMChatOptions.getNumberOfMessagesLoaded()条消息, 默认是20条以保持兼容
