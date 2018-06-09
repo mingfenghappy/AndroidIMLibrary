@@ -369,7 +369,17 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     private void sendPicMessage(File file) {
-
+        // 刷新列表
+        EMMessage message = EMMessageManager.prepareImageMessage(file.getPath(), true, chatUserId);
+        messageBeens.add(message);
+        adapter.notifyItemInserted(messageBeens.size()-1);
+        // 移动列表位置
+        if (!rv_conversation.canScrollVertically(1)) {
+            rv_conversation.scrollToPosition(messageBeens.size()-1);
+        }
+        // 发送
+        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
+        EMMessageManager.addSendingMessage(message.getMsgId());
     }
 
     private void sendVoiceMessage(File file) {

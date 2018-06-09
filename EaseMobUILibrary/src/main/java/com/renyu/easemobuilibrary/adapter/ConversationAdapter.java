@@ -34,6 +34,7 @@ import com.renyu.easemoblibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.params.CommonParams;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -169,7 +170,6 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
             ((ReceiverTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setText(messages.get(position).getFrom());
-            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(((EMTextMessageBody) messages.get(position).getBody()).getMessage());
             // 如果是群组则显示用户昵称或者userId
             if (isGroup) {
                 ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.VISIBLE);
@@ -177,6 +177,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
             }
+            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(((EMTextMessageBody) messages.get(position).getBody()).getMessage());
         }
         else if (getItemViewType(position)==1) {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
@@ -208,6 +209,74 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 temp.setStatus(EMMessage.Status.INPROGRESS);
                 EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
                 notifyItemChanged(position);
+            });
+        }
+        else if (getItemViewType(position)==2) {
+            ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
+            ((ReceiverImageViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
+            ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_display_name.setText(messages.get(position).getFrom());
+            // 如果是群组则显示用户昵称或者userId
+            if (isGroup) {
+                ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
+            }
+            // 加载图片
+            ImageRequest request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse(((EMImageMessageBody) messages.get(position).getBody()).getRemoteUrl()))
+                    .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            File file = new File(((EMImageMessageBody) messages.get(position).getBody()).getLocalUrl());
+            if (file.exists()) {
+                request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file:///"+file.getPath()))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            }
+            DraweeController draweeController_ = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(request_).setAutoPlayAnimations(true).build();
+            ((ReceiverImageViewHolder) holder).aurora_iv_msgitem_photo.setController(draweeController_);
+        }
+        else if (getItemViewType(position)==3) {
+            ((SendImageViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
+            ((SendImageViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
+            ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).localTime()+"_status");
+
+            // 发送失败显示图标
+            if (messages.get(position).status() == EMMessage.Status.FAIL) {
+                ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setVisibility(View.GONE);
+            }
+            ((SendImageViewHolder) holder).aurora_iv_msgitem_send_status.setOnClickListener(view -> {
+                // 发送失败则通过点击进行重新发送
+                EMMessage temp = messages.get(position);
+                temp.setStatus(EMMessage.Status.INPROGRESS);
+                EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
+                notifyItemChanged(position);
+            });
+
+            ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).localTime()+"_pb");
+            // 未发送完成则需要显示进度圈
+            if (messages.get(position).status() == EMMessage.Status.INPROGRESS ||
+                    messages.get(position).status() == EMMessage.Status.CREATE) {
+                ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.VISIBLE);
+            }
+            else {
+                ((SendImageViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setVisibility(View.GONE);
+            }
+
+            // 加载图片
+            ImageRequest request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse(((EMImageMessageBody) messages.get(position).getBody()).getRemoteUrl()))
+                    .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            File file = new File(((EMImageMessageBody) messages.get(position).getBody()).getLocalUrl());
+            if (file.exists()) {
+                request_ = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file:///"+file.getPath()))
+                        .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(100), SizeUtils.dp2px(100))).build();
+            }
+            DraweeController draweeController_ = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(request_).setAutoPlayAnimations(true).build();
+            ((SendImageViewHolder) holder).aurora_iv_msgitem_photo.setController(draweeController_);
+            ((SendImageViewHolder) holder).bubble.setOnClickListener(view -> {
+
             });
         }
     }
