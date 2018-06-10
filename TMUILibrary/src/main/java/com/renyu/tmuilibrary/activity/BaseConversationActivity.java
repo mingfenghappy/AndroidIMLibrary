@@ -312,6 +312,10 @@ public class BaseConversationActivity extends BaseIMActivity {
                         if (!((((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable()) instanceof SystemMessageBean)) {
                             MessageBean messageBean = (MessageBean) ((BroadcastBean) intent.getSerializableExtra("broadcast")).getSerializable();
                             if (messageBean.getUserId().equals(chatUserId)) {
+                                // 设置当前会话列表消息均已读
+                                PlainTextDBHelper.getInstance(Utils.getApp()).updateRead(chatUserId);
+                                BroadcastBean.sendBroadcast(BaseConversationActivity.this, BroadcastBean.MTCommand.UpdateRead, chatUserId);
+
                                 messageBeens.add(messageBean);
                                 adapter.notifyItemInserted(messageBeens.size()-1);
                                 if (!rv_conversation.canScrollVertically(1)) {

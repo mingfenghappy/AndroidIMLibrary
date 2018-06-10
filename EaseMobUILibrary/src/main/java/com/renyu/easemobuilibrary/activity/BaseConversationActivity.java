@@ -204,6 +204,10 @@ public class BaseConversationActivity extends BaseIMActivity {
                     if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.MessageReceive) {
                         EMMessage emMessage = intent.getParcelableExtra(BroadcastBean.PARCELABLE);
                         if (emMessage.getFrom().equals(chatUserId)) {
+                            // 设置当前聊天人的消息已读
+                            EMMessageManager.markAllMessagesAsRead(chatUserId);
+                            BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.UpdateRead);
+
                             messageBeens.add(emMessage);
                             adapter.notifyItemInserted(messageBeens.size()-1);
                             if (!rv_conversation.canScrollVertically(1)) {
