@@ -1,7 +1,6 @@
 package com.renyu.easemobapp.activity
 
 import android.Manifest
-import android.content.Intent
 import android.os.Build
 import android.widget.LinearLayout
 import android.widget.TextView

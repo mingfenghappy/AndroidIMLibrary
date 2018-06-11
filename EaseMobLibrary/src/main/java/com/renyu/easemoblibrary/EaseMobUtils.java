@@ -10,8 +10,6 @@ import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
-import com.renyu.easemoblibrary.manager.EMMessageManager;
-import com.renyu.easemoblibrary.manager.GroupManager;
 import com.renyu.easemoblibrary.model.BroadcastBean;
 
 public class EaseMobUtils {
@@ -45,14 +43,22 @@ public class EaseMobUtils {
             @Override
             public void onDisconnected(int errorCode) {
                 Log.d("EaseMobUtils", "addConnectionListener errorCode:" + errorCode);
-                if(errorCode == EMError.USER_REMOVED){
-                    // 显示帐号已经被移除
-                }
-                else if (errorCode == EMError.USER_LOGIN_ANOTHER_DEVICE) {
-                    // 显示帐号在其他设备登录
-                }
-                else {
-                    // 其他异常
+                switch (errorCode) {
+                    case EMError.USER_REMOVED:
+                        // 账户被删除
+                        break;
+                    case EMError.USER_LOGIN_ANOTHER_DEVICE:
+                        // 账户在另外一台设备登录
+                        break;
+                    case EMError.USER_KICKED_BY_CHANGE_PASSWORD:
+                        // 用户修改密码
+                        break;
+                    case EMError.USER_KICKED_BY_OTHER_DEVICE:
+                        // 用户被其他设备踢掉
+                        break;
+                    default:
+                        // 其他异常
+                        break;
                 }
             }
         });

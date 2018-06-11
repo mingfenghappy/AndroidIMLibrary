@@ -23,7 +23,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
+import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
+import com.hyphenate.exceptions.HyphenateException;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.easemoblibrary.manager.EMMessageManager;
 import com.renyu.easemoblibrary.model.BroadcastBean;
@@ -219,6 +221,20 @@ public class BaseConversationActivity extends BaseIMActivity {
                     if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.MessageSend) {
                         EMMessage emMessage = intent.getParcelableExtra(BroadcastBean.PARCELABLE);
                         if (emMessage.status() == EMMessage.Status.SUCCESS) {
+                            try {
+                                // 来自音视频通话
+                                if (emMessage.getBooleanAttribute("is_video_call") || emMessage.getBooleanAttribute("is_voice_call")) {
+                                    messageBeens.add(emMessage);
+                                    adapter.notifyItemInserted(messageBeens.size()-1);
+                                    // 移动列表位置
+                                    if (!rv_conversation.canScrollVertically(1)) {
+                                        rv_conversation.scrollToPosition(messageBeens.size()-1);
+                                    }
+                                    return;
+                                }
+                            } catch (HyphenateException e) {
+
+                            }
                             new Handler().postDelayed(() -> {
                                 // 找到已存在的那条数据，调整它的文本发送时间，以保证发送时间与最初时间相同
                                 for (EMMessage messageBeen : messageBeens) {
@@ -524,5 +540,27 @@ public class BaseConversationActivity extends BaseIMActivity {
             e.printStackTrace();
         }
         return cropFile;
+    }
+
+    /**
+     * 发起语音聊天
+     */
+    protected void startVoiceCall() {
+        if (EMClient.getInstance().isConnected()) {
+            startActivity(new Intent(this, VoiceCallActivity.class)
+                    .putExtra("username", chatUserId)
+                    .putExtra("isComingCall", false));
+        }
+    }
+
+    /**
+     * 发起视频聊天
+     */
+    protected void startVideoCall() {
+        if (EMClient.getInstance().isConnected()) {
+            startActivity(new Intent(this, VideoCallActivity.class)
+                    .putExtra("username", chatUserId)
+                    .putExtra("isComingCall", false));
+        }
     }
 }

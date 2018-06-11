@@ -267,9 +267,6 @@ public class EMMessageManager {
             public void onCmdMessageReceived(List<EMMessage> messages) {
                 // 收到透传消息
                 Log.d("EaseMobUtils", "onCmdMessageReceived");
-                for (EMMessage message : messages) {
-
-                }
             }
         });
     }

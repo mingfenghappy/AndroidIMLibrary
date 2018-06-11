@@ -9,13 +9,17 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.hyphenate.chat.EMClient;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.network.HttpsUtils;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.easemoblibrary.EaseMobUtils;
+import com.renyu.easemoblibrary.manager.ContactManager;
 import com.renyu.easemoblibrary.manager.EMMessageManager;
+import com.renyu.easemoblibrary.manager.GroupManager;
 import com.renyu.easemobuilibrary.params.CommonParams;
+import com.renyu.easemobuilibrary.receiver.CallReceiver;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +29,9 @@ import okhttp3.OkHttpClient;
 public abstract class EaseMobApplication extends MultiDexApplication {
 
     // 基础广播
-    public BroadcastReceiver baseReceiver = null;
+    private BroadcastReceiver baseReceiver = null;
+    // 音视频广播
+    private CallReceiver callReceiver = null;
 
     String actionName = "";
     String storageName = "mt";
@@ -88,10 +94,8 @@ public abstract class EaseMobApplication extends MultiDexApplication {
 
             // 环信配置
             EaseMobUtils.initChatOptions(this);
-            // 开启环信广播监听
-            EaseMobUtils.registerMessageListener();
-            // 设置消息监听
-            EMMessageManager.registerMessageListener(this);
+            // 配置环信全局广播监听
+            setGlobalListeners();
 
         }
     }
@@ -120,6 +124,24 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             baseReceiver = null;
         }
     }
+
+    public void setGlobalListeners() {
+        // 设置连接状态监听
+        EaseMobUtils.registerMessageListener();
+        // 设置消息监听
+        EMMessageManager.registerMessageListener(this);
+        // 设置音视频广播监听
+        IntentFilter callFilter = new IntentFilter(EMClient.getInstance().callManager().getIncomingCallBroadcastAction());
+        if(callReceiver == null){
+            callReceiver = new CallReceiver();
+        }
+        registerReceiver(callReceiver, callFilter);
+        // 设置群组监听
+        GroupManager.setEMGroupChangeListener();
+        // 设置联系人监听
+        ContactManager.setContactListener();
+    }
+
 
     abstract public Intent getNotificationIntent(String userId);
 }
