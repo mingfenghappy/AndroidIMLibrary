@@ -20,7 +20,7 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMMessage.Status;
 import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.exceptions.EMServiceNotReadyException;
-import com.renyu.easemoblibrary.model.BroadcastBean;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.base.BaseIMActivity;
 
 public abstract class CallActivity extends BaseIMActivity {

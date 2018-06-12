@@ -14,12 +14,12 @@ import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
 import com.renyu.commonlibrary.network.HttpsUtils;
 import com.renyu.commonlibrary.network.Retrofit2Utils;
 import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.easemoblibrary.EaseMobUtils;
-import com.renyu.easemoblibrary.manager.ContactManager;
-import com.renyu.easemoblibrary.manager.EMMessageManager;
-import com.renyu.easemoblibrary.manager.GroupManager;
+import com.renyu.easemobuilibrary.manager.ContactManager;
+import com.renyu.easemobuilibrary.manager.EMMessageManager;
+import com.renyu.easemobuilibrary.manager.GroupManager;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.receiver.CallReceiver;
+import com.renyu.easemobuilibrary.utils.EaseMobUtils;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +35,7 @@ public abstract class EaseMobApplication extends MultiDexApplication {
 
     String actionName = "";
     String storageName = "mt";
+    String appKey  = "";
 
     @Override
     public void onCreate() {
@@ -44,6 +45,7 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
             actionName = clazz.getField("actionName").get(clazz).toString();
             storageName = clazz.getField("StorageName").get(clazz).toString();
+            appKey = clazz.getField("appKey").get(clazz).toString();
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -93,7 +95,7 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             }
 
             // 环信配置
-            EaseMobUtils.initChatOptions(this);
+            EaseMobUtils.initChatOptions(this, appKey);
             // 配置环信全局广播监听
             setGlobalListeners();
 

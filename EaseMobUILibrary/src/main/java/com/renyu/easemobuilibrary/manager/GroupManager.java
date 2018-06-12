@@ -1,4 +1,4 @@
-package com.renyu.easemoblibrary.manager;
+package com.renyu.easemobuilibrary.manager;
 
 import com.hyphenate.EMGroupChangeListener;
 import com.hyphenate.chat.EMClient;

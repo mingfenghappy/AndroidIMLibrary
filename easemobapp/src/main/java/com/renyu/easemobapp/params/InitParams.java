@@ -19,6 +19,8 @@ public class InitParams {
     public static String actionName = "MTDemo";
     // 通知栏图片
     public static int notificationIcon = R.mipmap.ic_launcher;
+    // 环信appkey
+    public static String appKey = "r17171709#nanjinggongjiao";
 
     // 自定义的踢下线逻辑
     public static void kickoutFunc() {

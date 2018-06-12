@@ -12,8 +12,8 @@ import com.renyu.commonlibrary.impl.OnPermissionCheckedImpl
 import com.renyu.commonlibrary.params.InitParams
 import com.renyu.commonlibrary.views.permission.PermissionActivity
 import com.renyu.easemobapp.R
-import com.renyu.easemoblibrary.manager.EMMessageManager
-import com.renyu.easemoblibrary.manager.GroupManager
+import com.renyu.easemobuilibrary.manager.EMMessageManager
+import com.renyu.easemobuilibrary.manager.GroupManager
 import com.renyu.easemobuilibrary.params.CommonParams
 
 class SplashActivity : BaseActivity() {

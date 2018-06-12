@@ -1,9 +1,8 @@
 package com.renyu.easemobapp
 
 import android.graphics.Color
-import com.blankj.utilcode.util.Utils
+import com.hyphenate.chat.EMClient
 import com.renyu.commonlibrary.baseact.BaseActivity
-import com.renyu.easemoblibrary.manager.EMMessageManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
@@ -17,7 +16,8 @@ class MainActivity : BaseActivity() {
 
     override fun initParams() {
         btn_chattext.setOnClickListener {
-            EMMessageManager.sendSingleMessage(Utils.getApp(), EMMessageManager.prepareTxtEMMessage("from local", "admin"))
+//            EMMessageManager.sendSingleMessage(Utils.getApp(), EMMessageManager.prepareTxtEMMessage("from local", "admin"))
+            EMClient.getInstance().contactManager().addContact("r17171708", "Hello")
         }
     }
 

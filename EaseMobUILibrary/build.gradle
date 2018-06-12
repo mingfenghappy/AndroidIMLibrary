@@ -64,5 +64,5 @@ dependencies {
     }
     // JKeyboardPanelSwitch  For resolve the layout conflict when keybord & panel are switching (Android键盘面板冲突 布局闪动处理方案)
     api 'cn.dreamtobe.kpswitch:library:1.6.1'
-    api project(':EaseMobLibrary')
+    api 'com.hyphenate:hyphenate-sdk:3.4.1'
 }

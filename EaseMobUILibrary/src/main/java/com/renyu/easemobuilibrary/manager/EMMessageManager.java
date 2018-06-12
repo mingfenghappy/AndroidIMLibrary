@@ -1,4 +1,4 @@
-package com.renyu.easemoblibrary.manager;
+package com.renyu.easemobuilibrary.manager;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,7 +10,7 @@ import com.hyphenate.chat.EMCmdMessageBody;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.exceptions.HyphenateException;
-import com.renyu.easemoblibrary.model.BroadcastBean;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

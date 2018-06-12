@@ -1,4 +1,4 @@
-package com.renyu.easemoblibrary.model;
+package com.renyu.easemobuilibrary.model;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +18,14 @@ public class BroadcastBean {
         UpdateRead,
         Kickout,
         MessageReceive,
-        MessageSend
+        MessageSend,
+        FriendGroupsRsp,
+        FriendGroupsFailRsp,
+        onContactInvited,
+        onFriendRequestAccepted,
+        onFriendRequestDeclined,
+        onContactDeleted,
+        onContactAdded
     }
 
     public static void sendBroadcast(Context context, EaseMobCommand command) {

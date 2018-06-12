@@ -1,11 +1,16 @@
-package com.renyu.easemoblibrary.manager;
+package com.renyu.easemobuilibrary.manager;
 
+import android.content.Context;
+
+import com.blankj.utilcode.util.Utils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContactManager {
@@ -14,16 +19,17 @@ public class ContactManager {
      * 获取好友列表
      * @return
      */
-    public static void aysncGetAllContactsFromServer() {
+    public static void aysncGetAllContactsFromServer(Context context) {
         EMClient.getInstance().contactManager().aysncGetAllContactsFromServer(new EMValueCallBack<List<String>>() {
             @Override
             public void onSuccess(List<String> value) {
-
+                ArrayList<String> users = new ArrayList<>(value);
+                BroadcastBean.sendBroadcastSerializable(context, BroadcastBean.EaseMobCommand.FriendGroupsRsp, users);
             }
 
             @Override
             public void onError(int error, String errorMsg) {
-
+                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.FriendGroupsFailRsp);
             }
         });
     }
@@ -170,27 +176,35 @@ public class ContactManager {
             @Override
             public void onContactInvited(String username, String reason) {
                 // 收到好友邀请
+                ArrayList<String> strings = new ArrayList<>();
+                strings.add(username);
+                strings.add(reason);
+                BroadcastBean.sendBroadcastSerializable(Utils.getApp(), BroadcastBean.EaseMobCommand.onContactInvited, strings);
             }
 
             @Override
             public void onFriendRequestAccepted(String username) {
                 // 好友请求被同意
+                BroadcastBean.sendBroadcastSerializable(Utils.getApp(), BroadcastBean.EaseMobCommand.onFriendRequestAccepted, username);
             }
 
             @Override
             public void onFriendRequestDeclined(String username) {
                 // 好友请求被拒绝
+                BroadcastBean.sendBroadcastSerializable(Utils.getApp(), BroadcastBean.EaseMobCommand.onFriendRequestDeclined, username);
             }
 
             @Override
             public void onContactDeleted(String username) {
                 // 被删除时回调此方法
+                BroadcastBean.sendBroadcastSerializable(Utils.getApp(), BroadcastBean.EaseMobCommand.onContactDeleted, username);
             }
 
 
             @Override
             public void onContactAdded(String username) {
                 // 增加了联系人时回调此方法
+                BroadcastBean.sendBroadcastSerializable(Utils.getApp(), BroadcastBean.EaseMobCommand.onContactAdded, username);
             }
         });
     }

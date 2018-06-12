@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
-import com.renyu.easemoblibrary.manager.EMMessageManager;
+import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.adapter.ChatListAdapter;
 

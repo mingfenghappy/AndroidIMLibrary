@@ -21,8 +21,8 @@ class ChatListActivity : BaseChatListActivity(), ChatListFragment.OnHeaderViewSe
         val textView = TextView(this)
         textView.text = "联系人"
         textView.setOnClickListener { _ ->
-            //            val intent = Intent(this, FriendListActivity::class.java)
-//            startActivity(intent)
+            val intent = Intent(this, FriendListActivity::class.java)
+            startActivity(intent)
         }
         findViewById<LinearLayout>(R.id.layout_nav_right).addView(textView)
 

@@ -1,4 +1,4 @@
-package com.renyu.easemoblibrary;
+package com.renyu.easemobuilibrary.utils;
 
 import android.app.Application;
 import android.content.Context;
@@ -10,7 +10,7 @@ import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
-import com.renyu.easemoblibrary.model.BroadcastBean;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 
 public class EaseMobUtils {
 
@@ -18,10 +18,11 @@ public class EaseMobUtils {
      * 配置环信基础选项
      * @return
      */
-    public static void initChatOptions(Application application){
+    public static void initChatOptions(Application application, String appKey){
         EMOptions options = new EMOptions();
+        options.setAppKey(appKey);
         // 默认添加好友时，是不需要验证的，改成需要验证
-        options.setAcceptInvitationAlways(false);
+//        options.setAcceptInvitationAlways(false);
         // 设置是否需要发送已读回执
         options.setRequireAck(true);
         // 设置是否需要接受方送达确认,默认false

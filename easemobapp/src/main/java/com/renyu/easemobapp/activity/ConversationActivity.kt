@@ -1,6 +1,8 @@
 package com.renyu.easemobapp.activity
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -8,6 +10,7 @@ import com.renyu.commonlibrary.impl.OnPermissionCheckedImpl
 import com.renyu.commonlibrary.views.permission.PermissionActivity
 import com.renyu.easemobapp.R
 import com.renyu.easemobuilibrary.activity.BaseConversationActivity
+import com.renyu.easemobuilibrary.activity.UserDetailActivity
 
 /**
  * 涉及到会话详情的可以参考此类的写法
@@ -27,9 +30,9 @@ class ConversationActivity : BaseConversationActivity() {
         val textView = TextView(this@ConversationActivity)
         textView.text = "个人信息"
         textView.setOnClickListener { _ ->
-//            val intent = Intent(this@ConversationActivity, UserDetailActivity::class.java)
-//            intent.putExtra("UserId", chatUserId)
-//            startActivity(intent)
+            val intent = Intent(this@ConversationActivity, UserDetailActivity::class.java)
+            intent.putExtra("UserId", chatUserId)
+            startActivityForResult(intent, 100)
         }
         layout_nav_right = findViewById(R.id.layout_nav_right)
         layout_nav_right?.addView(textView)
@@ -44,6 +47,13 @@ class ConversationActivity : BaseConversationActivity() {
 
                 }
             })
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
+            finish()
         }
     }
 }

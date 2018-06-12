@@ -3,7 +3,7 @@ package com.renyu.easemobuilibrary.activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.renyu.easemoblibrary.model.BroadcastBean
+import com.renyu.easemobuilibrary.model.BroadcastBean
 import com.renyu.easemobuilibrary.base.BaseIMActivity
 import com.renyu.easemobuilibrary.fragment.ChatListFragment
 import com.renyu.easemobuilibrary.params.CommonParams

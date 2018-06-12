@@ -30,7 +30,7 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.chat.EMVideoMessageBody;
 import com.hyphenate.chat.EMVoiceMessageBody;
-import com.renyu.easemoblibrary.manager.EMMessageManager;
+import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.activity.BaseConversationActivity;
 import com.renyu.easemobuilibrary.params.CommonParams;
