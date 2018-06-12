@@ -24,9 +24,6 @@ import java.util.Map;
 
 public class EMMessageManager {
 
-    static final String KEY_DING_ACK = "EMDingMessageAck";
-    static final String KEY_CONVERSATION_ID = "EMConversationID";
-
     /**
      * 文本消息
      * @param content 消息文字内容
@@ -114,15 +111,7 @@ public class EMMessageManager {
             } catch (HyphenateException e) {
                 e.printStackTrace();
             }
-            return;
         }
-        EMMessage msg = EMMessage.createSendMessage(EMMessage.Type.CMD);
-        msg.setTo(message.getFrom());
-        msg.setAttribute(KEY_CONVERSATION_ID, message.getTo());
-        msg.setAttribute(KEY_DING_ACK, true);
-        msg.addBody(new EMCmdMessageBody(message.getMsgId()));
-        EMClient.getInstance().chatManager().sendMessage(msg);
-        message.setAcked(true);
     }
 
     public static void sendSingleMessage(Context context, EMMessage emMessage) {
@@ -421,7 +410,15 @@ public class EMMessageManager {
         EMClient.getInstance().chatManager().loadAllConversations();
     }
 
-    static List<String> sendingMessages = Collections.synchronizedList(new ArrayList<String>());
+    /**
+     * 获取指定ID 的消息对象
+     * @param msgId
+     */
+    public static EMMessage getMessage(String msgId) {
+        return EMClient.getInstance().chatManager().getMessage(msgId);
+    }
+
+    private static List<String> sendingMessages = Collections.synchronizedList(new ArrayList<String>());
 
     /**
      * 添加正在发送消息

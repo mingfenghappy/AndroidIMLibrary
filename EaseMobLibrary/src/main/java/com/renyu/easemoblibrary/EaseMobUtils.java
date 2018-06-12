@@ -22,10 +22,10 @@ public class EaseMobUtils {
         EMOptions options = new EMOptions();
         // 默认添加好友时，是不需要验证的，改成需要验证
         options.setAcceptInvitationAlways(false);
-        // 设置是否需要接受方已读确认
+        // 设置是否需要发送已读回执
         options.setRequireAck(true);
         // 设置是否需要接受方送达确认,默认false
-        options.setRequireDeliveryAck(false);
+        options.setRequireDeliveryAck(true);
 
         EMClient.getInstance().init(application, options);
     }

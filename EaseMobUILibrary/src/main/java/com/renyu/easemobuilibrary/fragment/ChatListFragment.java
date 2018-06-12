@@ -9,10 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
+import com.renyu.easemoblibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.adapter.ChatListAdapter;
 
@@ -83,7 +83,7 @@ public class ChatListFragment extends BaseFragment {
     }
 
     private void loadConversationList() {
-        Map<String, EMConversation> conversations = EMClient.getInstance().chatManager().getAllConversations();
+        Map<String, EMConversation> conversations = EMMessageManager.getAllConversations();
         List<Pair<Long, EMConversation>> sortList = new ArrayList<>();
         synchronized (conversations) {
             for (EMConversation conversation : conversations.values()) {

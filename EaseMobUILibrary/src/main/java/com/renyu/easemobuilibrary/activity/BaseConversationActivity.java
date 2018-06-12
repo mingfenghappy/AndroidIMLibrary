@@ -81,7 +81,9 @@ public class BaseConversationActivity extends BaseIMActivity {
 
         messageBeens=new ArrayList<>();
 
+        // 初始化第一页消息
         initMessages();
+
         rv_conversation = findViewById(R.id.rv_conversation);
         rv_conversation.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -206,6 +208,9 @@ public class BaseConversationActivity extends BaseIMActivity {
                     if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.MessageReceive) {
                         EMMessage emMessage = intent.getParcelableExtra(BroadcastBean.PARCELABLE);
                         if (emMessage.getFrom().equals(chatUserId)) {
+                            // 发送已读回执
+                            EMMessageManager.sendAckMessage(emMessage);
+
                             // 设置当前聊天人的消息已读
                             EMMessageManager.markAllMessagesAsRead(chatUserId);
                             BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.UpdateRead);
@@ -318,6 +323,33 @@ public class BaseConversationActivity extends BaseIMActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==1000 && resultCode==RESULT_OK) {
+            ArrayList<String> temp=data.getExtras().getStringArrayList("choiceImages");
+            File file=null;
+            if (temp.size()>0) {
+                file=new File(temp.get(0));
+            }
+            // 选择的是当前项目Cache目录下的图片
+            if (file.getParentFile().getPath().equals(InitParams.CACHE_PATH)) {
+                Toast.makeText(this, "图片选择有误", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            File cropFile = compress(file);
+            if (cropFile!=null) {
+                sendPicMessage(cropFile);
+            }
+        }
+        else if (requestCode == 1001 && resultCode == RESULT_OK) {
+            File cropFile = compress(new File(data.getExtras().getString("path")));
+            if (cropFile!=null) {
+                sendPicMessage(cropFile);
+            }
+        }
+    }
+
+    @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // 点击返回键的时候，如果面板开着，则隐藏面板
         if (event.getAction() == KeyEvent.ACTION_UP && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
@@ -329,15 +361,18 @@ public class BaseConversationActivity extends BaseIMActivity {
         return super.dispatchKeyEvent(event);
     }
 
+    /**
+     * 初始化pagesize个消息
+     */
     private void initMessages() {
         this.messageBeens.clear();
         List<EMMessage> msgs = EMMessageManager.getAllMessages(chatUserId);
         checkCreateAndInProgress(msgs);
         this.messageBeens.addAll(msgs);
-        int msgCount = msgs != null ? msgs.size() : 0;
+        int msgCount = msgs.size();
         if (msgCount < pagesize) {
             String msgId = null;
-            if (msgs != null && msgs.size() > 0) {
+            if (msgs.size() > 0) {
                 msgId = msgs.get(0).getMsgId();
             }
             List<EMMessage> msgs2 = EMMessageManager.getConversationByStartMsgId(chatUserId, msgId, pagesize - msgCount);
@@ -464,33 +499,6 @@ public class BaseConversationActivity extends BaseIMActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==1000 && resultCode==RESULT_OK) {
-            ArrayList<String> temp=data.getExtras().getStringArrayList("choiceImages");
-            File file=null;
-            if (temp.size()>0) {
-                file=new File(temp.get(0));
-            }
-            // 选择的是当前项目Cache目录下的图片
-            if (file.getParentFile().getPath().equals(InitParams.CACHE_PATH)) {
-                Toast.makeText(this, "图片选择有误", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            File cropFile = compress(file);
-            if (cropFile!=null) {
-                sendPicMessage(cropFile);
-            }
-        }
-        else if (requestCode == 1001 && resultCode == RESULT_OK) {
-            File cropFile = compress(new File(data.getExtras().getString("path")));
-            if (cropFile!=null) {
-                sendPicMessage(cropFile);
-            }
-        }
-    }
-
     /**
      * 播放语音
      * @param isSend
@@ -522,26 +530,6 @@ public class BaseConversationActivity extends BaseIMActivity {
         }
     }
 
-    private File compress(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getPath(), options);
-
-        File cropFile = null;
-        try {
-            cropFile = new Compressor(getApplicationContext())
-                    .setMaxWidth(options.outWidth/2)
-                    .setMaxHeight(options.outHeight/2)
-                    .setQuality(70)
-                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
-                    .setDestinationDirectoryPath(InitParams.CACHE_PATH)
-                    .compressToFile(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return cropFile;
-    }
-
     /**
      * 发起语音聊天
      */
@@ -562,5 +550,25 @@ public class BaseConversationActivity extends BaseIMActivity {
                     .putExtra("username", chatUserId)
                     .putExtra("isComingCall", false));
         }
+    }
+
+    private File compress(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getPath(), options);
+
+        File cropFile = null;
+        try {
+            cropFile = new Compressor(getApplicationContext())
+                    .setMaxWidth(options.outWidth/2)
+                    .setMaxHeight(options.outHeight/2)
+                    .setQuality(70)
+                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .setDestinationDirectoryPath(InitParams.CACHE_PATH)
+                    .compressToFile(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return cropFile;
     }
 }
