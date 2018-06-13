@@ -34,7 +34,7 @@
             android:layout_marginStart="8dip"
             android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
             android:background="@mipmap/ic_conversation_left" >
-            <TextView
+            <com.facebook.drawee.span.SimpleDraweeSpanTextView
                 android:id="@+id/aurora_tv_msgitem_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

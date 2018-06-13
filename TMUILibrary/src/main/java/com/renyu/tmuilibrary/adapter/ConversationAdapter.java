@@ -17,6 +17,7 @@ import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.Utils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.span.SimpleDraweeSpanTextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -214,6 +215,8 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         if (getItemViewType(position)==0) {
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
+            // 加载文字
+            FaceIconUtil.getInstance().replaceFaceMsgByFresco(((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message, messages.get(position).getMsg());
             ((ReceiverTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
             // 判断显示用户昵称还是userId
             if (!userNickName.equals("")) {
@@ -229,8 +232,6 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
             }
-            // 加载文字
-            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
         }
         else if (getItemViewType(position)==1) {
             ((ReceiverImageViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
@@ -318,9 +319,9 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         }
         else if (getItemViewType(position)==3) {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getTimestamp()));
+            // 加载文字
+            FaceIconUtil.getInstance().replaceFaceMsgByFresco(((SendTextViewHolder) holder).aurora_tv_msgitem_message, messages.get(position).getMsg());
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
-            ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(messages.get(position).getMsg()));
-
             ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).getSvrMsgId()+"_status");
             // 不需要重发则不显示图标
             if (messages.get(position).getResend()== Enums.Enable.DISABLE) {
@@ -505,7 +506,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         TextView aurora_tv_msgitem_date;
         SimpleDraweeView aurora_iv_msgitem_avatar;
         TextView aurora_tv_msgitem_display_name;
-        TextView aurora_tv_msgitem_message;
+        SimpleDraweeSpanTextView aurora_tv_msgitem_message;
 
         ReceiverTextViewHolder(View itemView) {
             super(itemView);
@@ -560,7 +561,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         SimpleDraweeView aurora_iv_msgitem_avatar;
         ImageView aurora_iv_msgitem_send_status;
         ProgressBar aurora_iv_msgitem_send_progress_bar;
-        TextView aurora_tv_msgitem_message;
+        SimpleDraweeSpanTextView aurora_tv_msgitem_message;
 
         SendTextViewHolder(View itemView) {
             super(itemView);

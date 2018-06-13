@@ -1,6 +1,10 @@
 package com.renyu.easemobuilibrary.utils;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -8,6 +12,14 @@ import android.text.style.ImageSpan;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.Utils;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.interfaces.DraweeHierarchy;
+import com.facebook.drawee.span.DraweeSpan;
+import com.facebook.drawee.span.DraweeSpanStringBuilder;
+import com.facebook.drawee.span.SimpleDraweeSpanTextView;
 import com.renyu.easemobuilibrary.R;
 
 import java.lang.reflect.Field;
@@ -113,14 +125,19 @@ public class FaceIconUtil {
         return msg;
     }
 
+    /**
+     * TextView显示静态emoji表情
+     * @param msg
+     * @return
+     */
     public SpannableStringBuilder replaceFaceMsg(String msg) {
         SpannableStringBuilder builder = new SpannableStringBuilder(msg);
-        for (int i = 0; i < arr.length; i++) {
-            if (msg.contains(arr[i])) {
-                Pattern mPattern = Pattern.compile(arr[i]);
+        for (String anArr : arr) {
+            if (msg.contains(anArr)) {
+                Pattern mPattern = Pattern.compile(anArr);
                 Matcher matcher = mPattern.matcher(msg);
                 while (matcher.find()) {
-                    int resId = faceMap.get(arr[i]);
+                    int resId = faceMap.get(anArr);
                     Drawable mdrawable = Utils.getApp().getResources().getDrawable(resId);
                     mdrawable.setBounds(0, 0, SizeUtils.dp2px(18), SizeUtils.dp2px(18));
                     ImageSpan span = new ImageSpan(mdrawable, ImageSpan.ALIGN_BOTTOM);
@@ -129,5 +146,47 @@ public class FaceIconUtil {
             }
         }
         return builder;
+    }
+
+    /**
+     * 基于fresco的TextView显示动态emoji表情解决方案
+     * @param simpleDraweeSpanTextView
+     * @param msg
+     */
+    public void replaceFaceMsgByFresco(SimpleDraweeSpanTextView simpleDraweeSpanTextView, String msg) {
+        Context context = simpleDraweeSpanTextView.getContext();
+
+        DraweeSpanStringBuilder draweeSpanStringBuilder = new DraweeSpanStringBuilder(msg);
+
+        for (String anArr : arr) {
+            if (msg.contains(anArr)) {
+                Pattern mPattern = Pattern.compile(anArr);
+                Matcher matcher = mPattern.matcher(msg);
+                while (matcher.find()) {
+                    int resId = faceMap.get(anArr);
+                    DraweeHierarchy draweeAnimatedHierarchy =
+                            GenericDraweeHierarchyBuilder.newInstance(context.getResources())
+                                    .setPlaceholderImage(new ColorDrawable(Color.TRANSPARENT))
+                                    .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
+                                    .build();
+                    DraweeController animatedController =
+                            Fresco.newDraweeControllerBuilder()
+                                    .setUri(Uri.parse("res:///"+resId))
+                                    .setAutoPlayAnimations(true)
+                                    .build();
+                    draweeSpanStringBuilder.setImageSpan(
+                            context,
+                            draweeAnimatedHierarchy,
+                            animatedController,
+                            matcher.start(),
+                            matcher.end()-1,
+                            SizeUtils.dp2px(18),
+                            SizeUtils.dp2px(18),
+                            false,
+                            DraweeSpan.ALIGN_CENTER);
+                }
+            }
+        }
+        simpleDraweeSpanTextView.setDraweeSpanStringBuilder(draweeSpanStringBuilder);
     }
 }

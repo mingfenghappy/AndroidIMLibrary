@@ -19,6 +19,7 @@ import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.Utils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.span.SimpleDraweeSpanTextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -171,7 +172,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         if (getItemViewType(position)==0) {
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
             ((ReceiverTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
-            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(((EMTextMessageBody) messages.get(position).getBody()).getMessage()));
+            FaceIconUtil.getInstance().replaceFaceMsgByFresco(((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message, ((EMTextMessageBody) messages.get(position).getBody()).getMessage());
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setText(messages.get(position).getFrom());
             // 如果是群组则显示用户昵称或者userId
             if (isGroup) {
@@ -184,7 +185,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         else if (getItemViewType(position)==1) {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
-            ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(((EMTextMessageBody) messages.get(position).getBody()).getMessage()));
+            FaceIconUtil.getInstance().replaceFaceMsgByFresco(((SendTextViewHolder) holder).aurora_tv_msgitem_message, ((EMTextMessageBody) messages.get(position).getBody()).getMessage());
             ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).localTime()+"_status");
             ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).localTime()+"_pb");
 
@@ -464,7 +465,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         TextView aurora_tv_msgitem_date;
         SimpleDraweeView aurora_iv_msgitem_avatar;
         TextView aurora_tv_msgitem_display_name;
-        TextView aurora_tv_msgitem_message;
+        SimpleDraweeSpanTextView aurora_tv_msgitem_message;
 
         ReceiverTextViewHolder(View itemView) {
             super(itemView);
@@ -519,7 +520,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         SimpleDraweeView aurora_iv_msgitem_avatar;
         ImageView aurora_iv_msgitem_send_status;
         ProgressBar aurora_iv_msgitem_send_progress_bar;
-        TextView aurora_tv_msgitem_message;
+        SimpleDraweeSpanTextView aurora_tv_msgitem_message;
 
         SendTextViewHolder(View itemView) {
             super(itemView);
