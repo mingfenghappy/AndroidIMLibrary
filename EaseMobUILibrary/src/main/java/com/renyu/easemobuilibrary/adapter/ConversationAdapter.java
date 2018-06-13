@@ -34,6 +34,7 @@ import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.activity.BaseConversationActivity;
 import com.renyu.easemobuilibrary.params.CommonParams;
+import com.renyu.easemobuilibrary.utils.FaceIconUtil;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -170,6 +171,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         if (getItemViewType(position)==0) {
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
             ((ReceiverTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
+            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(((EMTextMessageBody) messages.get(position).getBody()).getMessage()));
             ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setText(messages.get(position).getFrom());
             // 如果是群组则显示用户昵称或者userId
             if (isGroup) {
@@ -178,12 +180,11 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             else {
                 ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_display_name.setVisibility(View.GONE);
             }
-            ((ReceiverTextViewHolder) holder).aurora_tv_msgitem_message.setText(((EMTextMessageBody) messages.get(position).getBody()).getMessage());
         }
         else if (getItemViewType(position)==1) {
             ((SendTextViewHolder) holder).aurora_tv_msgitem_date.setText(getFriendlyTimeSpanByNow(messages.get(position).getMsgTime()));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_avatar.setController(draweeController);
-            ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(((EMTextMessageBody) messages.get(position).getBody()).getMessage());
+            ((SendTextViewHolder) holder).aurora_tv_msgitem_message.setText(FaceIconUtil.getInstance().replaceFaceMsg(((EMTextMessageBody) messages.get(position).getBody()).getMessage()));
             ((SendTextViewHolder) holder).aurora_iv_msgitem_send_status.setTag(messages.get(position).localTime()+"_status");
             ((SendTextViewHolder) holder).aurora_iv_msgitem_send_progress_bar.setTag(messages.get(position).localTime()+"_pb");
 

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -27,12 +28,14 @@ import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.exceptions.HyphenateException;
 import com.renyu.commonlibrary.params.InitParams;
+import com.renyu.easemobuilibrary.adapter.FaceAdapter;
 import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.adapter.ConversationAdapter;
 import com.renyu.easemobuilibrary.base.BaseIMActivity;
 import com.renyu.easemobuilibrary.params.CommonParams;
+import com.renyu.easemobuilibrary.utils.FaceIconUtil;
 import com.renyu.easemobuilibrary.view.DetectDelEventEditText;
 import com.renyu.easemobuilibrary.view.VoiceRecorderView;
 
@@ -57,6 +60,7 @@ public class BaseConversationActivity extends BaseIMActivity {
     View layout_voicechoice;
     View layout_emojichoice;
     RecyclerView rv_panel_content;
+    FaceAdapter faceAdapter;
     VoiceRecorderView layout_record;
 
     ArrayList<EMMessage> messageBeens;
@@ -152,6 +156,31 @@ public class BaseConversationActivity extends BaseIMActivity {
         });
         edit_conversation.setDelListener(() -> {
             // 点击删除键
+            String value = edit_conversation.getText().toString();
+            if (value.equals("")) {
+                return true;
+            }
+            int end = value.lastIndexOf("]");
+            // 如果最后一个字符是]，则进入表情判断
+            if (end == value.length()-1) {
+                int start = value.lastIndexOf("[");
+                String temp_ = value.substring(start+1, end);
+                String[] faceids = getResources().getStringArray(R.array.faceid);
+                boolean isEmoji = false;
+                for (String faceid : faceids) {
+                    if (faceid.equals(temp_)) {
+                        isEmoji = true;
+                        break;
+                    }
+                }
+                if (isEmoji) {
+                    edit_conversation.getText().delete(value.length()-(end+1-start), value.length());
+                    edit_conversation.setSelection(value.length()-(end+1-start));
+                    return true;
+                }
+            }
+            edit_conversation.getText().delete(value.length()-1, value.length());
+            edit_conversation.setSelection(value.length()-1);
             return true;
         });
         layout_voicechoice=kp_panel_root.findViewById(R.id.layout_voicechoice);
@@ -170,6 +199,14 @@ public class BaseConversationActivity extends BaseIMActivity {
                     });
         });
         layout_emojichoice=kp_panel_root.findViewById(R.id.layout_emojichoice);
+        faceAdapter = new FaceAdapter(this, (value, res) -> {
+            int currentPosition = edit_conversation.getSelectionStart();
+            edit_conversation.getText().insert(currentPosition, FaceIconUtil.getInstance().getEmojiSpannableString(value, res));
+        });
+        rv_panel_content = layout_emojichoice.findViewById(R.id.rv_panel_content);
+        rv_panel_content.setHasFixedSize(true);
+        rv_panel_content.setLayoutManager(new GridLayoutManager(this, 7));
+        rv_panel_content.setAdapter(faceAdapter);
         KeyboardUtil.attach(this, kp_panel_root, isShowing -> {
             if (isShowing) {
                 rv_conversation.scrollToPosition(messageBeens.size()-1);
@@ -409,7 +446,7 @@ public class BaseConversationActivity extends BaseIMActivity {
             return;
         }
         // 刷新列表
-        EMMessage message = EMMessageManager.prepareTxtEMMessage(edit_conversation.getText().toString(), chatUserId);
+        EMMessage message = EMMessageManager.prepareTxtEMMessage(FaceIconUtil.getInstance().replaceAddBounce(edit_conversation.getText().toString()), chatUserId);
         messageBeens.add(message);
         adapter.notifyItemInserted(messageBeens.size()-1);
         // 移动列表位置

@@ -32,6 +32,7 @@ import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.params.CommonParams;
+import com.renyu.easemobuilibrary.utils.FaceIconUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
                 messages.get(position).getFrom();
         holder.tv_adapter_conversationlist_name.setText(uid);
         if (messages.get(position).getBody() instanceof EMTextMessageBody) {
-            holder.tv_adapter_conversationlist_msg.setText(((EMTextMessageBody) messages.get(position).getBody()).getMessage());
+            holder.tv_adapter_conversationlist_msg.setText(FaceIconUtil.getInstance().replaceFaceMsg(((EMTextMessageBody) messages.get(position).getBody()).getMessage()));
         }
         else if (messages.get(position).getBody() instanceof EMImageMessageBody) {
             holder.tv_adapter_conversationlist_msg.setText("[图片]");

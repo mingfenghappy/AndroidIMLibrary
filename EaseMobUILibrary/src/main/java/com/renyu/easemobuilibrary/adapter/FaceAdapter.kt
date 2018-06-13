@@ -1,12 +1,12 @@
-package com.renyu.tmuilibrary.adapter
+package com.renyu.easemobuilibrary.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.renyu.tmbaseuilibrary.utils.FaceIconUtil
-import com.renyu.tmuilibrary.R
+import com.renyu.easemobuilibrary.R
+import com.renyu.easemobuilibrary.utils.FaceIconUtil
 import kotlinx.android.synthetic.main.adapter_face.view.*
 import org.jetbrains.anko.imageResource
 
