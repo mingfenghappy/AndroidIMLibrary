@@ -14,6 +14,11 @@ abstract class BaseFriendListActivity : BaseIMActivity() {
     @JvmField var friendListFragment: FriendListFragment? = null
 
     override fun initParams() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (checkNullInfo()) {
+            return
+        }
+
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == actionName) {

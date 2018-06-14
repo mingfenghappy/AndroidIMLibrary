@@ -33,6 +33,26 @@ class SplashActivity : BaseActivity() {
     }
 
     override fun initParams() {
+        if (CommonParams.isKickout) {
+            CommonParams.isKickout = false
+            // 重置回收标志位
+            CommonParams.isRestore = false
+
+            val clazz = Class.forName("com.renyu.easemobapp.params.InitParams")
+            // 加载自定义的踢下线方法
+            val kickoutFuncMethod = clazz.getDeclaredMethod("kickoutFunc")
+            kickoutFuncMethod.invoke(null)
+
+            startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
+            return
+        }
+
+        // 发生回收，若执行返回操作则执行页面关闭
+        if (CommonParams.isRestore) {
+            finish()
+            return
+        }
+
         if (Build.VERSION_CODES.M <= Build.VERSION.SDK_INT) {
             PermissionActivity.gotoActivity(this, permissions, "请授予SD卡读写权限与定位权限", object : OnPermissionCheckedImpl {
                 override fun denied() {

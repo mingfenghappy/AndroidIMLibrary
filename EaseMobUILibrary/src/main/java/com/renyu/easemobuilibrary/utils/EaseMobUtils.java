@@ -1,7 +1,6 @@
 package com.renyu.easemobuilibrary.utils;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import com.hyphenate.EMCallBack;
@@ -50,6 +49,7 @@ public class EaseMobUtils {
                         break;
                     case EMError.USER_LOGIN_ANOTHER_DEVICE:
                         // 账户在另外一台设备登录
+                        BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.Kickout);
                         break;
                     case EMError.USER_KICKED_BY_CHANGE_PASSWORD:
                         // 用户修改密码
@@ -70,16 +70,16 @@ public class EaseMobUtils {
      * @param id
      * @param password
      */
-    public static void login(Context context, String id, String password) {
+    public static void login(String id, String password) {
         EMClient.getInstance().login(id, password, new EMCallBack() {
             @Override
             public void onSuccess() {
-                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.LoginRsp);
+                BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.LoginRsp);
             }
 
             @Override
             public void onError(int code, String error) {
-                BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.LoginRspERROR);
+                BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.LoginRspERROR);
             }
 
             @Override

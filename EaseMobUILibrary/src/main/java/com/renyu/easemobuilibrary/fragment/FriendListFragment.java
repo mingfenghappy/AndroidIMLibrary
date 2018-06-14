@@ -53,7 +53,7 @@ public class FriendListFragment extends BaseFragment {
     @Override
     public void loadData() {
         // 加载好友列表
-        ContactManager.aysncGetAllContactsFromServer(Utils.getApp());
+        ContactManager.aysncGetAllContactsFromServer();
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.renyu.easemobuilibrary.manager;
 
-import android.content.Context;
 import android.util.Log;
 
+import com.blankj.utilcode.util.Utils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -120,28 +120,28 @@ public class EMMessageManager {
         }
     }
 
-    public static void sendSingleMessage(Context context, EMMessage emMessage) {
-        sendMessage(context, emMessage, null, null);
+    public static void sendSingleMessage(EMMessage emMessage) {
+        sendMessage(emMessage, null, null);
     }
 
-    public static void sendSingleMessage(Context context, EMMessage emMessage, HashMap<String, Object> attributes) {
-        sendMessage(context, emMessage, null, attributes);
+    public static void sendSingleMessage(EMMessage emMessage, HashMap<String, Object> attributes) {
+        sendMessage(emMessage, null, attributes);
     }
 
-    public static void sendGroupMessage(Context context, EMMessage emMessage) {
-        sendMessage(context, emMessage, EMMessage.ChatType.GroupChat, null);
+    public static void sendGroupMessage(EMMessage emMessage) {
+        sendMessage(emMessage, EMMessage.ChatType.GroupChat, null);
     }
 
-    public static void sendGroupMessage(Context context, EMMessage emMessage, HashMap<String, Object> attributes) {
-        sendMessage(context, emMessage, EMMessage.ChatType.GroupChat, attributes);
+    public static void sendGroupMessage(EMMessage emMessage, HashMap<String, Object> attributes) {
+        sendMessage(emMessage, EMMessage.ChatType.GroupChat, attributes);
     }
 
-    public static void sendChatRoomMessage(Context context, EMMessage emMessage) {
-        sendMessage(context, emMessage, EMMessage.ChatType.ChatRoom, null);
+    public static void sendChatRoomMessage(EMMessage emMessage) {
+        sendMessage(emMessage, EMMessage.ChatType.ChatRoom, null);
     }
 
-    public static void sendChatRoomMessage(Context context, EMMessage emMessage, HashMap<String, Object> attributes) {
-        sendMessage(context, emMessage, EMMessage.ChatType.ChatRoom, attributes);
+    public static void sendChatRoomMessage(EMMessage emMessage, HashMap<String, Object> attributes) {
+        sendMessage(emMessage, EMMessage.ChatType.ChatRoom, attributes);
     }
 
     /**
@@ -150,7 +150,7 @@ public class EMMessageManager {
      * @param chatType 如果是群聊，设置chattype，默认是单聊
      * @param attributes 扩展消息
      */
-    private static void sendMessage(final Context context, EMMessage message, EMMessage.ChatType chatType, HashMap<String, Object> attributes) {
+    private static void sendMessage(EMMessage message, EMMessage.ChatType chatType, HashMap<String, Object> attributes) {
         if (attributes != null && attributes.size() > 0) {
             Iterator<Map.Entry<String, Object>> iterator = attributes.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -183,7 +183,7 @@ public class EMMessageManager {
             message.setChatType(chatType);
         }
 
-        registerMessageStatusCallback(context, message);
+        registerMessageStatusCallback(message);
 
         EMClient.getInstance().chatManager().sendMessage(message);
     }
@@ -192,7 +192,7 @@ public class EMMessageManager {
      * 监听消息发送状态
      * @param message 消息体
      */
-    private static void registerMessageStatusCallback(final Context context, final EMMessage message) {
+    private static void registerMessageStatusCallback(final EMMessage message) {
         message.setMessageStatusCallback(new EMCallBack() {
             @Override
             public void onSuccess() {
@@ -200,7 +200,7 @@ public class EMMessageManager {
                 message.setMsgTime(message.localTime());
                 // 修改文件发送状态
                 message.setStatus(EMMessage.Status.SUCCESS);
-                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageSend, message);
+                BroadcastBean.sendBroadcastParcelable(BroadcastBean.EaseMobCommand.MessageSend, message);
 
                 EMMessageManager.removeSendingMessage(message.getMsgId());
             }
@@ -211,7 +211,7 @@ public class EMMessageManager {
                 message.setMsgTime(message.localTime());
                 // 修改文件发送状态
                 message.setStatus(EMMessage.Status.FAIL);
-                BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageSend, message);
+                BroadcastBean.sendBroadcastParcelable(BroadcastBean.EaseMobCommand.MessageSend, message);
 
                 EMMessageManager.removeSendingMessage(message.getMsgId());
             }
@@ -225,7 +225,7 @@ public class EMMessageManager {
     /**
      * 设置消息监听
      */
-    public static void registerMessageListener(Context context) {
+    public static void registerMessageListener() {
         EMClient.getInstance().chatManager().addMessageListener(new EMMessageListener() {
             @Override
             public void onMessageRead(List<EMMessage> messages) {
@@ -249,23 +249,23 @@ public class EMMessageManager {
                 // 收到消息
                 Log.d("EaseMobUtils", "onMessageReceived");
                 for (EMMessage message : messages) {
-                    BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
+                    BroadcastBean.sendBroadcastParcelable(BroadcastBean.EaseMobCommand.MessageReceive, message);
 
                     // 发送通知
                     if (message.getBody() instanceof EMTextMessageBody) {
                         CommonUtils.playNewMessage(message.getFrom()+":"+((EMTextMessageBody) message.getBody()).getMessage(),
                                 message.getFrom(), ((EMTextMessageBody) message.getBody()).getMessage(),
-                                R.raw.ring_user_message_high, ((EaseMobApplication) context).getNotificationIntent(message.getFrom()));
+                                R.raw.ring_user_message_high, ((EaseMobApplication) Utils.getApp()).getNotificationIntent(message.getFrom()));
                     }
                     else if (message.getBody() instanceof EMVoiceMessageBody) {
                         CommonUtils.playNewMessage(message.getFrom()+":[语音]",
                                 message.getFrom(), "[语音]",
-                                R.raw.ring_user_message_high, ((EaseMobApplication) context).getNotificationIntent(message.getFrom()));
+                                R.raw.ring_user_message_high, ((EaseMobApplication) Utils.getApp()).getNotificationIntent(message.getFrom()));
                     }
                     else if (message.getBody() instanceof EMImageMessageBody) {
                         CommonUtils.playNewMessage(message.getFrom()+":[图片]",
                                 message.getFrom(), "[图片]",
-                                R.raw.ring_user_message_high, ((EaseMobApplication) context).getNotificationIntent(message.getFrom()));
+                                R.raw.ring_user_message_high, ((EaseMobApplication) Utils.getApp()).getNotificationIntent(message.getFrom()));
                     }
                 }
             }

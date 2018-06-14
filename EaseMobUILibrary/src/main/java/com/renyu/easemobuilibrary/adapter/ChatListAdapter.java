@@ -28,9 +28,9 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.chat.EMVideoMessageBody;
 import com.hyphenate.chat.EMVoiceMessageBody;
+import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.model.BroadcastBean;
-import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.utils.FaceIconUtil;
 
@@ -102,7 +102,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.Conver
         holder.layout_adapter_conversationlist.setOnClickListener(view -> {
             // 设置当前会话列表消息均已读
             EMMessageManager.markAllMessagesAsRead(uid);
-            BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.UpdateRead);
+            BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.UpdateRead);
 
             try {
                 Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");

@@ -16,7 +16,6 @@ import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.blankj.utilcode.util.Utils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.span.SimpleDraweeSpanTextView;
@@ -31,9 +30,9 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.chat.EMVideoMessageBody;
 import com.hyphenate.chat.EMVoiceMessageBody;
-import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.activity.BaseConversationActivity;
+import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.utils.FaceIconUtil;
 
@@ -210,7 +209,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 发送失败则通过点击进行重新发送
                 EMMessage temp = messages.get(position);
                 temp.setStatus(EMMessage.Status.INPROGRESS);
-                EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
+                EMMessageManager.sendSingleMessage(temp);
                 notifyItemChanged(position);
             });
         }
@@ -253,7 +252,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 发送失败则通过点击进行重新发送
                 EMMessage temp = messages.get(position);
                 temp.setStatus(EMMessage.Status.INPROGRESS);
-                EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
+                EMMessageManager.sendSingleMessage(temp);
                 notifyItemChanged(position);
             });
 
@@ -355,7 +354,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
                 // 发送失败则通过点击进行重新发送
                 EMMessage temp = messages.get(position);
                 temp.setStatus(EMMessage.Status.INPROGRESS);
-                EMMessageManager.sendSingleMessage(Utils.getApp(), temp);
+                EMMessageManager.sendSingleMessage(temp);
                 notifyItemChanged(position);
             });
 

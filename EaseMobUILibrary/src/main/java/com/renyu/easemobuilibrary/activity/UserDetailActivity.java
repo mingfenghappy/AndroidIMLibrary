@@ -35,6 +35,11 @@ public class UserDetailActivity extends BaseIMActivity {
 
     @Override
     public void initParams() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (checkNullInfo()) {
+            return;
+        }
+
         btn_userdetail_delete = findViewById(R.id.btn_userdetail_delete);
         btn_userdetail_delete.setOnClickListener(v -> ContactManager.deleteContact(getIntent().getStringExtra("UserId")));
         btn_userdetail_add = findViewById(R.id.btn_userdetail_add);

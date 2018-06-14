@@ -1,8 +1,9 @@
 package com.renyu.easemobuilibrary.model;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
+
+import com.blankj.utilcode.util.Utils;
 
 import java.io.Serializable;
 
@@ -28,11 +29,11 @@ public class BroadcastBean {
         onContactAdded
     }
 
-    public static void sendBroadcast(Context context, EaseMobCommand command) {
-        sendBroadcastParcelable(context, command, null);
+    public static void sendBroadcast(EaseMobCommand command) {
+        sendBroadcastParcelable(command, null);
     }
 
-    public static void sendBroadcastParcelable(Context context, EaseMobCommand command, Parcelable parcelable) {
+    public static void sendBroadcastParcelable(EaseMobCommand command, Parcelable parcelable) {
         String actionName = "";
         try {
             Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
@@ -47,10 +48,10 @@ public class BroadcastBean {
             intent.putExtra(PARCELABLE, parcelable);
         }
         intent.setAction(actionName);
-        context.sendBroadcast(intent);
+        Utils.getApp().sendBroadcast(intent);
     }
 
-    public static void sendBroadcastSerializable(Context context, EaseMobCommand command, Serializable serializable) {
+    public static void sendBroadcastSerializable(EaseMobCommand command, Serializable serializable) {
         String actionName = "";
         try {
             Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");
@@ -65,6 +66,6 @@ public class BroadcastBean {
             intent.putExtra(SERIALIZABLE, serializable);
         }
         intent.setAction(actionName);
-        context.sendBroadcast(intent);
+        Utils.getApp().sendBroadcast(intent);
     }
 }

@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.hyphenate.chat.EMClient;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
@@ -18,6 +19,7 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.easemobuilibrary.manager.ContactManager;
 import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.manager.GroupManager;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.receiver.CallReceiver;
 import com.renyu.easemobuilibrary.service.HeartBeatService;
@@ -121,7 +123,15 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(actionName)) {
+                    // 被踢下线
+                    if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.Kickout) {
+                        CommonParams.isKickout = true;
 
+                        // 清除缓存内容
+                        SPUtils.getInstance().remove(CommonParams.SP_UNAME);
+                        SPUtils.getInstance().remove(CommonParams.SP_PWD);
+                        Log.d("EaseMobUtils", "发生注销");
+                    }
                 }
             }
         };
@@ -145,7 +155,7 @@ public abstract class EaseMobApplication extends MultiDexApplication {
         // 设置连接状态监听
         EaseMobUtils.registerMessageListener();
         // 设置消息监听
-        EMMessageManager.registerMessageListener(this);
+        EMMessageManager.registerMessageListener();
         // 设置音视频广播监听
         IntentFilter callFilter = new IntentFilter(EMClient.getInstance().callManager().getIncomingCallBroadcastAction());
         if(callReceiver == null){

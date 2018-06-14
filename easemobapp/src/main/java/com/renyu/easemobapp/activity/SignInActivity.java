@@ -9,13 +9,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.SPUtils;
-import com.blankj.utilcode.util.Utils;
-import com.renyu.easemobapp.params.InitParams;
-import com.renyu.easemobuilibrary.utils.EaseMobUtils;
-import com.renyu.easemobuilibrary.model.BroadcastBean;
-import com.renyu.easemobuilibrary.base.BaseIMActivity;
-import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobapp.R;
+import com.renyu.easemobapp.params.InitParams;
+import com.renyu.easemobuilibrary.base.BaseIMActivity;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
+import com.renyu.easemobuilibrary.params.CommonParams;
+import com.renyu.easemobuilibrary.utils.EaseMobUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -98,7 +97,7 @@ public class SignInActivity extends BaseIMActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_signin:
-                EaseMobUtils.login(Utils.getApp(), ed_username.getText().toString(), ed_pwd.getText().toString());
+                EaseMobUtils.login(ed_username.getText().toString(), ed_pwd.getText().toString());
                 break;
         }
     }

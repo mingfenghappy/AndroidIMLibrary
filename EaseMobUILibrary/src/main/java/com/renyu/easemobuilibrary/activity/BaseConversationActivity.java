@@ -23,17 +23,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.Utils;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.exceptions.HyphenateException;
 import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.easemobuilibrary.adapter.FaceAdapter;
-import com.renyu.easemobuilibrary.manager.EMMessageManager;
-import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.R;
 import com.renyu.easemobuilibrary.adapter.ConversationAdapter;
+import com.renyu.easemobuilibrary.adapter.FaceAdapter;
 import com.renyu.easemobuilibrary.base.BaseIMActivity;
+import com.renyu.easemobuilibrary.manager.EMMessageManager;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.utils.FaceIconUtil;
 import com.renyu.easemobuilibrary.view.DetectDelEventEditText;
@@ -81,6 +80,11 @@ public class BaseConversationActivity extends BaseIMActivity {
 
     @Override
     public void initParams() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (checkNullInfo()) {
+            return;
+        }
+
         chatUserId = getIntent().getStringExtra("UserId");
 
         messageBeens=new ArrayList<>();
@@ -250,7 +254,7 @@ public class BaseConversationActivity extends BaseIMActivity {
 
                             // 设置当前聊天人的消息已读
                             EMMessageManager.markAllMessagesAsRead(chatUserId);
-                            BroadcastBean.sendBroadcast(context, BroadcastBean.EaseMobCommand.UpdateRead);
+                            BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.UpdateRead);
 
                             messageBeens.add(emMessage);
                             adapter.notifyItemInserted(messageBeens.size()-1);
@@ -351,7 +355,7 @@ public class BaseConversationActivity extends BaseIMActivity {
 
         // 设置当前会话列表消息均已读
         EMMessageManager.markAllMessagesAsRead(chatUserId);
-        BroadcastBean.sendBroadcast(getApplicationContext(), BroadcastBean.EaseMobCommand.UpdateRead);
+        BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.UpdateRead);
 
         // 关闭音频播放
         recycleMedia();
@@ -456,7 +460,7 @@ public class BaseConversationActivity extends BaseIMActivity {
         // 重置文本框
         edit_conversation.setText("");
         // 发送
-        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
+        EMMessageManager.sendSingleMessage(message);
         EMMessageManager.addSendingMessage(message.getMsgId());
     }
 
@@ -470,7 +474,7 @@ public class BaseConversationActivity extends BaseIMActivity {
             rv_conversation.scrollToPosition(messageBeens.size()-1);
         }
         // 发送
-        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
+        EMMessageManager.sendSingleMessage(message);
         EMMessageManager.addSendingMessage(message.getMsgId());
     }
 
@@ -483,7 +487,7 @@ public class BaseConversationActivity extends BaseIMActivity {
             rv_conversation.scrollToPosition(messageBeens.size()-1);
         }
         // 发送
-        EMMessageManager.sendSingleMessage(Utils.getApp(), message);
+        EMMessageManager.sendSingleMessage(message);
         EMMessageManager.addSendingMessage(message.getMsgId());
     }
 

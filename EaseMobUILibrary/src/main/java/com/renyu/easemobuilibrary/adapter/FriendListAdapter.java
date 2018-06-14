@@ -65,7 +65,7 @@ public class FriendListAdapter extends DelegateAdapter.Adapter<FriendListAdapter
         holder.layout_adapter_friendlist.setOnClickListener(view -> {
             // 设置当前会话列表消息均已读
             EMMessageManager.markAllMessagesAsRead(beans.get(position_));
-            BroadcastBean.sendBroadcast(context.getApplicationContext(), BroadcastBean.EaseMobCommand.UpdateRead);
+            BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.UpdateRead);
 
             try {
                 Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");

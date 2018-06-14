@@ -6,7 +6,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.views.dialog.ChoiceDialog;
 import com.renyu.easemobuilibrary.params.CommonParams;
@@ -93,5 +96,21 @@ public abstract class BaseIMActivity extends BaseActivity {
             });
             dialog.show(BaseIMActivity.this);
         });
+    }
+
+    /**
+     * 存在回收之后再次回收，造成下线标志位出错
+     * @return
+     */
+    public boolean checkNullInfo() {
+        // 存在回收之后再次回收，造成下线标志位出错
+        if (TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_UNAME, "")) ||
+                TextUtils.isEmpty(SPUtils.getInstance().getString(CommonParams.SP_PWD, ""))) {
+            CommonParams.isKickout = true;
+            finish();
+            Log.d("EaseMobUtils", "回退到上一页");
+            return true;
+        }
+        return false;
     }
 }

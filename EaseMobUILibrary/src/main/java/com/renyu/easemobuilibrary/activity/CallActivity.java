@@ -9,7 +9,6 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.Utils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMCallManager;
@@ -20,8 +19,8 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMMessage.Status;
 import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.exceptions.EMServiceNotReadyException;
-import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.base.BaseIMActivity;
+import com.renyu.easemobuilibrary.model.BroadcastBean;
 
 public abstract class CallActivity extends BaseIMActivity {
     protected final int MSG_CALL_MAKE_VIDEO = 0;
@@ -323,7 +322,7 @@ public abstract class CallActivity extends BaseIMActivity {
         EMClient.getInstance().chatManager().saveMessage(message);
 
         // 发送刷新广播
-        BroadcastBean.sendBroadcastParcelable(Utils.getApp(), BroadcastBean.EaseMobCommand.MessageSend, message);
+        BroadcastBean.sendBroadcastParcelable(BroadcastBean.EaseMobCommand.MessageSend, message);
     }
 
     enum CallingState {

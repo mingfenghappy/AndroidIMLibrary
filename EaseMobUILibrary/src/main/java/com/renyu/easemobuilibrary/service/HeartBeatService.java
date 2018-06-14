@@ -57,7 +57,7 @@ public class HeartBeatService extends Service {
                 boolean isConnected = EMClient.getInstance().isConnected();
                 Log.d("EaseMobUtils", "isConnected:" + isConnected);
                 if (!isConnected) {
-                    EMMessageManager.sendSingleMessage(this, EMMessageManager.prepareCMDMessage("conn", "admin"));
+                    EMMessageManager.sendSingleMessage(EMMessageManager.prepareCMDMessage("conn", "admin"));
                 }
             }, 1, 10, TimeUnit.SECONDS);
         }
