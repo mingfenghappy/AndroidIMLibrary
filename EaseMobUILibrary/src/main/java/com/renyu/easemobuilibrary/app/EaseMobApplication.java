@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
@@ -19,6 +20,8 @@ import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.manager.GroupManager;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.receiver.CallReceiver;
+import com.renyu.easemobuilibrary.service.HeartBeatService;
+import com.renyu.easemobuilibrary.utils.CommonUtils;
 import com.renyu.easemobuilibrary.utils.EaseMobUtils;
 
 import java.io.File;
@@ -99,6 +102,17 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             // 配置环信全局广播监听
             setGlobalListeners();
 
+            // 如果之前的服务已经开启，则关闭
+            if (CommonUtils.isServiceRunning("com.renyu.easemobuilibrary.service.HeartBeatService")) {
+                stopService(new Intent(this, HeartBeatService.class));
+            }
+            // 开启心跳服务并进行连接
+            if (Build.VERSION_CODES.O <= Build.VERSION.SDK_INT) {
+                startForegroundService(new Intent(this, HeartBeatService.class));
+            }
+            else {
+                startService(new Intent(this, HeartBeatService.class));
+            }
         }
     }
 
@@ -143,7 +157,6 @@ public abstract class EaseMobApplication extends MultiDexApplication {
         // 设置联系人监听
         ContactManager.setContactListener();
     }
-
 
     abstract public Intent getNotificationIntent(String userId);
 }

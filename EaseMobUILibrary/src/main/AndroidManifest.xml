@@ -28,7 +28,11 @@
             android:name=".activity.UserDetailActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
-
+        <!-- 心跳服务 -->
+        <service
+            android:name=".service.HeartBeatService"
+            android:enabled="true"
+            android:exported="false" />
         <!-- 声明sdk所需的service -->
         <service
             android:name="com.hyphenate.chat.EMChatService"

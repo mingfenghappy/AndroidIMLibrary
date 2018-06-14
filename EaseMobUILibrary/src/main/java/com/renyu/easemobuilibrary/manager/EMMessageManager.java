@@ -8,9 +8,15 @@ import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMCmdMessageBody;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMMessage;
+import com.hyphenate.chat.EMTextMessageBody;
+import com.hyphenate.chat.EMVoiceMessageBody;
 import com.hyphenate.exceptions.HyphenateException;
+import com.renyu.easemobuilibrary.R;
+import com.renyu.easemobuilibrary.app.EaseMobApplication;
 import com.renyu.easemobuilibrary.model.BroadcastBean;
+import com.renyu.easemobuilibrary.utils.CommonUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -244,6 +250,23 @@ public class EMMessageManager {
                 Log.d("EaseMobUtils", "onMessageReceived");
                 for (EMMessage message : messages) {
                     BroadcastBean.sendBroadcastParcelable(context, BroadcastBean.EaseMobCommand.MessageReceive, message);
+
+                    // 发送通知
+                    if (message.getBody() instanceof EMTextMessageBody) {
+                        CommonUtils.playNewMessage(message.getFrom()+":"+((EMTextMessageBody) message.getBody()).getMessage(),
+                                message.getFrom(), ((EMTextMessageBody) message.getBody()).getMessage(),
+                                R.raw.ring_user_message_high, ((EaseMobApplication) context).getNotificationIntent(message.getFrom()));
+                    }
+                    else if (message.getBody() instanceof EMVoiceMessageBody) {
+                        CommonUtils.playNewMessage(message.getFrom()+":[语音]",
+                                message.getFrom(), "[语音]",
+                                R.raw.ring_user_message_high, ((EaseMobApplication) context).getNotificationIntent(message.getFrom()));
+                    }
+                    else if (message.getBody() instanceof EMImageMessageBody) {
+                        CommonUtils.playNewMessage(message.getFrom()+":[图片]",
+                                message.getFrom(), "[图片]",
+                                R.raw.ring_user_message_high, ((EaseMobApplication) context).getNotificationIntent(message.getFrom()));
+                    }
                 }
             }
 
