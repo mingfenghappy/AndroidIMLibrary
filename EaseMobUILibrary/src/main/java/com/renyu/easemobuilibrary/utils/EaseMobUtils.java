@@ -3,6 +3,7 @@ package com.renyu.easemobuilibrary.utils;
 import android.app.Application;
 import android.util.Log;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMConnectionListener;
 import com.hyphenate.EMError;
@@ -10,6 +11,7 @@ import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
 import com.renyu.easemobuilibrary.model.BroadcastBean;
+import com.renyu.easemobuilibrary.params.CommonParams;
 
 public class EaseMobUtils {
 
@@ -49,6 +51,16 @@ public class EaseMobUtils {
                         break;
                     case EMError.USER_LOGIN_ANOTHER_DEVICE:
                         // 账户在另外一台设备登录
+                        CommonParams.isKickout = true;
+
+                        // 环信登出
+                        EaseMobUtils.logout();
+
+                        // 清除缓存内容
+                        SPUtils.getInstance().remove(CommonParams.SP_UNAME);
+                        SPUtils.getInstance().remove(CommonParams.SP_PWD);
+                        Log.d("EaseMobUtils", "发生注销");
+
                         BroadcastBean.sendBroadcast(BroadcastBean.EaseMobCommand.Kickout);
                         break;
                     case EMError.USER_KICKED_BY_CHANGE_PASSWORD:

@@ -1,15 +1,11 @@
 package com.renyu.easemobuilibrary.app;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 
-import com.blankj.utilcode.util.SPUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.hyphenate.chat.EMClient;
 import com.renyu.commonlibrary.commonutils.ImagePipelineConfigUtils;
@@ -19,7 +15,6 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.easemobuilibrary.manager.ContactManager;
 import com.renyu.easemobuilibrary.manager.EMMessageManager;
 import com.renyu.easemobuilibrary.manager.GroupManager;
-import com.renyu.easemobuilibrary.model.BroadcastBean;
 import com.renyu.easemobuilibrary.params.CommonParams;
 import com.renyu.easemobuilibrary.receiver.CallReceiver;
 import com.renyu.easemobuilibrary.service.HeartBeatService;
@@ -33,8 +28,6 @@ import okhttp3.OkHttpClient;
 
 public abstract class EaseMobApplication extends MultiDexApplication {
 
-    // 基础广播
-    private BroadcastReceiver baseReceiver = null;
     // 音视频广播
     private CallReceiver callReceiver = null;
 
@@ -93,12 +86,6 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             retrofit2Utils.addBaseOKHttpClient(baseBuilder.build());
             retrofit2Utils.baseBuild();
 
-            // 注册基础广播
-            if (baseReceiver == null) {
-                Log.d("MTAPP", "注册基础广播");
-                openBaseReceiver();
-            }
-
             // 环信配置
             EaseMobUtils.initChatOptions(this, appKey);
             // 配置环信全局广播监听
@@ -115,39 +102,6 @@ public abstract class EaseMobApplication extends MultiDexApplication {
             else {
                 startService(new Intent(this, HeartBeatService.class));
             }
-        }
-    }
-
-    private void openBaseReceiver() {
-        baseReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(actionName)) {
-                    // 被踢下线
-                    if (intent.getSerializableExtra(BroadcastBean.COMMAND) == BroadcastBean.EaseMobCommand.Kickout) {
-                        CommonParams.isKickout = true;
-
-                        // 清除缓存内容
-                        SPUtils.getInstance().remove(CommonParams.SP_UNAME);
-                        SPUtils.getInstance().remove(CommonParams.SP_PWD);
-                        Log.d("EaseMobUtils", "发生注销");
-                    }
-                }
-            }
-        };
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(actionName);
-        registerReceiver(baseReceiver, filter);
-    }
-
-    /**
-     * 反注册基础广播
-     */
-    private void closeBaseReceiver() {
-        if (baseReceiver != null) {
-            unregisterReceiver(baseReceiver);
-            baseReceiver = null;
         }
     }
 

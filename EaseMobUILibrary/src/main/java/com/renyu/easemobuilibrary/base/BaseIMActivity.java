@@ -40,6 +40,10 @@ public abstract class BaseIMActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            CommonParams.isRestore = true;
+        }
+
         // 广播action标志名称设置
         try {
             Class clazz = Class.forName("com.renyu.easemobapp.params.InitParams");

@@ -37,14 +37,6 @@ class SplashActivity : BaseActivity() {
             CommonParams.isKickout = false
             // 重置回收标志位
             CommonParams.isRestore = false
-
-            val clazz = Class.forName("com.renyu.easemobapp.params.InitParams")
-            // 加载自定义的踢下线方法
-            val kickoutFuncMethod = clazz.getDeclaredMethod("kickoutFunc")
-            kickoutFuncMethod.invoke(null)
-
-            startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
-            return
         }
 
         // 发生回收，若执行返回操作则执行页面关闭
@@ -70,6 +62,12 @@ class SplashActivity : BaseActivity() {
     }
 
     override fun initViews() = R.layout.activity_splash
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // 重置回收标志位
+        CommonParams.isRestore = false
+    }
 
     private fun grant() {
         // 初始化文件夹

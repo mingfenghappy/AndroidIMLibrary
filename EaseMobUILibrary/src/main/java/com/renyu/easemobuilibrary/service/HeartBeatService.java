@@ -56,7 +56,7 @@ public class HeartBeatService extends Service {
             scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
                 boolean isConnected = EMClient.getInstance().isConnected();
                 Log.d("EaseMobUtils", "isConnected:" + isConnected);
-                if (!isConnected) {
+                if (!isConnected && EMClient.getInstance().isLoggedInBefore()) {
                     EMMessageManager.sendSingleMessage(EMMessageManager.prepareCMDMessage("conn", "admin"));
                 }
             }, 1, 10, TimeUnit.SECONDS);
