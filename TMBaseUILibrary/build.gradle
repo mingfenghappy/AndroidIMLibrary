@@ -50,10 +50,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api('com.github.renyu:AndroidCommonLibrary:1.12.4') {
+    api('com.github.renyu:AndroidCommonLibrary:1.13.1') {
         exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
     }
-    api('com.github.renyu:AndroidImageLibrary:1.4.7') {
+    api('com.github.renyu:AndroidImageLibrary:1.4.10') {
         exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
     }
     api project(':TMLibrary')

@@ -45,7 +45,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-        force "com.github.renyu:AndroidCommonLibrary:1.12.4"
+        force "com.github.renyu:AndroidCommonLibrary:1.13.1"
     }
 }
 
@@ -56,10 +56,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api('com.github.renyu:AndroidCommonLibrary:1.12.4') {
+    api('com.github.renyu:AndroidCommonLibrary:1.13.1') {
         exclude group: 'com.tencent.wcdb', module: 'wcdb-android'
     }
-    api('com.github.renyu:AndroidImageLibrary:1.4.7') {
+    api('com.github.renyu:AndroidImageLibrary:1.4.10') {
         exclude group: 'com.github.renyu', module: 'AndroidCommonLibrary'
     }
     // JKeyboardPanelSwitch  For resolve the layout conflict when keybord & panel are switching (Android键盘面板冲突 布局闪动处理方案)
