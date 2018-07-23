@@ -30,7 +30,12 @@ class ExampleApp : MultiDexApplication() {
             Repos.observeLoginSyncDataStatus()
             // 监听多端登录状态
             Repos.observeOtherClients()
-
+            // 消息接收观察者
+            Repos.observeReceiveMessage()
+            // 监听最近会话变更
+            Repos.observeRecentContact()
+            // 监听消息状态
+            Repos.observeMsgStatus()
         }
     }
 

@@ -1,12 +1,9 @@
 package com.renyu.nimapp.ui.activity
 
-import android.Manifest
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
-import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.SPUtils
 import com.renyu.nimapp.R
 import com.renyu.nimlibrary.params.CommonParams
