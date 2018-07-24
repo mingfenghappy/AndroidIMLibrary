@@ -40,8 +40,9 @@ kapt {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
     api 'android.arch.lifecycle:extensions:1.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -62,7 +63,9 @@ dependencies {
     api 'com.netease.nimlib:lucene:5.4.0'
     // 小米、华为、魅族、fcm 推送
     api 'com.netease.nimlib:push:5.4.0'
-
     // 工具类
     api 'com.blankj:utilcode:1.17.3'
+    // Fresco
+    api 'com.facebook.fresco:fresco:1.10.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
 }

@@ -6,11 +6,14 @@ import android.text.TextUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.Utils
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.SDKOptions
 import com.netease.nimlib.sdk.auth.LoginInfo
 import com.netease.nimlib.sdk.util.NIMUtil
 import com.renyu.nimapp.repository.Repos
+import com.renyu.nimlibrary.manager.MessageManager
+import com.renyu.nimlibrary.manager.StatueManager
 import com.renyu.nimlibrary.params.CommonParams
 import java.io.File
 
@@ -23,19 +26,25 @@ class ExampleApp : MultiDexApplication() {
         if (NIMUtil.isMainProcess(this)) {
             // 初始化工具库
             Utils.init(this)
+            // 初始化Fresco
+            Fresco.initialize(this)
 
             // 监听用户在线状态
-            Repos.observeOnlineStatus()
+            StatueManager.observeOnlineStatus()
             // 监听数据同步状态
-            Repos.observeLoginSyncDataStatus()
+            StatueManager.observeLoginSyncDataStatus()
             // 监听多端登录状态
-            Repos.observeOtherClients()
+            StatueManager.observeOtherClients()
             // 消息接收观察者
-            Repos.observeReceiveMessage()
+            MessageManager.observeReceiveMessage()
             // 监听最近会话变更
-            Repos.observeRecentContact()
+            MessageManager.observeRecentContact()
             // 监听消息状态
-            Repos.observeMsgStatus()
+            MessageManager.observeMsgStatus()
+            // 监听最近联系人被删除
+            MessageManager.observeRecentContactDeleted()
+            // 监听消息撤回
+            MessageManager.observeRevokeMessage()
         }
     }
 
