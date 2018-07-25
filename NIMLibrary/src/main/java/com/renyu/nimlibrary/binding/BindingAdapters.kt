@@ -19,7 +19,11 @@ object BindingAdapters {
     @BindingAdapter(value = ["adapter"])
     fun <T: RecyclerView.ViewHolder> setAdapter(recyclerView: RecyclerView, adapter: RecyclerView.Adapter<T>) {
         recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(recyclerView.context)
+        val manager = LinearLayoutManager(recyclerView.context)
+        manager.isSmoothScrollbarEnabled = true
+        manager.isAutoMeasureEnabled = true
+        recyclerView.layoutManager = manager
+        recyclerView.isNestedScrollingEnabled = false
         recyclerView.adapter = adapter
     }
 
