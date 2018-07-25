@@ -36,7 +36,7 @@
                     android:layout_width="46dip"
                     android:layout_height="46dip"
                     android:layout_centerVertical="true"
-                    app:account="@{recentContact.getContactId()}"
+                    app:chatListAvatar="@{recentContact.getContactId()}"
                     fresco:actualImageResource="@drawable/default_grey_avatar"
                     fresco:actualImageScaleType="focusCrop"
                     fresco:placeholderImage="@drawable/default_grey_avatar"
@@ -63,7 +63,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textSize="14sp"
-                            android:text="@{recentContact.getFromNick()}"
+                            app:chatListName="@{recentContact.getContactId()}"
                             android:textColor="#333333"/>
                         <TextView
                             android:layout_width="wrap_content"
@@ -108,7 +108,6 @@
             </View>
         </LinearLayout>
         <Button
-            android:id="@+id/btn_adapter_conversationlist_delete"
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:background="@android:color/holo_red_light"

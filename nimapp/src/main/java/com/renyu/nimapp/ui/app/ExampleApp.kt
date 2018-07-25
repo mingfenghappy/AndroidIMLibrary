@@ -13,6 +13,7 @@ import com.netease.nimlib.sdk.auth.LoginInfo
 import com.netease.nimlib.sdk.util.NIMUtil
 import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.manager.StatueManager
+import com.renyu.nimlibrary.manager.UserManager
 import com.renyu.nimlibrary.params.CommonParams
 import java.io.File
 
@@ -44,6 +45,8 @@ class ExampleApp : MultiDexApplication() {
             MessageManager.observeRecentContactDeleted()
             // 监听消息撤回
             MessageManager.observeRevokeMessage()
+            // 监听用户资料变更
+            UserManager.observeUserInfoUpdate()
         }
     }
 

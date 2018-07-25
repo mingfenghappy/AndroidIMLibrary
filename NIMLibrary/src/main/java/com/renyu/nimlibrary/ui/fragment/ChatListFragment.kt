@@ -15,7 +15,6 @@ import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.databinding.FragmentChatlistBinding
 import com.renyu.nimlibrary.viewmodel.ChatListViewModel
-import kotlinx.android.synthetic.main.fragment_chatlist.*
 
 class ChatListFragment : Fragment() {
 
@@ -42,13 +41,12 @@ class ChatListFragment : Fragment() {
                         if (t.data != null) {
                             vm?.notifyDataSetChanged(t.data)
                         }
-                        swipe_conversationlist.isRefreshing = false
                     }
                     Status.FAIL -> {
-                        swipe_conversationlist.isRefreshing = false
+
                     }
                     Status.Exception -> {
-                        swipe_conversationlist.isRefreshing = false
+
                     }
                 }
             })
@@ -58,10 +56,6 @@ class ChatListFragment : Fragment() {
             Handler().postDelayed({
                 vm?.queryRecentContacts()
             }, 250)
-
-            swipe_conversationlist.setOnRefreshListener {
-                vm?.queryRecentContacts()
-            }
         }
     }
 }

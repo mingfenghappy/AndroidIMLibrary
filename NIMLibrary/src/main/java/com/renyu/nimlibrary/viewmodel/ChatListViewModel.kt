@@ -4,17 +4,21 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.view.View
+import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.msg.model.RecentContact
+import com.netease.nimlib.sdk.uinfo.UserService
 import com.renyu.nimapp.bean.Resource
 import com.renyu.nimlibrary.bean.ObserveResponse
 import com.renyu.nimlibrary.bean.ObserveResponseType
 import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.manager.MessageManager
+import com.renyu.nimlibrary.manager.UserManager
 import com.renyu.nimlibrary.repository.Repos
 import com.renyu.nimlibrary.ui.adapter.ChatListAdapter
 import com.renyu.nimlibrary.util.RxBus
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatListViewModel : BaseViewModel(), EventImpl {
 
@@ -44,11 +48,11 @@ class ChatListViewModel : BaseViewModel(), EventImpl {
             }
         }
 
-        // 添加最近会话列表监听
         compositeDisposable.add(RxBus.getDefault()
                 .toObservable(ObserveResponse::class.java)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
+                    // 添加最近会话列表监听
                     if (it.type == ObserveResponseType.ObserveRecentContact) {
                         (it.data as List<*>).forEach {
                             if (it is RecentContact) {
@@ -70,6 +74,17 @@ class ChatListViewModel : BaseViewModel(), EventImpl {
                         }
                         sortRecentContacts(beans)
                         adapter.notifyDataSetChanged()
+
+                        // 刷新用户个人数据
+                        refreshUserInfo()
+                    }
+                    // 用户资料变更
+                    if (it.type == ObserveResponseType.UserInfoUpdate) {
+                        adapter.notifyDataSetChanged()
+                    }
+                    // 从服务器获取用户资料
+                    if (it.type == ObserveResponseType.FetchUserInfo) {
+                        adapter.notifyDataSetChanged()
                     }
                 }.subscribe())
     }
@@ -88,6 +103,9 @@ class ChatListViewModel : BaseViewModel(), EventImpl {
         beans.clear()
         beans.addAll(sortRecentContacts(recentContacts))
         adapter.notifyDataSetChanged()
+
+        // 刷新用户个人数据
+        refreshUserInfo()
     }
 
     /**
@@ -103,6 +121,22 @@ class ChatListViewModel : BaseViewModel(), EventImpl {
             beans.remove(it)
         }
         adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * 刷新用户个人数据
+     */
+    private fun refreshUserInfo() {
+        val refreshLists = ArrayList<String>()
+        beans.forEach {
+            val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(it.contactId)
+            if (userInfo == null) {
+                refreshLists.add(it.contactId)
+            }
+        }
+        if (refreshLists.size>0) {
+            UserManager.fetchUserInfo(refreshLists)
+        }
     }
 
     private fun sortRecentContacts(list: List<RecentContact>):  List<RecentContact> {
