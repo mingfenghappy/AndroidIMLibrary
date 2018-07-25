@@ -22,14 +22,6 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["notify"])
-    fun notifyDataSetChanged(recyclerView: RecyclerView, refresh: Boolean) {
-        if (refresh) {
-            recyclerView.adapter.notifyDataSetChanged()
-        }
-    }
-
-    @JvmStatic
     @BindingAdapter(value = ["account"])
     fun loadChatListImage(simpleDraweeView: SimpleDraweeView, account: String) {
         val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(account)

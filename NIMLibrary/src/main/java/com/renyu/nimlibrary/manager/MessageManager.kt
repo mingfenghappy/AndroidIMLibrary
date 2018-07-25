@@ -3,11 +3,14 @@ package com.renyu.nimlibrary.manager
 import android.util.Log
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.msg.MsgServiceObserve
+import com.renyu.nimlibrary.bean.ObserveResponse
+import com.renyu.nimlibrary.bean.ObserveResponseType
+import com.renyu.nimlibrary.util.RxBus
 
 object MessageManager {
 
     /**
-     * 监听消息接收
+     * 监听新消息接收
      */
     fun observeReceiveMessage() {
         NIMClient.getService(MsgServiceObserve::class.java)
@@ -19,7 +22,14 @@ object MessageManager {
      */
     fun observeRecentContact() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeRecentContact({ t -> Log.d("NIMAPP", "最近会话列表变更${t?.size}") }, true)
+                .observeRecentContact({
+                    if (it != null) {
+                        it.forEach {
+                            Log.d("NIMAPP", "最近会话列表变更:${it.fromNick}")
+                        }
+                        RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.ObserveRecentContact))
+                    }
+                }, true)
     }
 
     /**

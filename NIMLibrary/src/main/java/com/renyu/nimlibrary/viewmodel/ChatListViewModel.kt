@@ -3,16 +3,18 @@ package com.renyu.nimlibrary.viewmodel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
-import android.databinding.ObservableBoolean
 import com.netease.nimlib.sdk.msg.model.RecentContact
-import com.renyu.nimapp.bean.RefreshBean
 import com.renyu.nimapp.bean.Resource
-import com.renyu.nimapp.repository.Repos
+import com.renyu.nimlibrary.bean.ObserveResponse
+import com.renyu.nimlibrary.bean.ObserveResponseType
+import com.renyu.nimlibrary.repository.Repos
 import com.renyu.nimlibrary.ui.adapter.ChatListAdapter
+import com.renyu.nimlibrary.util.RxBus
+import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
-class ChatListViewModel : ViewModel() {
+class ChatListViewModel : BaseViewModel() {
 
     // 置顶功能可直接使用，也可作为思路，供开发者充分利用RecentContact的tag字段
     private val RECENT_TAG_STICKY: Long = 1 // 联系人置顶tag
@@ -26,9 +28,7 @@ class ChatListViewModel : ViewModel() {
         ChatListAdapter(beans)
     }
 
-    // 刷新标志位
-    val refreshBean = RefreshBean(ObservableBoolean(false))
-
+    // 接口请求数据
     private val recentContactListRequest = MutableLiveData<String>()
     var recentContactListResponse: LiveData<Resource<List<RecentContact>>>? = null
 
@@ -41,6 +41,35 @@ class ChatListViewModel : ViewModel() {
                 Repos.queryRecentContacts()
             }
         }
+
+        // 添加最近会话列表监听
+        compositeDisposable.add(RxBus.getDefault()
+                .toObservable(ObserveResponse::class.java)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext {
+                    if (it.type == ObserveResponseType.ObserveRecentContact) {
+                        (it.data as List<*>).forEach {
+                            if (it is RecentContact) {
+                                var indexTemp = -1
+                                // 找到同一个Item并删除
+                                beans.forEachIndexed { index, recentContact ->
+                                    if (recentContact.contactId == it.contactId &&
+                                            recentContact.sessionType == it.sessionType) {
+                                        indexTemp = index
+                                        return@forEachIndexed
+                                    }
+                                }
+                                if (indexTemp != -1) {
+                                    beans.removeAt(indexTemp)
+                                }
+                                // 添加当前Item
+                                beans.add(it)
+                            }
+                        }
+                        sortRecentContacts(beans)
+                        adapter.notifyDataSetChanged()
+                    }
+                }.subscribe())
     }
 
     /**
@@ -57,7 +86,8 @@ class ChatListViewModel : ViewModel() {
         beans.clear()
         beans.addAll(sortRecentContacts(recentContacts))
         // 刷新RV
-        refreshBean.refresh.set(true)
+        AtomicInteger().getAndIncrement()
+        adapter.notifyDataSetChanged()
     }
 
     private fun sortRecentContacts(list: List<RecentContact>) :  List<RecentContact> {

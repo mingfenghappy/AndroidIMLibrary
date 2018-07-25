@@ -1,4 +1,4 @@
-package com.renyu.nimapp.repository
+package com.renyu.nimlibrary.repository
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData

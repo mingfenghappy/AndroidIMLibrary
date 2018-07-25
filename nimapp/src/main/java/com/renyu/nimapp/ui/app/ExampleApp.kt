@@ -11,7 +11,6 @@ import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.SDKOptions
 import com.netease.nimlib.sdk.auth.LoginInfo
 import com.netease.nimlib.sdk.util.NIMUtil
-import com.renyu.nimapp.repository.Repos
 import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.manager.StatueManager
 import com.renyu.nimlibrary.params.CommonParams

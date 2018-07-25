@@ -7,9 +7,6 @@
             type="com.renyu.nimlibrary.ui.adapter.ChatListAdapter">
 
         </variable>
-        <variable
-            name="refreshBean"
-            type="com.renyu.nimapp.bean.RefreshBean"></variable>
     </data>
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_conversationlist"
@@ -30,10 +27,8 @@
                     android:orientation="vertical">
                 </LinearLayout>
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_conversationlist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:notify="@{refreshBean.refresh}"
                     app:adapter="@{adapter}">
 
                 </android.support.v7.widget.RecyclerView>
