@@ -11,7 +11,6 @@ import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
-import com.netease.nimlib.sdk.msg.model.QueryDirectionEnum
 import com.netease.nimlib.sdk.msg.model.RecentContact
 import com.renyu.nimapp.bean.Resource
 import com.renyu.nimlibrary.manager.AuthManager
@@ -78,23 +77,21 @@ object Repos {
      * 获取会话详情
      */
     fun queryMessageListEx(message: IMMessage) {
-        NIMClient.getService(MsgService::class.java)
-                .queryMessageListEx(message, QueryDirectionEnum.QUERY_OLD, 20, true)
-                .setCallback(object : RequestCallback<List<IMMessage>> {
-                    override fun onSuccess(param: List<IMMessage>?) {
-                        param?.forEach {
-                            Log.d("NIMAPP", "会话列表：${it.fromNick} ${it.content}")
-                        }
-                    }
+        MessageManager.queryMessageListEx(message, object : RequestCallback<List<IMMessage>> {
+            override fun onSuccess(param: List<IMMessage>?) {
+                param?.forEach {
+                    Log.d("NIMAPP", "会话列表：${it.fromNick} ${it.content}")
+                }
+            }
 
-                    override fun onFailed(code: Int) {
+            override fun onFailed(code: Int) {
 
-                    }
+            }
 
-                    override fun onException(exception: Throwable?) {
+            override fun onException(exception: Throwable?) {
 
-                    }
-                })
+            }
+        })
     }
 
     private fun sendTextMessage(account: String, text: String, resend: Boolean) {

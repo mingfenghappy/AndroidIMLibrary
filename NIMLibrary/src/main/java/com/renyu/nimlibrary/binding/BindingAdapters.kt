@@ -28,8 +28,8 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["account"])
-    fun loadChatListImage(simpleDraweeView: SimpleDraweeView, account: String) {
+    @BindingAdapter(value = ["chatListAvatar"])
+    fun loadChatListAvatar(simpleDraweeView: SimpleDraweeView, account: String) {
         val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(account)
         if (userInfo != null) {
             val request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(userInfo.avatar))
@@ -47,6 +47,18 @@ object BindingAdapters {
             View.VISIBLE
         } else {
             View.INVISIBLE
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["chatListName"])
+    fun loadChatListName(textView: TextView, contactId: String) {
+        val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(contactId)
+        if (userInfo != null) {
+            textView.text = userInfo.name
+        }
+        else {
+            textView.text = contactId
         }
     }
 }
