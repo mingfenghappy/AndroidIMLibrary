@@ -6,7 +6,6 @@ import android.util.Log
 import com.netease.nimlib.sdk.AbortableFuture
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.RequestCallback
-import com.netease.nimlib.sdk.auth.AuthService
 import com.netease.nimlib.sdk.auth.LoginInfo
 import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.MsgService
@@ -15,6 +14,8 @@ import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.msg.model.QueryDirectionEnum
 import com.netease.nimlib.sdk.msg.model.RecentContact
 import com.renyu.nimapp.bean.Resource
+import com.renyu.nimlibrary.manager.AuthManager
+import com.renyu.nimlibrary.manager.MessageManager
 
 object Repos {
 
@@ -24,12 +25,11 @@ object Repos {
     /**
      * 登录
      */
-    fun login(account: String, token: String) : LiveData<Resource<LoginInfo>> {
+    fun login(account: String, token: String): LiveData<Resource<LoginInfo>> {
         val temp = MutableLiveData<Resource<LoginInfo>>()
         temp.value = Resource.loading()
-        val loginRequest = NIMClient.getService(AuthService::class.java)
-                .login(LoginInfo(account, token))
-        loginRequest.setCallback(object : RequestCallback<LoginInfo> {
+        // 添加请求
+        requests["login"] = AuthManager.login(account, token, object : RequestCallback<LoginInfo> {
             override fun onSuccess(param: LoginInfo?) {
                 temp.value = Resource.sucess(param)
             }
@@ -42,8 +42,6 @@ object Repos {
                 temp.value = Resource.exception(exception?.message)
             }
         })
-        // 添加请求
-        requests["login"] = loginRequest
         return temp
     }
 
@@ -60,8 +58,7 @@ object Repos {
     fun queryRecentContacts(): LiveData<Resource<List<RecentContact>>> {
         val temp = MutableLiveData<Resource<List<RecentContact>>>()
         temp.value = Resource.loading()
-        NIMClient.getService(MsgService::class.java).queryRecentContacts()
-                .setCallback(object : RequestCallback<List<RecentContact>> {
+        MessageManager.queryRecentContacts(object : RequestCallback<List<RecentContact>> {
             override fun onSuccess(param: List<RecentContact>?) {
                 temp.value = Resource.sucess(param)
             }

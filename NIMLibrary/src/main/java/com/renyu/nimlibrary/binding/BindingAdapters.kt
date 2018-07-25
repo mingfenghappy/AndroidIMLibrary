@@ -4,6 +4,8 @@ import android.databinding.BindingAdapter
 import android.net.Uri
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.widget.TextView
 import com.blankj.utilcode.util.SizeUtils
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
@@ -31,6 +33,16 @@ object BindingAdapters {
             val draweeController = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(request).setAutoPlayAnimations(true).build()
             simpleDraweeView.controller = draweeController
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["tvVisible"])
+    fun changeVisible(textView: TextView, count: Int) {
+        textView.visibility = if (count>0) {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
         }
     }
 }

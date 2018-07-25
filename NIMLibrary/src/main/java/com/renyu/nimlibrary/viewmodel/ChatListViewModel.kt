@@ -3,18 +3,20 @@ package com.renyu.nimlibrary.viewmodel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.view.View
 import com.netease.nimlib.sdk.msg.model.RecentContact
 import com.renyu.nimapp.bean.Resource
 import com.renyu.nimlibrary.bean.ObserveResponse
 import com.renyu.nimlibrary.bean.ObserveResponseType
+import com.renyu.nimlibrary.binding.EventImpl
+import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.repository.Repos
 import com.renyu.nimlibrary.ui.adapter.ChatListAdapter
 import com.renyu.nimlibrary.util.RxBus
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
-class ChatListViewModel : BaseViewModel() {
+class ChatListViewModel : BaseViewModel(), EventImpl {
 
     // 置顶功能可直接使用，也可作为思路，供开发者充分利用RecentContact的tag字段
     private val RECENT_TAG_STICKY: Long = 1 // 联系人置顶tag
@@ -25,7 +27,7 @@ class ChatListViewModel : BaseViewModel() {
 
     // 用来设置的adapter
     val adapter: ChatListAdapter by lazy {
-        ChatListAdapter(beans)
+        ChatListAdapter(beans, this)
     }
 
     // 接口请求数据
@@ -85,12 +87,25 @@ class ChatListViewModel : BaseViewModel() {
     fun notifyDataSetChanged(recentContacts: List<RecentContact>) {
         beans.clear()
         beans.addAll(sortRecentContacts(recentContacts))
-        // 刷新RV
-        AtomicInteger().getAndIncrement()
         adapter.notifyDataSetChanged()
     }
 
-    private fun sortRecentContacts(list: List<RecentContact>) :  List<RecentContact> {
+    /**
+     * 从最近联系人列表中删除一项。
+     */
+    override fun deleteRecentContact(view: View, contactId: String) {
+        super.deleteRecentContact(view, contactId)
+
+        beans.filter {
+            it.contactId == contactId
+        }.forEach {
+            MessageManager.deleteRecentContact(it)
+            beans.remove(it)
+        }
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun sortRecentContacts(list: List<RecentContact>):  List<RecentContact> {
         if (!list.isEmpty()) {
             Collections.sort(list, comp)
         }

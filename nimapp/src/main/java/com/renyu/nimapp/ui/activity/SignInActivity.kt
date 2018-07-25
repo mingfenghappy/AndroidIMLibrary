@@ -16,7 +16,7 @@ import com.renyu.nimapp.bean.Status
 import com.renyu.nimapp.databinding.ActivitySigninBinding
 import com.renyu.nimapp.viewmodel.SignInViewModel
 import com.renyu.nimlibrary.BR
-import com.renyu.nimlibrary.impl.EventImpl
+import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.params.CommonParams
 import kotlinx.android.synthetic.main.activity_signin.*
 import org.jetbrains.anko.toast

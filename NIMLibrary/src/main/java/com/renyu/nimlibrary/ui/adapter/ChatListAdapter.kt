@@ -8,9 +8,10 @@ import android.view.ViewGroup
 import com.android.databinding.library.baseAdapters.BR
 import com.netease.nimlib.sdk.msg.model.RecentContact
 import com.renyu.nimlibrary.R
+import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.databinding.AdapterChatlistBinding
 
-class ChatListAdapter(private val beans: ArrayList<RecentContact>) : RecyclerView.Adapter<ChatListAdapter.ChatListViewHolder>() {
+class ChatListAdapter(private val beans: ArrayList<RecentContact>, private val eventImpl: EventImpl) : RecyclerView.Adapter<ChatListAdapter.ChatListViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatListViewHolder {
         val viewDataBinding = DataBindingUtil.inflate<AdapterChatlistBinding>(LayoutInflater.from(parent.context), R.layout.adapter_chatlist, parent, false)
         return ChatListViewHolder(viewDataBinding)
@@ -20,10 +21,11 @@ class ChatListAdapter(private val beans: ArrayList<RecentContact>) : RecyclerVie
 
     override fun onBindViewHolder(holder: ChatListViewHolder, position: Int) {
         holder.vd.setVariable(BR.recentContact, beans[holder.layoutPosition])
+        holder.vd.setVariable(BR.eventImpl, eventImpl)
         holder.vd.executePendingBindings()
     }
 
-    class ChatListViewHolder(viewDataBinding: ViewDataBinding) : RecyclerView.ViewHolder(viewDataBinding.root) {
+    class ChatListViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
         val vd = viewDataBinding
     }
 }

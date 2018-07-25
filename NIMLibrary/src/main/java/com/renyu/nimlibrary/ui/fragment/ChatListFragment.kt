@@ -14,7 +14,6 @@ import com.renyu.nimapp.bean.Resource
 import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.databinding.FragmentChatlistBinding
-import com.renyu.nimlibrary.repository.Repos
 import com.renyu.nimlibrary.viewmodel.ChatListViewModel
 import kotlinx.android.synthetic.main.fragment_chatlist.*
 
@@ -63,9 +62,6 @@ class ChatListFragment : Fragment() {
             swipe_conversationlist.setOnRefreshListener {
                 vm?.queryRecentContacts()
             }
-
-//            Repos.sendTextMessage("r17171708", "Hello4")
         }
     }
-
 }

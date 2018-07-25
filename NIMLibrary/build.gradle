@@ -67,5 +67,8 @@ dependencies {
     api 'com.blankj:utilcode:1.17.3'
     // Fresco
     api 'com.facebook.fresco:fresco:1.10.0'
+    // rxandroid
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    // SwipeDelMenuLayout
+    api 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
 }
