@@ -1,5 +1,9 @@
 package com.renyu.nimlibrary.params;
 
+import android.os.Environment;
+
+import java.io.File;
+
 /**
  * Created by Administrator on 2018/3/21 0021.
  */
@@ -8,6 +12,9 @@ public class CommonParams {
     // 用户登录、密码信息
     public static final String SP_UNAME = "sp_uname";
     public static final String SP_PWD = "sp_pwd";
+
+    // SDK根目录路径
+    public static final String SDKROOT = Environment.getExternalStorageDirectory().getPath() + File.separator + "example";
 
     // app是否发生了回收，用来给中控页使用
     public static boolean isRestore = false;

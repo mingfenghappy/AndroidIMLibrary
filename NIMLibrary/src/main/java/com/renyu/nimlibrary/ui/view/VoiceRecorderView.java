@@ -1,4 +1,4 @@
-package com.renyu.easemobuilibrary.view;
+package com.renyu.nimlibrary.ui.view;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,8 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
-import com.renyu.easemobuilibrary.R;
-import com.renyu.easemobuilibrary.utils.VoiceRecordUtils;
+import com.renyu.nimlibrary.R;
+import com.renyu.nimlibrary.util.VoiceRecordUtils;
 
 /**
  * Voice recorder view

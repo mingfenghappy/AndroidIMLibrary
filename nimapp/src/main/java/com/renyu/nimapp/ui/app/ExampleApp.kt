@@ -62,7 +62,7 @@ class ExampleApp : MultiDexApplication() {
     private fun options() : SDKOptions {
         val options = SDKOptions()
         // 配置 APP 保存图片/语音/文件/log等数据的目录
-        options.sdkStorageRootPath = Environment.getExternalStorageDirectory().path + File.separator + "example"
+        options.sdkStorageRootPath = CommonParams.SDKROOT
         // 配置数据库加密秘钥
         options.databaseEncryptKey = "house365"
         // 配置是否需要预下载附件缩略图

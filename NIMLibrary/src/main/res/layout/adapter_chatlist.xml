@@ -23,6 +23,7 @@
             android:background="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:onClick="@{(view) -> eventImpl.gotoConversationActivity(view, recentContact.getContactId())}"
             android:gravity="center_vertical">
             <RelativeLayout
                 android:layout_marginLeft="12dip"

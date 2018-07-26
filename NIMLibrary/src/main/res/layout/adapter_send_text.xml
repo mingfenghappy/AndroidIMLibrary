@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+
+    </data>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="30dp" >
+        <TextView
+            android:id="@+id/aurora_tv_msgitem_date"
+            style="@style/chat_text_date_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.facebook.drawee.view.SimpleDraweeView
+                xmlns:fresco="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/aurora_iv_msgitem_avatar"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="10dip"
+                fresco:actualImageResource="@drawable/default_grey_avatar"
+                fresco:actualImageScaleType="focusCrop"
+                fresco:placeholderImage="@drawable/default_grey_avatar"
+                fresco:placeholderImageScaleType="centerCrop"
+                fresco:failureImage="@drawable/default_grey_avatar"
+                fresco:failureImageScaleType="centerCrop"
+                fresco:roundAsCircle="true"/>
+            <RelativeLayout
+                android:id="@+id/bubble"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dip"
+                android:layout_toStartOf="@id/aurora_iv_msgitem_avatar"
+                android:background="@mipmap/ic_conversation_right">
+                <com.facebook.drawee.span.SimpleDraweeSpanTextView
+                    android:id="@+id/aurora_tv_msgitem_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoLink="all"
+                    android:layout_centerInParent="true"
+                    android:gravity="center|left"
+                    android:minHeight="42dp"
+                    android:lineSpacingExtra="2dp"
+                    android:textColor="#000000"
+                    android:maxWidth="225.0dip"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+            <ImageView
+                android:id="@+id/aurora_iv_msgitem_send_status"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/bubble"
+                android:layout_marginEnd="12dip"
+                android:src="@mipmap/ease_msg_state_failed_resend"
+                android:visibility="gone" />
+            <ProgressBar
+                android:id="@+id/aurora_iv_msgitem_send_progress_bar"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="12dip"
+                style="@style/pb_conversation_send"
+                android:visibility="gone"
+                android:layout_toStartOf="@id/bubble" />
+        </RelativeLayout>
+    </LinearLayout>
+</layout>

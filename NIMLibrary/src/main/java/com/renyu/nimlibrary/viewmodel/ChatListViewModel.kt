@@ -3,6 +3,7 @@ package com.renyu.nimlibrary.viewmodel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.content.Intent
 import android.view.View
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.msg.model.RecentContact
@@ -121,6 +122,32 @@ class ChatListViewModel : BaseViewModel(), EventImpl {
             beans.remove(it)
         }
         adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * 跳转会话详情
+     */
+    override fun gotoConversationActivity(view: View, contactId: String) {
+        super.gotoConversationActivity(view, contactId)
+        try {
+            val clazz = Class.forName("com.renyu.nimapp.params.InitParams")
+            val conversationActivityName = clazz.getField("ConversationActivityName").get(clazz).toString()
+            val conversationClass = Class.forName(conversationActivityName)
+
+            val intent = Intent(view.context, conversationClass)
+            intent.putExtra("contactId", contactId)
+            intent.putExtra("isGroup", false)
+            view.context.startActivity(intent)
+        }
+        catch (e:ClassNotFoundException) {
+            e.printStackTrace()
+        }
+        catch (e:IllegalAccessException) {
+            e.printStackTrace()
+        }
+        catch (e:NoSuchFieldException) {
+            e.printStackTrace()
+        }
     }
 
     /**

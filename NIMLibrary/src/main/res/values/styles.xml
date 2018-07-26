@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="chat_text_date_style">
+        <item name="android:paddingBottom">28dp</item>
+        <item name="android:textColor">#777777</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="chat_text_name_style">
+        <item name="android:textColor">#818181</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="pb_conversation_send" parent="@android:style/Widget.ProgressBar.Small">
+        <item name="android:indeterminateDrawable">@drawable/pb_conversation_send</item>
+        <item name="android:minWidth">15dp</item>
+        <item name="android:minHeight">15dp</item>
+        <item name="android:maxWidth">15dp</item>
+        <item name="android:maxHeight">15dp</item>
+    </style>
+</resources>

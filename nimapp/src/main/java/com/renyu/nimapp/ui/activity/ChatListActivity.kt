@@ -17,9 +17,6 @@ class ChatListActivity : BaseChatListActivity() {
                 .beginTransaction()
                 .replace(R.id.layout_chatlistframe, conversationFragment, "conversationFragment")
                 .commitAllowingStateLoss()
-
-//        Repos.sendTextMessage("r17171707", "Hello6")
-//        Repos.queryMessageListEx(MessageBuilder.createEmptyMessage("r17171709", SessionTypeEnum.P2P, 0))
     }
 
     override fun onBackPressed() {
