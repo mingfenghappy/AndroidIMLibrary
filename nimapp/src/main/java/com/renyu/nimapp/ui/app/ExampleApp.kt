@@ -45,6 +45,8 @@ class ExampleApp : MultiDexApplication() {
             MessageManager.observeRecentContactDeleted()
             // 监听消息撤回
             MessageManager.observeRevokeMessage()
+            // 监听消息已读回执
+            MessageManager.observeMessageReceipt()
             // 监听用户资料变更
             UserManager.observeUserInfoUpdate()
         }

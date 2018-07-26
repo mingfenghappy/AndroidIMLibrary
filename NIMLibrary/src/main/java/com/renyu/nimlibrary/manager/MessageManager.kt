@@ -3,6 +3,7 @@ package com.renyu.nimlibrary.manager
 import android.util.Log
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.RequestCallback
+import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.MsgServiceObserve
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
@@ -20,7 +21,7 @@ object MessageManager {
      */
     fun observeReceiveMessage() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeReceiveMessage({ t -> Log.d("NIMAPP", "收到新消息${t?.size}") }, true)
+                .observeReceiveMessage({ t -> Log.d("NIM_APP", "收到新消息${t?.size}") }, true)
     }
 
     /**
@@ -31,7 +32,7 @@ object MessageManager {
                 .observeRecentContact({
                     if (it != null) {
                         it.forEach {
-                            Log.d("NIMAPP", "最近会话列表变更:${it.fromNick}")
+                            Log.d("NIM_APP", "最近会话列表变更:${it.fromNick}")
                         }
                         RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.ObserveRecentContact))
                     }
@@ -43,7 +44,7 @@ object MessageManager {
      */
     fun observeRecentContactDeleted() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeRecentContactDeleted({ t -> Log.d("NIMAPP", "最近会话列表变更${t?.contactId}") }, true)
+                .observeRecentContactDeleted({ t -> Log.d("NIM_APP", "最近会话列表变更${t?.contactId}") }, true)
     }
 
     /**
@@ -51,7 +52,10 @@ object MessageManager {
      */
     fun observeMsgStatus() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeMsgStatus({ t -> Log.d("NIMAPP", "消息状态：${t.fromNick} ${t.content} ${t.status}") }, true)
+                .observeMsgStatus({
+                    RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.MsgStatus))
+                    Log.d("NIM_APP", "消息状态：${it.fromNick} ${it.content} ${it.status}")
+                }, true)
     }
 
     /**
@@ -59,7 +63,20 @@ object MessageManager {
      */
     fun observeRevokeMessage() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeRevokeMessage({ t -> Log.d("NIMAPP", "被撤回的消息消息ID：${t.message.uuid}") }, true)
+                .observeRevokeMessage({ t -> Log.d("NIM_APP", "被撤回的消息消息ID：${t.message.uuid}") }, true)
+    }
+
+    /**
+     * 监听消息已读回执
+     */
+    fun observeMessageReceipt() {
+        NIMClient.getService(MsgServiceObserve::class.java)
+                .observeMessageReceipt({
+                    it.forEach {
+                        Log.d("NIM_APP", "被撤回的消息消息ID：${it.sessionId} ${it.time}")
+                    }
+
+                }, true)
     }
 
     /**
@@ -128,11 +145,22 @@ object MessageManager {
     }
 
     /**
-     * 获取会话详情
+     * 向前获取会话详情
      */
-    fun queryMessageListEx(message: IMMessage, requestCallback: RequestCallback<List<IMMessage>>) {
+    fun queryMessageListExBefore(message: IMMessage, requestCallback: RequestCallback<List<IMMessage>>) {
+        queryMessageListEx(message, QueryDirectionEnum.QUERY_OLD, requestCallback)
+    }
+
+    /**
+     * 向后获取会话详情
+     */
+    fun queryMessageListExAfter(message: IMMessage, requestCallback: RequestCallback<List<IMMessage>>) {
+        queryMessageListEx(message, QueryDirectionEnum.QUERY_NEW, requestCallback)
+    }
+
+    private fun queryMessageListEx(message: IMMessage, direction: QueryDirectionEnum, requestCallback: RequestCallback<List<IMMessage>>) {
         NIMClient.getService(MsgService::class.java)
-                .queryMessageListEx(message, QueryDirectionEnum.QUERY_OLD, 20, true)
+                .queryMessageListEx(message, direction, 20, true)
                 .setCallback(requestCallback)
     }
 
@@ -165,5 +193,34 @@ object MessageManager {
         NIMClient.getService(MsgService::class.java).setChattingAccount(account, sessionType)
     }
 
+    /**
+     * 发送文字消息
+     */
+    fun sendTextMessage(account: String, text: String) {
+        sendTextMessage(MessageBuilder.createTextMessage(account, SessionTypeEnum.P2P, text), false)
+    }
 
+    /**
+     * 重发文字消息
+     */
+    fun reSendTextMessage(imMessage: IMMessage) {
+        sendTextMessage(imMessage, true)
+    }
+
+    private fun sendTextMessage(imMessage: IMMessage, resend: Boolean) {
+        NIMClient.getService(MsgService::class.java).sendMessage(imMessage, resend)
+                .setCallback(object : RequestCallback<Void> {
+                    override fun onSuccess(param: Void?) {
+                        Log.d("NIM_APP", "消息发送成功")
+                    }
+
+                    override fun onFailed(code: Int) {
+                        Log.d("NIM_APP", "消息发送失败 $code")
+                    }
+
+                    override fun onException(exception: Throwable?) {
+                        Log.d("NIM_APP", "消息发送失败 ${exception?.message}")
+                    }
+                })
+    }
 }

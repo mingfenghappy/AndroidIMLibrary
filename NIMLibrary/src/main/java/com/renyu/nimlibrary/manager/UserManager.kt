@@ -18,7 +18,7 @@ object UserManager {
         NIMClient.getService(UserServiceObserve::class.java).observeUserInfoUpdate({
             RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.UserInfoUpdate))
             it.forEach {
-                Log.d("NIMAPP", "用户资料变更通知：${it.name}")
+                Log.d("NIM_APP", "用户资料变更通知：${it.name}")
             }
         }, true)
     }
@@ -31,7 +31,7 @@ object UserManager {
             override fun onSuccess(param: List<NimUserInfo>?) {
                 RxBus.getDefault().post(ObserveResponse(param, ObserveResponseType.FetchUserInfo))
                 param?.forEach {
-                    Log.d("NIMAPP", "从服务器获取用户资料：${it.name}")
+                    Log.d("NIM_APP", "从服务器获取用户资料：${it.name}")
                 }
             }
 

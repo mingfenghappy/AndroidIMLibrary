@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-
+        <import type="com.renyu.nimlibrary.util.OtherUtils"></import>
+        <variable
+            name="iMMessage"
+            type="com.netease.nimlib.sdk.msg.model.IMMessage"></variable>
+        <variable
+            name="eventImpl"
+            type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,6 +20,7 @@
             style="@style/chat_text_date_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{OtherUtils.getFriendlyTimeSpanByNow2(iMMessage.getTime())}"
             android:layout_gravity="center" />
         <RelativeLayout
             android:layout_width="match_parent"
@@ -24,6 +32,7 @@
                 android:layout_height="42dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="10dip"
+                app:chatListAvatar="@{iMMessage.getFromAccount()}"
                 fresco:actualImageResource="@drawable/default_grey_avatar"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:placeholderImage="@drawable/default_grey_avatar"
@@ -49,7 +58,8 @@
                     android:minHeight="42dp"
                     android:maxWidth="225.0dip"
                     android:textColor="#ff000000"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    app:cvListContent="@{iMMessage.getContent()}"/>
             </RelativeLayout>
             <TextView
                 android:id="@+id/aurora_tv_msgitem_display_name"
@@ -59,7 +69,8 @@
                 android:layout_marginStart="12dp"
                 android:textSize="13sp"
                 android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:chatListName="@{iMMessage.getFromAccount()}" />
         </RelativeLayout>
     </LinearLayout>
 </layout>

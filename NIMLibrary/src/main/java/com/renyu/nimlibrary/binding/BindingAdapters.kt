@@ -5,14 +5,19 @@ import android.net.Uri
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.blankj.utilcode.util.SizeUtils
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.span.SimpleDraweeSpanTextView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.netease.nimlib.sdk.NIMClient
+import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
 import com.netease.nimlib.sdk.uinfo.UserService
+import com.renyu.nimlibrary.util.FaceIconUtil
 
 object BindingAdapters {
     @JvmStatic
@@ -59,6 +64,36 @@ object BindingAdapters {
         }
         else {
             textView.text = contactId
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["cvListContent"])
+    fun loadConversationListContent(textView: SimpleDraweeSpanTextView, text: String) {
+        FaceIconUtil.getInstance().replaceFaceMsgByFresco(textView, text)
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["cvListPbStatue"])
+    fun changeConversationListProgressStatue(progressBar: ProgressBar, statue: Int) {
+        if (statue == MsgStatusEnum.sending.value) {
+            // 发送中
+            progressBar.visibility = View.VISIBLE
+        }
+        else {
+            progressBar.visibility = View.GONE
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["cvListIvStatue"])
+    fun changeConversationListImageStatue(imageView: ImageView, statue: Int) {
+        if (statue == MsgStatusEnum.fail.value) {
+            // 发送失败
+            imageView.visibility = View.VISIBLE
+        }
+        else {
+            imageView.visibility = View.GONE
         }
     }
 }

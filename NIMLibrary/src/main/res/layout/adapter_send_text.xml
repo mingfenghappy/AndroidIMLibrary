@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-
+        <import type="com.renyu.nimlibrary.util.OtherUtils"></import>
+        <variable
+            name="iMMessage"
+            type="com.netease.nimlib.sdk.msg.model.IMMessage"></variable>
+        <variable
+            name="eventImpl"
+            type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -13,7 +19,8 @@
             android:id="@+id/aurora_tv_msgitem_date"
             style="@style/chat_text_date_style"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@{OtherUtils.getFriendlyTimeSpanByNow2(iMMessage.getTime())}" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -25,6 +32,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="10dip"
+                app:chatListAvatar="@{iMMessage.getFromAccount()}"
                 fresco:actualImageResource="@drawable/default_grey_avatar"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:placeholderImage="@drawable/default_grey_avatar"
@@ -45,12 +53,13 @@
                     android:layout_height="wrap_content"
                     android:autoLink="all"
                     android:layout_centerInParent="true"
-                    android:gravity="center|left"
+                    android:gravity="center|start"
                     android:minHeight="42dp"
                     android:lineSpacingExtra="2dp"
                     android:textColor="#000000"
                     android:maxWidth="225.0dip"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    app:cvListContent="@{iMMessage.getContent()}" />
             </RelativeLayout>
             <ImageView
                 android:id="@+id/aurora_iv_msgitem_send_status"
@@ -60,7 +69,8 @@
                 android:layout_toStartOf="@id/bubble"
                 android:layout_marginEnd="12dip"
                 android:src="@mipmap/ease_msg_state_failed_resend"
-                android:visibility="gone" />
+                android:onClick="@{(view) -> eventImpl.resendIMMessage(view, iMMessage.getUuid())}"
+                app:cvListIvStatue="@{iMMessage.getStatus().getValue()}" />
             <ProgressBar
                 android:id="@+id/aurora_iv_msgitem_send_progress_bar"
                 android:layout_width="15dp"
@@ -68,7 +78,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="12dip"
                 style="@style/pb_conversation_send"
-                android:visibility="gone"
+                app:cvListPbStatue="@{iMMessage.getStatus().getValue()}"
                 android:layout_toStartOf="@id/bubble" />
         </RelativeLayout>
     </LinearLayout>

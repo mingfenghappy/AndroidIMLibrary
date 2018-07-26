@@ -2,14 +2,9 @@ package com.renyu.nimlibrary.repository
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.netease.nimlib.sdk.AbortableFuture
-import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.RequestCallback
 import com.netease.nimlib.sdk.auth.LoginInfo
-import com.netease.nimlib.sdk.msg.MessageBuilder
-import com.netease.nimlib.sdk.msg.MsgService
-import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.msg.model.RecentContact
 import com.renyu.nimapp.bean.Resource
@@ -74,56 +69,46 @@ object Repos {
     }
 
     /**
-     * 获取会话详情
+     * 向前获取会话详情
      */
-    fun queryMessageListEx(message: IMMessage) {
-        MessageManager.queryMessageListEx(message, object : RequestCallback<List<IMMessage>> {
+    fun queryMessageListExBefore(message: IMMessage): LiveData<Resource<List<IMMessage>>> {
+        val temp = MutableLiveData<Resource<List<IMMessage>>>()
+        temp.value = Resource.loading()
+        MessageManager.queryMessageListExBefore(message, object : RequestCallback<List<IMMessage>> {
             override fun onSuccess(param: List<IMMessage>?) {
-                param?.forEach {
-                    Log.d("NIMAPP", "会话列表：${it.fromNick} ${it.content}")
-                }
+                temp.value = Resource.sucess(param)
             }
 
             override fun onFailed(code: Int) {
-
+                temp.value = Resource.failed(code)
             }
 
             override fun onException(exception: Throwable?) {
-
+                temp.value = Resource.exception(exception?.message)
             }
         })
+        return temp
     }
 
-    private fun sendTextMessage(account: String, text: String, resend: Boolean) {
-        val sessionTypeEnum = SessionTypeEnum.P2P
-        val textMessage = MessageBuilder.createTextMessage(account, sessionTypeEnum, text)
-        NIMClient.getService(MsgService::class.java).sendMessage(textMessage, resend)
-                .setCallback(object : RequestCallback<Void> {
-            override fun onSuccess(param: Void?) {
-                Log.d("NIMAPP", "消息发送成功")
+    /**
+     * 向后获取会话详情
+     */
+    fun queryMessageListExAfter(message: IMMessage): LiveData<Resource<List<IMMessage>>> {
+        val temp = MutableLiveData<Resource<List<IMMessage>>>()
+        temp.value = Resource.loading()
+        MessageManager.queryMessageListExAfter(message, object : RequestCallback<List<IMMessage>> {
+            override fun onSuccess(param: List<IMMessage>?) {
+                temp.value = Resource.sucess(param)
             }
 
             override fun onFailed(code: Int) {
-
+                temp.value = Resource.failed(code)
             }
 
             override fun onException(exception: Throwable?) {
-
+                temp.value = Resource.exception(exception?.message)
             }
         })
-    }
-
-    /**
-     * 发送文字消息
-     */
-    fun sendTextMessage(account: String, text: String) {
-        sendTextMessage(account, text, false)
-    }
-
-    /**
-     * 重发文字消息
-     */
-    fun reSendTextMessage(account: String, text: String) {
-        sendTextMessage(account, text, true)
+        return temp
     }
 }

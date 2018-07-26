@@ -10,4 +10,7 @@ interface EventImpl {
 
     // 跳转会话详情
     fun gotoConversationActivity(view: View, contactId: String) {}
+
+    // 重新发送消息
+    fun resendIMMessage(view: View, uuid: String) {}
 }

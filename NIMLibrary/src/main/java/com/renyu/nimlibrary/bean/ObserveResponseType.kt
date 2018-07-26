@@ -8,5 +8,7 @@ enum class ObserveResponseType {
     // 用户资料刷新
     UserInfoUpdate,
     // 从服务器获取用户资料
-    FetchUserInfo
+    FetchUserInfo,
+    // 用户发送的消息状态
+    MsgStatus
 }

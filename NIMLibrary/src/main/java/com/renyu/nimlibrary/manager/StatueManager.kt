@@ -56,11 +56,11 @@ object StatueManager {
                     }
                     else {
                         when (it) {
-                            StatusCode.NET_BROKEN -> Log.d("NIMAPP", "在线状态：当前网络不可用")
-                            StatusCode.UNLOGIN -> Log.d("NIMAPP", "在线状态：未登录")
-                            StatusCode.CONNECTING -> Log.d("NIMAPP", "连接中")
-                            StatusCode.LOGINING -> Log.d("NIMAPP", "登录中")
-                            StatusCode.LOGINED -> Log.d("NIMAPP", "登录成功")
+                            StatusCode.NET_BROKEN -> Log.d("NIM_APP", "在线状态：当前网络不可用")
+                            StatusCode.UNLOGIN -> Log.d("NIM_APP", "在线状态：未登录")
+                            StatusCode.CONNECTING -> Log.d("NIM_APP", "连接中")
+                            StatusCode.LOGINING -> Log.d("NIM_APP", "登录中")
+                            StatusCode.LOGINED -> Log.d("NIM_APP", "登录成功")
                             else -> {
                             }
                         }
@@ -74,7 +74,7 @@ object StatueManager {
     fun observeLoginSyncDataStatus() {
         NIMClient.getService(AuthServiceObserver::class.java)
                 .observeLoginSyncDataStatus({ t ->
-                    Log.d("NIMAPP", "数据同步状态${t?.name}")
+                    Log.d("NIM_APP", "数据同步状态${t?.name}")
                     when(t) {
                         LoginSyncStatus.NO_BEGIN -> {
 
