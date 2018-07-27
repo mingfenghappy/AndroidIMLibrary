@@ -21,7 +21,14 @@ object MessageManager {
      */
     fun observeReceiveMessage() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeReceiveMessage({ t -> Log.d("NIM_APP", "收到新消息${t?.size}") }, true)
+                .observeReceiveMessage({
+                    if (it != null) {
+                        it.forEach {
+                            Log.d("NIM_APP", "收到新消息:${it.fromNick}")
+                        }
+                        RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.ReceiveMessage))
+                    }
+                }, true)
     }
 
     /**
@@ -76,6 +83,16 @@ object MessageManager {
                         Log.d("NIM_APP", "被撤回的消息消息ID：${it.sessionId} ${it.time}")
                     }
 
+                }, true)
+    }
+
+    /**
+     * 监听消息附件上传/下载进度
+     */
+    fun observeAttachmentProgress() {
+        NIMClient.getService(MsgServiceObserve::class.java)
+                .observeAttachmentProgress({
+                    Log.d("NIM_APP", "上传/下载进度消息ID：${it.uuid} ${it.transferred*100/it.total}")
                 }, true)
     }
 

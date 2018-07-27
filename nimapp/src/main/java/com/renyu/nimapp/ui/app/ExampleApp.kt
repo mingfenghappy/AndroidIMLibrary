@@ -47,6 +47,8 @@ class ExampleApp : MultiDexApplication() {
             MessageManager.observeRevokeMessage()
             // 监听消息已读回执
             MessageManager.observeMessageReceipt()
+            // 监听消息附件上传/下载进度
+            MessageManager.observeAttachmentProgress()
             // 监听用户资料变更
             UserManager.observeUserInfoUpdate()
         }

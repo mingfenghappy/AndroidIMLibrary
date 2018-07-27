@@ -4,7 +4,9 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.view.View
+import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
+import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.renyu.nimapp.bean.Resource
 import com.renyu.nimlibrary.bean.ObserveResponse
@@ -16,8 +18,9 @@ import com.renyu.nimlibrary.ui.adapter.ConversationAdapter
 import com.renyu.nimlibrary.util.RxBus
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
+import kotlin.collections.ArrayList
 
-class ConversationViewModel : BaseViewModel(), EventImpl {
+class ConversationViewModel(private val contactId: String, private val sessionType: SessionTypeEnum) : BaseViewModel(), EventImpl {
 
     private val messages: ArrayList<IMMessage> by lazy {
         ArrayList<IMMessage>()
@@ -32,6 +35,11 @@ class ConversationViewModel : BaseViewModel(), EventImpl {
 
     val adapter: ConversationAdapter by lazy {
         ConversationAdapter(messages, this)
+    }
+
+    // 重写发送的数据集合
+    val resendList: MutableList<String> by lazy {
+        mutableListOf<String>()
     }
 
     init {
@@ -65,12 +73,15 @@ class ConversationViewModel : BaseViewModel(), EventImpl {
                 .subscribe())
     }
 
-
     /**
      * 向前获取会话详情列表
      */
-    fun queryMessageListsBefore(immessage: IMMessage) {
-        messageListReqeuestBefore.value = immessage
+    fun queryMessageListsBefore(imMessage: IMMessage?) {
+        var temp = imMessage
+        if (imMessage == null) {
+            temp = MessageBuilder.createEmptyMessage(contactId, sessionType, 0)
+        }
+        messageListReqeuestBefore.value = temp
     }
 
     /**
@@ -85,7 +96,7 @@ class ConversationViewModel : BaseViewModel(), EventImpl {
      */
     fun addOldIMMessages(imMessages: List<IMMessage>) {
         messages.addAll(0, imMessages)
-        adapter.notifyDataSetChanged()
+        adapter.notifyItemRangeInserted(0, imMessages.size)
     }
 
     /**
@@ -93,7 +104,37 @@ class ConversationViewModel : BaseViewModel(), EventImpl {
      */
     fun addNewIMMessages(imMessages: List<IMMessage>) {
         messages.addAll(imMessages)
-        adapter.notifyDataSetChanged()
+        if (imMessages.size == 1) {
+            adapter.notifyItemInserted(messages.size - 1)
+        }
+        else {
+            sortMessages(messages)
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 收到新消息
+     */
+    fun receiveIMMessages(observeResponse: ObserveResponse) {
+        if (observeResponse.type == ObserveResponseType.ReceiveMessage) {
+            val temp = ArrayList<IMMessage>()
+            for (message in observeResponse.data as List<*>) {
+                if (message is IMMessage && isMyMessage(message)) {
+                    temp.add(message)
+                }
+            }
+            addNewIMMessages(temp)
+        }
+    }
+
+    /**
+     * 加载更多消息
+     */
+    fun loadMoreLocalMessage() {
+        if (messages.size != 0) {
+            queryMessageListsBefore(messages[0])
+        }
     }
 
     /**
@@ -105,8 +146,18 @@ class ConversationViewModel : BaseViewModel(), EventImpl {
         }.forEach {
             it.status = imMessage.status
         }
-        sortMessages(messages)
-        adapter.notifyDataSetChanged()
+        // 重发需要调整数据集
+        if (resendList.contains(imMessage.uuid)) {
+            sortMessages(messages)
+            adapter.notifyDataSetChanged()
+        }
+        else {
+            messages.forEachIndexed { index, temp ->
+                if (temp.uuid == imMessage.uuid) {
+                    adapter.notifyItemChanged(index)
+                }
+            }
+        }
     }
 
     /**
@@ -114,25 +165,33 @@ class ConversationViewModel : BaseViewModel(), EventImpl {
      */
     override fun resendIMMessage(view: View, uuid: String) {
         super.resendIMMessage(view, uuid)
-        messages.filter {
-            it.uuid == uuid
-        }.forEach {
-            it.status = MsgStatusEnum.sending
-            adapter.notifyDataSetChanged()
+        messages.forEachIndexed { index, imMessage ->
+            if (imMessage.uuid == uuid) {
+                imMessage.status = MsgStatusEnum.sending
+                adapter.notifyItemChanged(index)
 
-            MessageManager.reSendTextMessage(it)
+                resendList.add(uuid)
+
+                MessageManager.reSendTextMessage(imMessage)
+            }
         }
     }
 
     private fun sortMessages(list: List<IMMessage>) {
-        if (list.isEmpty()) {
-            return
+        if (!list.isEmpty()) {
+            Collections.sort(list, comp)
         }
-        Collections.sort(list, comp)
     }
 
     private val comp = Comparator<IMMessage> { o1, o2 ->
         val time = o1!!.time - o2!!.time
         if (time == 0L) 0 else if (time < 0) -1 else 1
+    }
+
+    /**
+     * 判断是不是当前聊天用户的消息
+     */
+    private fun isMyMessage(message: IMMessage): Boolean {
+        return message.sessionType == sessionType && message.sessionId != null && message.sessionId == contactId
     }
 }
