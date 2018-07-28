@@ -4,6 +4,7 @@ import android.databinding.BindingAdapter
 import android.net.Uri
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -37,11 +38,19 @@ object BindingAdapters {
     fun loadChatListAvatar(simpleDraweeView: SimpleDraweeView, account: String) {
         val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(account)
         if (userInfo != null) {
-            val request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(userInfo.avatar))
-                    .setResizeOptions(ResizeOptions(SizeUtils.dp2px(40f), SizeUtils.dp2px(40f))).build()
-            val draweeController = Fresco.newDraweeControllerBuilder()
-                    .setImageRequest(request).setAutoPlayAnimations(true).build()
-            simpleDraweeView.controller = draweeController
+            if (simpleDraweeView.tag !=null &&
+                    !TextUtils.isEmpty(simpleDraweeView.tag.toString()) &&
+                    simpleDraweeView.tag.toString() == userInfo.avatar) {
+                // 什么都不做，防止Fresco闪烁
+            }
+            else {
+                val request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(userInfo.avatar))
+                        .setResizeOptions(ResizeOptions(SizeUtils.dp2px(40f), SizeUtils.dp2px(40f))).build()
+                val draweeController = Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(request).setAutoPlayAnimations(true).build()
+                simpleDraweeView.controller = draweeController
+                simpleDraweeView.tag = userInfo.avatar
+            }
         }
     }
 

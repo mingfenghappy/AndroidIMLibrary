@@ -1,18 +1,25 @@
 package com.renyu.nimlibrary.manager
 
+import android.media.MediaPlayer
+import android.net.Uri
 import android.util.Log
+import com.blankj.utilcode.util.Utils
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.RequestCallback
 import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.MsgServiceObserve
+import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
+import com.netease.nimlib.sdk.msg.model.CustomMessageConfig
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.msg.model.QueryDirectionEnum
 import com.netease.nimlib.sdk.msg.model.RecentContact
 import com.renyu.nimlibrary.bean.ObserveResponse
 import com.renyu.nimlibrary.bean.ObserveResponseType
 import com.renyu.nimlibrary.util.RxBus
+import java.io.File
+
 
 object MessageManager {
 
@@ -213,18 +220,95 @@ object MessageManager {
     /**
      * 发送文字消息
      */
-    fun sendTextMessage(account: String, text: String) {
-        sendTextMessage(MessageBuilder.createTextMessage(account, SessionTypeEnum.P2P, text), false)
+    fun sendTextMessage(account: String, text: String): IMMessage {
+        val message = MessageBuilder.createTextMessage(account, SessionTypeEnum.P2P, text)
+        sendMessage(message, false)
+        return message
     }
 
     /**
-     * 重发文字消息
+     * 发送图片消息
      */
-    fun reSendTextMessage(imMessage: IMMessage) {
-        sendTextMessage(imMessage, true)
+    fun sendImageMessage(account: String, file: File): IMMessage {
+        val message = MessageBuilder.createImageMessage(account, SessionTypeEnum.P2P, file, file.name)
+        sendMessage(message, false)
+        return message
     }
 
-    private fun sendTextMessage(imMessage: IMMessage, resend: Boolean) {
+    /**
+     * 发送文件消息
+     */
+    fun sendFileMessage(account: String, file: File): IMMessage {
+        val message = MessageBuilder.createFileMessage(account, SessionTypeEnum.P2P, file, file.name)
+        sendMessage(message, false)
+        return message
+    }
+
+    /**
+     * 发送音频消息
+     */
+    fun sendAudioMessage(account: String, file: File, duration: Long): IMMessage {
+        val message = MessageBuilder.createAudioMessage(account, SessionTypeEnum.P2P, file, duration)
+        sendMessage(message, false)
+        return message
+    }
+
+    /**
+     * 发送视频消息
+     */
+    fun sendVideoMessage(account: String, file: File): IMMessage {
+        val mediaPlayer = MediaPlayer.create(Utils.getApp(), Uri.fromFile(file))
+        val duration = mediaPlayer.duration.toLong()
+        val height = mediaPlayer.videoHeight
+        val width = mediaPlayer.videoWidth
+        val message = MessageBuilder.createVideoMessage(account, SessionTypeEnum.P2P, file, duration, width, height, file.name)
+        sendMessage(message, false)
+        return message
+    }
+
+    /**
+     * 发送位置消息
+     */
+    fun sendAudioMessage(account: String, lat: Double, lng: Double, addr: String): IMMessage {
+        val message = MessageBuilder.createLocationMessage(account, SessionTypeEnum.P2P, lat, lng, addr)
+        sendMessage(message, false)
+        return message
+    }
+
+    /**
+     * 生成提示消息
+     */
+    fun sendTipMessage(account: String, content: String) {
+        val imMessage = MessageBuilder.createTipMessage(account, SessionTypeEnum.P2P)
+        imMessage.content = content
+        imMessage.status = MsgStatusEnum.success
+        val config = CustomMessageConfig()
+        config.enableUnreadCount = false
+        imMessage.config = config
+        NIMClient.getService(MsgService::class.java).saveMessageToLocal(imMessage, true)
+    }
+
+    /**
+     * 消息撤回
+     */
+    fun sendRevokeMessage(imMessage: IMMessage, content: String) {
+        val message = MessageBuilder.createTipMessage(imMessage.sessionId, imMessage.sessionType)
+        message.content = content
+        message.status = MsgStatusEnum.success
+        val config = CustomMessageConfig()
+        config.enableUnreadCount = false
+        message.config = config
+        NIMClient.getService(MsgService::class.java).saveMessageToLocalEx(message, true, imMessage.time)
+    }
+
+    /**
+     * 重发消息
+     */
+    fun reSendMessage(imMessage: IMMessage) {
+        sendMessage(imMessage, true)
+    }
+
+    private fun sendMessage(imMessage: IMMessage, resend: Boolean) {
         NIMClient.getService(MsgService::class.java).sendMessage(imMessage, resend)
                 .setCallback(object : RequestCallback<Void> {
                     override fun onSuccess(param: Void?) {

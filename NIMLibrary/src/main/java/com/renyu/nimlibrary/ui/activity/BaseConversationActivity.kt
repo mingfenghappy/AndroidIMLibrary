@@ -6,8 +6,8 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
@@ -21,6 +21,7 @@ import com.renyu.nimlibrary.viewmodel.ConversationViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_base_conversation.*
+
 
 open class BaseConversationActivity : AppCompatActivity() {
 
@@ -64,29 +65,6 @@ open class BaseConversationActivity : AppCompatActivity() {
                     }
                 }
             })
-            vm?.messageListResponseAfter?.observe(this, Observer {
-                when(it?.status) {
-                    Status.SUCESS -> {
-                        it.data?.forEach {
-                            Log.d("NIM_APP", "发送数据：${it.content} 状态： ${it.status}")
-                        }
-                        // 刚点击发送数据就添加
-                        vm?.addNewIMMessages(it.data!!)
-                        // 发送完成滚动到最底部
-                        rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
-                    }
-                    Status.FAIL -> {
-
-                    }
-                    Status.LOADING -> {
-
-                    }
-                    Status.Exception -> {
-
-                    }
-                }
-            })
-
             viewDataBinding?.adapter = vm?.adapter
 
             rv_conversation.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -102,7 +80,7 @@ open class BaseConversationActivity : AppCompatActivity() {
 
             // 获取会话列表数据
             Handler().postDelayed({
-                vm?.queryMessageListsBefore(null)
+                vm?.queryMessageLists(null)
             }, 250)
 
             disposable = RxBus.getDefault()
@@ -111,16 +89,30 @@ open class BaseConversationActivity : AppCompatActivity() {
                     .doOnNext {
                         // 处理接收到的新消息
                         if (it.type == ObserveResponseType.ReceiveMessage) {
+                            // 如果当前消息是最后一条的话就自动滚动到最底部
+                            val isLast = isLastMessageVisible()
                             vm?.receiveIMMessages(it)
+                            if (isLast) {
+                                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+                            }
                         }
                     }
                     .subscribe()
 
             Handler().postDelayed({
-                MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello16")
-                vm?.queryMessageListsAfter()
+                vm?.addItem(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello26"))
+                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
             }, 5000)
         }
+    }
+
+    /**
+     * 判断当前显示的是不是最后一条
+     */
+    private fun isLastMessageVisible(): Boolean {
+        val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
+        val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
+        return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
     }
 
     override fun onDestroy() {

@@ -147,16 +147,108 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         val sendTvDataBinding = viewDataBinding
     }
 
-    fun modifyShowTime(position: Int, viewDataBinding: ViewDataBinding) {
-        if (position == 0) {
+    private fun modifyShowTime(position: Int, viewDataBinding: ViewDataBinding) {
+        if (timedItems.contains(messages[position].uuid)) {
             viewDataBinding.root.findViewById<TextView>(R.id.aurora_tv_msgitem_date).visibility = View.VISIBLE
         }
         else {
-            if (messages[position].time - messages[position-1].time > 1000 * 60 * 5) {
-                viewDataBinding.root.findViewById<TextView>(R.id.aurora_tv_msgitem_date).visibility = View.VISIBLE
+            viewDataBinding.root.findViewById<TextView>(R.id.aurora_tv_msgitem_date).visibility = View.GONE
+        }
+    }
+
+    // 需要显示消息时间的消息ID
+    private val timedItems: MutableSet<String> by lazy {
+        HashSet<String>()
+    }
+    // 用于消息时间显示,判断和上条消息间的时间间隔
+    private var lastShowTimeItem: IMMessage? = null
+
+    /**
+     * 列表加入新消息时，更新时间显示
+     */
+    fun updateShowTimeItem(items: List<IMMessage>, fromStart: Boolean, update: Boolean) {
+        var anchor = if (fromStart) null else lastShowTimeItem
+        for (message in items) {
+            if (setShowTimeFlag(message, anchor)) {
+                anchor = message
+            }
+        }
+        // 添加旧数据的时候无需刷新lastShowTimeItem
+        if (update) {
+            lastShowTimeItem = anchor
+        }
+    }
+
+    /**
+     * 是否需要显示时间
+     */
+    fun needShowTime(message: IMMessage): Boolean {
+        return timedItems.contains(message.uuid)
+    }
+
+    /**
+     * 设置显示时间列表
+     */
+    private fun setShowTime(message: IMMessage, show: Boolean) {
+        if (show) {
+            timedItems.add(message.uuid)
+        } else {
+            timedItems.remove(message.uuid)
+        }
+    }
+
+    private fun setShowTimeFlag(message: IMMessage, anchor: IMMessage?): Boolean {
+        var update = false
+        // 添加第一条消息时间
+        if (anchor == null) {
+            setShowTime(message, true)
+            update = true
+        }
+        else {
+            val messageTime = message.time
+            val anchorTime = anchor.time
+            if (messageTime - anchorTime == 0.toLong()) {
+                // 消息撤回时使用
+                setShowTime(message, true)
+                lastShowTimeItem = message
+                update = true
+            }
+            // 时间间隔小于5分钟，则添加
+            else if (messageTime - anchorTime < 5 * 60 * 1000) {
+                // 去除之前可能已经存在的
+                setShowTime(message, false)
             }
             else {
-                viewDataBinding.root.findViewById<TextView>(R.id.aurora_tv_msgitem_date).visibility = View.GONE
+                setShowTime(message, true)
+                update = true
+            }
+        }
+        return update
+    }
+
+    /**
+     * 由于消息被删除而重新调整显示的时间
+     */
+    fun relocateShowTimeItemAfterDelete(messageItem: IMMessage, index: Int, messages: ArrayList<IMMessage>) {
+        if (needShowTime(messageItem)) {
+            setShowTime(messageItem, false)
+            if (messages.size > 0) {
+                // 找到下一项
+                val nextItem = if (index == messages.size) {
+                    // 如果被删除的是最后一项
+                    messages[(index - 1)]
+                } else {
+                    // 如果被删除的不是最后一项
+                    messages[(index)]
+                }
+                // 如果被删的项显示了时间，需要继承
+                setShowTime(nextItem, true)
+                // 把nextItem作为时间判断起始点
+                if (lastShowTimeItem == null || (lastShowTimeItem != null && lastShowTimeItem!!.isTheSame(messageItem))) {
+                    lastShowTimeItem = nextItem
+                }
+            } else {
+                lastShowTimeItem = null
             }
         }
     }

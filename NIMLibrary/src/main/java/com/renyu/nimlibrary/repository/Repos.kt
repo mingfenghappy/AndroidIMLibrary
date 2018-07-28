@@ -89,26 +89,4 @@ object Repos {
         })
         return temp
     }
-
-    /**
-     * 向后获取会话详情
-     */
-    fun queryMessageListExAfter(message: IMMessage): LiveData<Resource<List<IMMessage>>> {
-        val temp = MutableLiveData<Resource<List<IMMessage>>>()
-        temp.value = Resource.loading()
-        MessageManager.queryMessageListExAfter(message, object : RequestCallback<List<IMMessage>> {
-            override fun onSuccess(param: List<IMMessage>?) {
-                temp.value = Resource.sucess(param)
-            }
-
-            override fun onFailed(code: Int) {
-                temp.value = Resource.failed(code)
-            }
-
-            override fun onException(exception: Throwable?) {
-                temp.value = Resource.exception(exception?.message)
-            }
-        })
-        return temp
-    }
 }
