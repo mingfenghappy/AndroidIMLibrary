@@ -54,8 +54,8 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
                     if (it.type == ObserveResponseType.MsgStatus) {
                         val imMessage = it.data as IMMessage
                         // 遍历找到并刷新
-                        messages.forEachIndexed { index, temp ->
-                            if (temp.uuid == imMessage.uuid) {
+                        for ((index, message) in messages.withIndex()) {
+                            if (message.uuid == imMessage.uuid) {
                                 adapter.notifyItemChanged(index)
                             }
                         }

@@ -30,7 +30,9 @@ object MessageManager {
         NIMClient.getService(MsgServiceObserve::class.java)
                 .observeReceiveMessage({
                     if (it != null) {
-                        it.forEach {
+                        it.filter {
+                            it.fromAccount != null
+                        }.forEach {
                             Log.d("NIM_APP", "收到新消息:${it.fromNick}")
                         }
                         RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.ReceiveMessage))
@@ -45,7 +47,9 @@ object MessageManager {
         NIMClient.getService(MsgServiceObserve::class.java)
                 .observeRecentContact({
                     if (it != null) {
-                        it.forEach {
+                        it.filter {
+                            it.fromAccount != null
+                        }.forEach {
                             Log.d("NIM_APP", "最近会话列表变更:${it.fromNick}")
                         }
                         RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.ObserveRecentContact))

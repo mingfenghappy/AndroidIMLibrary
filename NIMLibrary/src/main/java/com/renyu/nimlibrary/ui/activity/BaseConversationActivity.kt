@@ -99,10 +99,10 @@ open class BaseConversationActivity : AppCompatActivity() {
                     }
                     .subscribe()
 
-            Handler().postDelayed({
-                vm?.addItem(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello26"))
-                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
-            }, 5000)
+//            Handler().postDelayed({
+//                vm?.addItem(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello28"))
+//                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+//            }, 5000)
         }
     }
 

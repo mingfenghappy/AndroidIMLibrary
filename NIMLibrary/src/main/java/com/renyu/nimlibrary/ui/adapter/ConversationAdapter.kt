@@ -213,12 +213,12 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                 lastShowTimeItem = message
                 update = true
             }
-            // 时间间隔小于5分钟，则添加
             else if (messageTime - anchorTime < 5 * 60 * 1000) {
                 // 去除之前可能已经存在的
                 setShowTime(message, false)
             }
             else {
+                // 时间间隔大于5分钟，则添加
                 setShowTime(message, true)
                 update = true
             }
@@ -233,20 +233,15 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         if (needShowTime(messageItem)) {
             setShowTime(messageItem, false)
             if (messages.size > 0) {
-                // 找到下一项
-                val nextItem = if (index == messages.size) {
-                    // 如果被删除的是最后一项
-                    messages[(index - 1)]
-                } else {
-                    // 如果被删除的不是最后一项
-                    messages[(index)]
+                var nextItem: IMMessage? = null
+                // 向上寻找最接近的一个lastShowTimeItem作为新的lastShowTimeItem
+                for (i in index-1 downTo 0) {
+                    if (timedItems.contains(messages[i].uuid)) {
+                        nextItem = messages[i]
+                        break
+                    }
                 }
-                // 如果被删的项显示了时间，需要继承
-                setShowTime(nextItem, true)
-                // 把nextItem作为时间判断起始点
-                if (lastShowTimeItem == null || (lastShowTimeItem != null && lastShowTimeItem!!.isTheSame(messageItem))) {
-                    lastShowTimeItem = nextItem
-                }
+                lastShowTimeItem = nextItem
             } else {
                 lastShowTimeItem = null
             }
