@@ -3,6 +3,8 @@ package com.renyu.nimlibrary.viewmodel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
+import android.os.Handler
 import android.view.View
 import com.blankj.utilcode.util.SPUtils
 import com.netease.nimlib.sdk.msg.MessageBuilder
@@ -17,12 +19,10 @@ import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.params.CommonParams
 import com.renyu.nimlibrary.repository.Repos
 import com.renyu.nimlibrary.ui.adapter.ConversationAdapter
-import com.renyu.nimlibrary.util.RxBus
-import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ConversationViewModel(private val contactId: String, private val sessionType: SessionTypeEnum) : BaseViewModel(), EventImpl {
+class ConversationViewModel(private val contactId: String, private val sessionType: SessionTypeEnum) : ViewModel(), EventImpl {
 
     private val messages: ArrayList<IMMessage> by lazy {
         ArrayList<IMMessage>()
@@ -45,23 +45,6 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
                 Repos.queryMessageListExBefore(it)
             }
         }
-
-        compositeDisposable.add(RxBus.getDefault()
-                .toObservable(ObserveResponse::class.java)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
-                    // 添加发出的消息状态监听
-                    if (it.type == ObserveResponseType.MsgStatus) {
-                        val imMessage = it.data as IMMessage
-                        // 遍历找到并刷新
-                        for ((index, message) in messages.withIndex()) {
-                            if (message.uuid == imMessage.uuid) {
-                                adapter.notifyItemChanged(index)
-                            }
-                        }
-                    }
-                }
-                .subscribe())
     }
 
     /**
@@ -113,6 +96,15 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
     }
 
     /**
+     * 发送消息
+     */
+    fun sendIMMessage(message: IMMessage) {
+        messages.add(message)
+        adapter.updateShowTimeItem(messages, false, true)
+        adapter.notifyItemInserted(messages.size - 1)
+    }
+
+    /**
      * 重新发送消息
      */
     override fun resendIMMessage(view: View, uuid: String) {
@@ -137,6 +129,41 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
     }
 
     /**
+     * 删除消息
+     */
+    private fun deleteIMMessage(imMessage: IMMessage) {
+        val index = deleteItem(imMessage, true)
+        adapter.notifyItemRemoved(index)
+        // 重新调整时间
+        adapter.updateShowTimeItem(messages, false, true)
+        adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * 更新消息状态
+     */
+    fun updateIMMessage(observeResponse: ObserveResponse) {
+        val imMessage = observeResponse.data as IMMessage
+        // 遍历找到并刷新
+        for ((index, message) in messages.withIndex()) {
+            if (message.uuid == imMessage.uuid) {
+                Handler().postDelayed({
+                    adapter.notifyItemChanged(index)
+                }, 250)
+            }
+        }
+    }
+
+    /**
+     * 长按消息列表
+     */
+    override fun onLongClick(v: View, imMessage: IMMessage): Boolean {
+        // 删除消息
+        deleteIMMessage(imMessage)
+        return super.onLongClick(v, imMessage)
+    }
+
+    /**
      * 判断是不是当前聊天用户的消息
      */
     private fun isMyMessage(message: IMMessage): Boolean {
@@ -144,18 +171,9 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
     }
 
     /**
-     * 添加消息
-     */
-    fun addItem(message: IMMessage) {
-        messages.add(message)
-        adapter.updateShowTimeItem(messages, false, true)
-        adapter.notifyDataSetChanged()
-    }
-
-    /**
      * 删除消息
      */
-    private fun deleteItem(messageItem: IMMessage, isRelocateTime: Boolean) {
+    private fun deleteItem(messageItem: IMMessage, isRelocateTime: Boolean): Int {
         MessageManager.deleteChattingHistory(messageItem)
         var index = 0
         for (item in messages) {
@@ -170,6 +188,7 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
                 adapter.relocateShowTimeItemAfterDelete(messageItem, index, messages)
             }
         }
+        return index
     }
 
     /**

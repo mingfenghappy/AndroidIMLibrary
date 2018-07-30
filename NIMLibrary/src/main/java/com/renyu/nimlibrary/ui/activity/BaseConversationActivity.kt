@@ -21,6 +21,10 @@ import com.renyu.nimlibrary.viewmodel.ConversationViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_base_conversation.*
+import com.netease.nimlib.sdk.msg.MsgService
+import com.netease.nimlib.sdk.NIMClient
+
+
 
 
 open class BaseConversationActivity : AppCompatActivity() {
@@ -32,10 +36,6 @@ open class BaseConversationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // 设置当前正在聊天的对象
-        MessageManager.setChattingAccount(intent.getStringExtra("contactId"),
-                if (intent.getBooleanExtra("isGroup", false)) SessionTypeEnum.Team else SessionTypeEnum.P2P)
 
         viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_base_conversation)
         viewDataBinding.also {
@@ -96,13 +96,17 @@ open class BaseConversationActivity : AppCompatActivity() {
                                 rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
                             }
                         }
+                        // 添加发出的消息状态监听
+                        if (it.type == ObserveResponseType.MsgStatus) {
+                            vm?.updateIMMessage(it)
+                        }
                     }
                     .subscribe()
 
-//            Handler().postDelayed({
-//                vm?.addItem(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello28"))
-//                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
-//            }, 5000)
+            Handler().postDelayed({
+                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello29"))
+                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+            }, 5000)
         }
     }
 
@@ -113,6 +117,20 @@ open class BaseConversationActivity : AppCompatActivity() {
         val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
         val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
         return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 设置当前正在聊天的对象
+        MessageManager.setChattingAccount(intent.getStringExtra("contactId"),
+                if (intent.getBooleanExtra("isGroup", false)) SessionTypeEnum.Team else SessionTypeEnum.P2P)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // 去除正在聊天的对象
+        NIMClient.getService(MsgService::class.java).setChattingAccount(MsgService.MSG_CHATTING_ACCOUNT_NONE,
+                SessionTypeEnum.None)
     }
 
     override fun onDestroy() {
