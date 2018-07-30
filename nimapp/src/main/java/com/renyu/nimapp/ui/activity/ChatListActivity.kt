@@ -2,11 +2,13 @@ package com.renyu.nimapp.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import com.renyu.nimapp.R
-import com.renyu.nimlibrary.ui.activity.BaseChatListActivity
 import com.renyu.nimlibrary.ui.fragment.ChatListFragment
 
-class ChatListActivity : BaseChatListActivity() {
+class ChatListActivity : AppCompatActivity() {
+
+    private var conversationFragment: ChatListFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

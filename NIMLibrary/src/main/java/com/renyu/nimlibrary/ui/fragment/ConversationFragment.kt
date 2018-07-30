@@ -1,19 +1,24 @@
-package com.renyu.nimlibrary.ui.activity
+package com.renyu.nimlibrary.ui.fragment
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import cn.dreamtobe.kpswitch.util.KPSwitchConflictUtil
 import cn.dreamtobe.kpswitch.util.KeyboardUtil
@@ -26,7 +31,7 @@ import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.bean.ObserveResponse
 import com.renyu.nimlibrary.bean.ObserveResponseType
-import com.renyu.nimlibrary.databinding.ActivityBaseConversationBinding
+import com.renyu.nimlibrary.databinding.FragmentConversationBinding
 import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.params.CommonParams
 import com.renyu.nimlibrary.util.RxBus
@@ -34,13 +39,27 @@ import com.renyu.nimlibrary.viewmodel.ConversationViewModel
 import com.renyu.nimlibrary.viewmodel.ConversationViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_base_conversation.*
+import kotlinx.android.synthetic.main.fragment_conversation.*
 import org.json.JSONObject
 
+/**
+ * Created by Administrator on 2018/7/30.
+ */
+class ConversationFragment : Fragment() {
 
-abstract class BaseConversationActivity : AppCompatActivity() {
+    companion object {
+        fun getInstance(contactId: String, isGroup: Boolean): ConversationFragment {
+            val fragment = ConversationFragment()
+            val bundle = Bundle()
+            bundle.putString("contactId", contactId)
+            bundle.putBoolean("isGroup", isGroup)
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
 
-    private var viewDataBinding: ActivityBaseConversationBinding? = null
+    private var viewDataBinding: FragmentConversationBinding? = null
+
     var vm: ConversationViewModel? = null
 
     private var disposable: Disposable? = null
@@ -48,25 +67,36 @@ abstract class BaseConversationActivity : AppCompatActivity() {
     // 面板是否已经收起
     private var isExecuteCollapse = false
 
-    // "正在输入提示"提示刷新使用
+    // "正在输入"提示刷新使用
     val titleChangeHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
         }
     }
-    private val titleChangeRunnable: Runnable = Runnable { titleChange(true) }
+    private val titleChangeRunnable: Runnable = Runnable { changeTipListener?.titleChange(true) }
 
-    // "正在输入提示"子类实现的方法
-    abstract fun titleChange(reset: Boolean)
+    private var changeTipListener: ChangeTipListener? = null
+    // "正在输入"提示接口
+    interface ChangeTipListener {
+        fun titleChange(reset: Boolean)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        changeTipListener = context as ChangeTipListener
+    }
 
-        viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_base_conversation)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_conversation, container, false)
+        return viewDataBinding?.root
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         viewDataBinding.also {
             vm = ViewModelProviders.of(this,
-                    ConversationViewModelFactory(intent.getStringExtra("contactId"),
-                            if (intent.getBooleanExtra("isGroup", false)) SessionTypeEnum.Team else SessionTypeEnum.P2P))
+                    ConversationViewModelFactory(arguments!!.getString("contactId"),
+                            if (arguments!!.getBoolean("isGroup")) SessionTypeEnum.Team else SessionTypeEnum.P2P))
                     .get(ConversationViewModel::class.java)
             vm?.messageListResponseBefore?.observe(this, Observer {
                 when(it?.status) {
@@ -101,7 +131,6 @@ abstract class BaseConversationActivity : AppCompatActivity() {
             })
             viewDataBinding?.adapter = vm?.adapter
 
-            // 配置UI
             initUI()
 
             disposable = RxBus.getDefault()
@@ -118,9 +147,9 @@ abstract class BaseConversationActivity : AppCompatActivity() {
                             }
                             // 发送消息已读回执
                             vm?.sendMsgReceipt()
-                            // "正在输入提示"提示重置
+                            // "正在输入"提示重置
                             titleChangeHandler.removeCallbacks(titleChangeRunnable)
-                            titleChange(true)
+                            changeTipListener?.titleChange(true)
                         }
                         // 添加发出的消息状态监听
                         if (it.type == ObserveResponseType.MsgStatus) {
@@ -136,11 +165,11 @@ abstract class BaseConversationActivity : AppCompatActivity() {
                         }
                         if (it.type == ObserveResponseType.CustomNotification) {
                             // 收到的自定义通知属于当前会话中的用户
-                            if ((it.data as CustomNotification).sessionId == intent.getStringExtra("contactId")) {
+                            if ((it.data as CustomNotification).sessionId == arguments!!.getString("contactId")) {
                                 val content = (it.data as CustomNotification).content
                                 val type = JSONObject(content).getString(CommonParams.TYPE)
                                 if (type == CommonParams.COMMAND_INPUT) {
-                                    titleChange(false)
+                                    changeTipListener?.titleChange(false)
                                     titleChangeHandler.postDelayed(titleChangeRunnable, 4000)
                                 }
                             }
@@ -160,20 +189,11 @@ abstract class BaseConversationActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 判断当前显示的是不是最后一条
-     */
-    private fun isLastMessageVisible(): Boolean {
-        val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
-        val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
-        return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
-    }
-
     override fun onResume() {
         super.onResume()
         // 设置当前正在聊天的对象
-        MessageManager.setChattingAccount(intent.getStringExtra("contactId"),
-                if (intent.getBooleanExtra("isGroup", false)) SessionTypeEnum.Team else SessionTypeEnum.P2P)
+        MessageManager.setChattingAccount(arguments!!.getString("contactId"),
+                if (arguments!!.getBoolean("isGroup")) SessionTypeEnum.Team else SessionTypeEnum.P2P)
     }
 
     override fun onPause() {
@@ -183,10 +203,19 @@ abstract class BaseConversationActivity : AppCompatActivity() {
                 SessionTypeEnum.None)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
 
         disposable?.dispose()
+    }
+
+    /**
+     * 判断当前显示的是不是最后一条
+     */
+    private fun isLastMessageVisible(): Boolean {
+        val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
+        val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
+        return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
     }
 
     private fun initUI() {
@@ -205,6 +234,7 @@ abstract class BaseConversationActivity : AppCompatActivity() {
                 } else {
                     btn_send_conversation.setBackgroundColor(Color.parseColor("#0099ff"))
                 }
+                // 发送"正在输入"提示
                 vm?.sendTypingCommand()
             }
         })
@@ -232,7 +262,7 @@ abstract class BaseConversationActivity : AppCompatActivity() {
             }
         })
         // ***********************************  JKeyboardPanelSwitch配置  ***********************************
-        KeyboardUtil.attach(this, kp_panel_root) { isShowing ->
+        KeyboardUtil.attach(context as Activity, kp_panel_root) { isShowing ->
             if (isShowing) {
                 rv_conversation.scrollToPosition(rv_conversation.adapter.itemCount - 1)
             }
@@ -252,7 +282,7 @@ abstract class BaseConversationActivity : AppCompatActivity() {
             false
         }
         kp_panel_root.post {
-            val height = KeyboardUtil.getKeyboardHeight(this@BaseConversationActivity)
+            val height = KeyboardUtil.getKeyboardHeight(context)
             val params = kp_panel_root.layoutParams as LinearLayout.LayoutParams
             params.height = height
             kp_panel_root.layoutParams = params
