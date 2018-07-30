@@ -36,6 +36,9 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
         ConversationAdapter(messages, this)
     }
 
+    // 首次添加
+    var firstLoad = false
+
     init {
         messageListResponseBefore = Transformations.switchMap(messageListReqeuestBefore) {
             if (it == null) {
@@ -71,9 +74,16 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
      * 添加旧的消息数据
      */
     fun addOldIMMessages(imMessages: List<IMMessage>) {
+        if (imMessages.isEmpty()) {
+            return
+        }
         messages.addAll(0, imMessages)
-        adapter.updateShowTimeItem(messages, true, true)
-        adapter.notifyDataSetChanged()
+        adapter.updateShowTimeItem(messages, true, firstLoad)
+        // 添加新数据
+        adapter.notifyItemRangeInserted(0, imMessages.size)
+        // 根据时间变化刷新老数据
+        adapter.notifyItemRangeChanged(imMessages.size, messages.size)
+        firstLoad = false
     }
 
     /**

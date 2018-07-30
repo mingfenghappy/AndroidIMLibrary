@@ -8,6 +8,8 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import com.netease.nimlib.sdk.NIMClient
+import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
@@ -21,10 +23,6 @@ import com.renyu.nimlibrary.viewmodel.ConversationViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_base_conversation.*
-import com.netease.nimlib.sdk.msg.MsgService
-import com.netease.nimlib.sdk.NIMClient
-
-
 
 
 open class BaseConversationActivity : AppCompatActivity() {
@@ -52,7 +50,14 @@ open class BaseConversationActivity : AppCompatActivity() {
                         if (needScrollToEnd) {
                             rv_conversation.scrollToPosition(rv_conversation.adapter.itemCount - 1)
                         }
-
+                        // 不是首次加载更新则显示最后加载的那一条
+                        else {
+                            val linearManager = rv_conversation.layoutManager as LinearLayoutManager
+                            val firstItemPosition = linearManager.findFirstVisibleItemPosition()
+                            if (firstItemPosition == 0) {
+                                rv_conversation.scrollToPosition(it.data!!.size - 1)
+                            }
+                        }
                     }
                     Status.FAIL -> {
 
@@ -103,10 +108,10 @@ open class BaseConversationActivity : AppCompatActivity() {
                     }
                     .subscribe()
 
-            Handler().postDelayed({
-                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello29"))
-                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
-            }, 5000)
+//            Handler().postDelayed({
+//                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello32"))
+//                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+//            }, 5000)
         }
     }
 

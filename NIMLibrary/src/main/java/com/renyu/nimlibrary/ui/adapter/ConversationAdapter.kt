@@ -158,7 +158,7 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
 
     // 需要显示消息时间的消息ID
     private val timedItems: MutableSet<String> by lazy {
-        HashSet<String>()
+        LinkedHashSet<String>()
     }
     // 用于消息时间显示,判断和上条消息间的时间间隔
     private var lastShowTimeItem: IMMessage? = null
@@ -169,6 +169,11 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
     fun updateShowTimeItem(items: List<IMMessage>, fromStart: Boolean, update: Boolean) {
         var anchor = if (fromStart) null else lastShowTimeItem
         for (message in items) {
+            // 如果是lastShowTimeItem发生改变，则只判断改变之后的部分
+            if (!fromStart && anchor!=null && message.time < anchor.time) {
+                continue
+            }
+            // 对比下一条数据
             if (setShowTimeFlag(message, anchor)) {
                 anchor = message
             }
@@ -182,7 +187,7 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
     /**
      * 是否需要显示时间
      */
-    fun needShowTime(message: IMMessage): Boolean {
+    private fun needShowTime(message: IMMessage): Boolean {
         return timedItems.contains(message.uuid)
     }
 
@@ -208,7 +213,6 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
             val messageTime = message.time
             val anchorTime = anchor.time
             if (messageTime - anchorTime == 0.toLong()) {
-                // 消息撤回时使用
                 setShowTime(message, true)
                 lastShowTimeItem = message
                 update = true
