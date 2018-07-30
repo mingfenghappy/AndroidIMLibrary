@@ -16,5 +16,7 @@ enum class ObserveResponseType {
     // 撤销当前消息
     RevokeMessage,
     // 收到已读回执
-    MessageReceipt
+    MessageReceipt,
+    // 通知类消息
+    CustomNotification
 }

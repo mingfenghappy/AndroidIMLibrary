@@ -31,4 +31,7 @@ public class CommonParams {
     public static final int SIGNINBACK = 3;
     // 去主页
     public static final int MAIN = 4;
+
+    // 发出"正在输入提示"指令
+    public static final String COMMAND_INPUT = "command_input";
 }

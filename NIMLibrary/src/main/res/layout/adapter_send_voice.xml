@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-
+        <import type="com.renyu.nimlibrary.util.OtherUtils"></import>
+        <variable
+            name="iMMessage"
+            type="com.netease.nimlib.sdk.msg.model.IMMessage"></variable>
+        <variable
+            name="eventImpl"
+            type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -58,7 +65,6 @@
                     android:src="@mipmap/ease_chatto_voice_playing" />
             </RelativeLayout>
             <ImageView
-                android:id="@+id/aurora_iv_msgitem_read_status"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_centerVertical="true"
@@ -67,7 +73,6 @@
                 android:src="@mipmap/ease_msg_state_failed_resend"
                 android:visibility="gone" />
             <ProgressBar
-                android:id="@+id/aurora_iv_msgitem_send_progress_bar"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_centerVertical="true"
@@ -75,6 +80,18 @@
                 style="@style/pb_conversation_send"
                 android:visibility="visible"
                 android:layout_toStartOf="@id/bubble" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="3dip"
+                android:text="已读"
+                android:layout_marginEnd="12dip"
+                android:layout_alignBottom="@id/bubble"
+                android:layout_toStartOf="@id/bubble"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                app:read="@{iMMessage}"/>
         </RelativeLayout>
     </LinearLayout>
 </layout>

@@ -41,6 +41,16 @@
                 fresco:failureImage="@drawable/default_grey_avatar"
                 fresco:failureImageScaleType="centerCrop"
                 fresco:roundAsCircle="true"/>
+            <TextView
+                android:id="@+id/aurora_tv_msgitem_display_name"
+                style="@style/chat_text_name_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:textSize="13sp"
+                android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
+                android:visibility="gone"
+                app:chatListName="@{iMMessage.getFromAccount()}" />
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,7 +59,6 @@
                 android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
                 android:background="@mipmap/ic_conversation_left" >
                 <com.facebook.drawee.span.SimpleDraweeSpanTextView
-                    android:id="@+id/aurora_tv_msgitem_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autoLink="all"
@@ -62,16 +71,6 @@
                     android:textSize="15sp"
                     app:cvListContent="@{iMMessage.getContent()}"/>
             </RelativeLayout>
-            <TextView
-                android:id="@+id/aurora_tv_msgitem_display_name"
-                style="@style/chat_text_name_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:textSize="13sp"
-                android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
-                android:visibility="gone"
-                app:chatListName="@{iMMessage.getFromAccount()}" />
         </RelativeLayout>
     </LinearLayout>
 </layout>

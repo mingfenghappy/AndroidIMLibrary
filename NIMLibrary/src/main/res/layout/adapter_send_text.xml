@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="com.renyu.nimlibrary.util.OtherUtils"></import>
         <variable
@@ -9,7 +10,7 @@
             name="eventImpl"
             type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -49,7 +50,6 @@
                 android:layout_toStartOf="@id/aurora_iv_msgitem_avatar"
                 android:background="@mipmap/ic_conversation_right">
                 <com.facebook.drawee.span.SimpleDraweeSpanTextView
-                    android:id="@+id/aurora_tv_msgitem_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autoLink="all"
@@ -63,7 +63,6 @@
                     app:cvListContent="@{iMMessage.getContent()}" />
             </RelativeLayout>
             <ImageView
-                android:id="@+id/aurora_iv_msgitem_send_status"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_centerVertical="true"
@@ -73,7 +72,6 @@
                 android:onClick="@{(view) -> eventImpl.resendIMMessage(view, iMMessage.getUuid())}"
                 app:cvListIvStatue="@{iMMessage.getStatus().getValue()}" />
             <ProgressBar
-                android:id="@+id/aurora_iv_msgitem_send_progress_bar"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_centerVertical="true"
@@ -82,7 +80,6 @@
                 app:cvListPbStatue="@{iMMessage.getStatus().getValue()}"
                 android:layout_toStartOf="@id/bubble" />
             <TextView
-                android:id="@+id/aurora_iv_msgitem_read_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"

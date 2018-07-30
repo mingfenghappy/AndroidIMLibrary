@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-
+        <import type="com.renyu.nimlibrary.util.OtherUtils"></import>
+        <variable
+            name="iMMessage"
+            type="com.netease.nimlib.sdk.msg.model.IMMessage"></variable>
+        <variable
+            name="eventImpl"
+            type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
     <LinearLayout
         android:layout_width="match_parent"

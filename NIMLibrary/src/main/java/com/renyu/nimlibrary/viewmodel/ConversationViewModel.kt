@@ -9,13 +9,17 @@ import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.Utils
+import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.RequestCallback
 import com.netease.nimlib.sdk.ResponseCode
 import com.netease.nimlib.sdk.msg.MessageBuilder
+import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
+import com.netease.nimlib.sdk.msg.model.CustomNotification
+import com.netease.nimlib.sdk.msg.model.CustomNotificationConfig
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.msg.model.RevokeMsgNotification
 import com.renyu.nimapp.bean.Resource
@@ -26,6 +30,7 @@ import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.params.CommonParams
 import com.renyu.nimlibrary.repository.Repos
 import com.renyu.nimlibrary.ui.adapter.ConversationAdapter
+import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -44,7 +49,10 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
     }
 
     // 首次添加
-    var firstLoad = false
+    private var firstLoad = false
+
+    // "正在输入提示"指令发送时间间隔
+    private var typingTime: Long = 0
 
     init {
         messageListResponseBefore = Transformations.switchMap(messageListReqeuestBefore) {
@@ -304,5 +312,30 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
     private val comp = Comparator<IMMessage> { o1, o2 ->
         val time = o1!!.time - o2!!.time
         if (time == 0L) 0 else if (time < 0) -1 else 1
+    }
+
+    /**
+     * 发送“正在输入”通知
+     */
+    fun sendTypingCommand() {
+        if (sessionType === SessionTypeEnum.Team || sessionType === SessionTypeEnum.ChatRoom) {
+            return
+        }
+        // 每5s发出一次
+        if (System.currentTimeMillis() - typingTime > 5000L) {
+            typingTime = System.currentTimeMillis()
+            val command = CustomNotification()
+            command.sessionId = contactId
+            command.sessionType = sessionType
+            val config = CustomNotificationConfig()
+            config.enablePush = false
+            config.enableUnreadCount = false
+            command.config = config
+            val json = JSONObject()
+            json.put(CommonParams.TYPE, CommonParams.COMMAND_INPUT)
+            command.content = json.toString()
+
+            NIMClient.getService(MsgService::class.java).sendCustomNotification(command)
+        }
     }
 }

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-
+        <import type="com.renyu.nimlibrary.util.OtherUtils"></import>
+        <variable
+            name="iMMessage"
+            type="com.netease.nimlib.sdk.msg.model.IMMessage"></variable>
+        <variable
+            name="eventImpl"
+            type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,6 +39,15 @@
                 fresco:failureImage="@drawable/default_grey_avatar"
                 fresco:failureImageScaleType="centerCrop"
                 fresco:roundAsCircle="true"/>
+            <TextView
+                android:id="@+id/aurora_tv_msgitem_display_name"
+                style="@style/chat_text_name_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:textSize="13sp"
+                android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
+                android:visibility="gone" />
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,7 +56,6 @@
                 android:layout_toEndOf="@id/aurora_iv_msgitem_avatar">
                 <com.facebook.drawee.view.SimpleDraweeView
                     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/aurora_iv_msgitem_photo"
                     android:layout_width="123dip"
                     android:layout_height="115dip"
                     fresco:actualImageResource="@drawable/default_grey_avatar"
@@ -51,15 +66,6 @@
                     fresco:failureImageScaleType="centerCrop"
                     fresco:roundedCornerRadius="15dp"/>
             </RelativeLayout>
-            <TextView
-                android:id="@+id/aurora_tv_msgitem_display_name"
-                style="@style/chat_text_name_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:textSize="13sp"
-                android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
-                android:visibility="gone" />
         </RelativeLayout>
     </LinearLayout>
 </layout>
