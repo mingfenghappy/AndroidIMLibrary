@@ -45,10 +45,12 @@ open class BaseConversationActivity : AppCompatActivity() {
             vm?.messageListResponseBefore?.observe(this, Observer {
                 when(it?.status) {
                     Status.SUCESS -> {
-                        val needScrollToEnd = rv_conversation.adapter.itemCount == 0
+                        val firstLoad = rv_conversation.adapter.itemCount == 0
                         vm?.addOldIMMessages(it.data!!)
-                        // 首次加载完成滚动到最底部
-                        if (needScrollToEnd) {
+                        if (firstLoad) {
+                            // 首次加载完成发送消息已读回执
+                            vm?.sendMsgReceipt()
+                            // 首次加载完成滚动到最底部
                             rv_conversation.scrollToPosition(rv_conversation.adapter.itemCount - 1)
                         }
                         // 不是首次加载更新则显示最后加载的那一条
@@ -101,6 +103,8 @@ open class BaseConversationActivity : AppCompatActivity() {
                             if (isLast) {
                                 rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
                             }
+                            // 发送消息已读回执
+                            vm?.sendMsgReceipt()
                         }
                         // 添加发出的消息状态监听
                         if (it.type == ObserveResponseType.MsgStatus) {
@@ -110,11 +114,16 @@ open class BaseConversationActivity : AppCompatActivity() {
                         if (it.type == ObserveResponseType.RevokeMessage) {
                             vm?.receiverRevokeMessage(it.data as RevokeMsgNotification)
                         }
+                        // 收到已读回执
+                        if (it.type == ObserveResponseType.MessageReceipt) {
+                            vm?.receiverMsgReceipt()
+                        }
+
                     }
                     .subscribe()
 
             Handler().postDelayed({
-                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello34"))
+                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello37"))
                 rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
             }, 5000)
         }

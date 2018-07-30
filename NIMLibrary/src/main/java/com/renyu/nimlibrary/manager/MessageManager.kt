@@ -96,10 +96,10 @@ object MessageManager {
     fun observeMessageReceipt() {
         NIMClient.getService(MsgServiceObserve::class.java)
                 .observeMessageReceipt({
+                    RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.MessageReceipt))
                     it.forEach {
                         Log.d("NIM_APP", "已读回执消息回执ID：${it.sessionId} ${it.time}")
                     }
-
                 }, true)
     }
 
@@ -333,5 +333,24 @@ object MessageManager {
                         Log.d("NIM_APP", "消息发送失败 ${exception?.message}")
                     }
                 })
+    }
+
+    /**
+     * 发送P2P消息已读回执
+     */
+    fun sendReceipt(account: String, imMessage: IMMessage) {
+        NIMClient.getService(MsgService::class.java).sendMessageReceipt(account, imMessage).setCallback(object : RequestCallback<Void> {
+            override fun onSuccess(param: Void?) {
+                Log.d("NIM_APP", "消息回执发送成功")
+            }
+
+            override fun onFailed(code: Int) {
+
+            }
+
+            override fun onException(exception: Throwable?) {
+
+            }
+        })
     }
 }

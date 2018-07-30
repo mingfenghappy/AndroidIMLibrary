@@ -12,7 +12,9 @@ import com.blankj.utilcode.util.Utils
 import com.netease.nimlib.sdk.RequestCallback
 import com.netease.nimlib.sdk.ResponseCode
 import com.netease.nimlib.sdk.msg.MessageBuilder
+import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
+import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.msg.model.RevokeMsgNotification
@@ -248,6 +250,49 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
             deleteItem(notification.message, false)
             MessageManager.sendRevokeMessage(notification.message, "对方撤回了一条消息")
         }
+    }
+
+    /**
+     * 收到已读回执
+     */
+    fun receiverMsgReceipt() {
+        adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * 发送已读回执
+     */
+    fun sendMsgReceipt() {
+        if (sessionType !== SessionTypeEnum.P2P) {
+            return
+        }
+        val message = getLastReceivedMessage()
+        if (message != null) {
+            MessageManager.sendReceipt(contactId, message)
+        }
+    }
+
+    /**
+     * 得到最后一条要发送回执的信息
+     */
+    private fun getLastReceivedMessage(): IMMessage? {
+        var lastMessage: IMMessage? = null
+        for (i in messages.indices.reversed()) {
+            if (sendReceiptCheck(messages[i])) {
+                lastMessage = messages[i]
+                break
+            }
+        }
+        return lastMessage
+    }
+
+    /**
+     * 非收到的消息，Tip消息和通知类消息，不要发已读回执
+     */
+    private fun sendReceiptCheck(msg: IMMessage): Boolean {
+        return !(msg.direct != MsgDirectionEnum.In ||
+                msg.msgType == MsgTypeEnum.tip ||
+                msg.msgType == MsgTypeEnum.notification)
     }
 
     private fun sortMessages(list: List<IMMessage>) {

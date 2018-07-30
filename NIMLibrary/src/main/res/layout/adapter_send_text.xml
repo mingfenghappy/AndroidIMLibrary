@@ -81,6 +81,19 @@
                 style="@style/pb_conversation_send"
                 app:cvListPbStatue="@{iMMessage.getStatus().getValue()}"
                 android:layout_toStartOf="@id/bubble" />
+            <TextView
+                android:id="@+id/aurora_iv_msgitem_read_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="3dip"
+                android:text="已读"
+                android:layout_marginEnd="12dip"
+                android:layout_alignBottom="@id/bubble"
+                android:layout_toStartOf="@id/bubble"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                app:read="@{iMMessage}"/>
         </RelativeLayout>
     </LinearLayout>
 </layout>

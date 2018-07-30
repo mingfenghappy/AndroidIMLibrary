@@ -16,7 +16,11 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.netease.nimlib.sdk.NIMClient
+import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
+import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
+import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
+import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.uinfo.UserService
 import com.renyu.nimlibrary.util.FaceIconUtil
 
@@ -103,6 +107,21 @@ object BindingAdapters {
         }
         else {
             imageView.visibility = View.GONE
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["read"])
+    fun changeReadedVisibility(textView: TextView, imMessage: IMMessage) {
+        if (imMessage.sessionType == SessionTypeEnum.P2P
+                && imMessage.direct == MsgDirectionEnum.Out
+                && imMessage.msgType != MsgTypeEnum.tip
+                && imMessage.msgType != MsgTypeEnum.notification
+                && imMessage.isRemoteRead) {
+            textView.visibility = View.VISIBLE
+        }
+        else {
+            textView.visibility = View.GONE
         }
     }
 }
