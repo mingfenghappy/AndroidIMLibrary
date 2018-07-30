@@ -15,6 +15,7 @@ import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.databinding.AdapterReceiveTextBinding
 import com.renyu.nimlibrary.databinding.AdapterSendTextBinding
+import com.renyu.nimlibrary.databinding.AdapterTipBinding
 
 class ConversationAdapter(private val messages: ArrayList<IMMessage>, private val eventImpl: EventImpl) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -28,6 +29,11 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                     DataBindingUtil.inflate<AdapterSendTextBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_text, parent,
+                            false))
+            16, 17 -> return TipHolder(
+                    DataBindingUtil.inflate<AdapterTipBinding>(
+                            LayoutInflater.from(parent.context),
+                            R.layout.adapter_tip, parent,
                             false))
         }
 
@@ -51,6 +57,9 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                 holder.sendTvDataBinding.executePendingBindings()
                 // 调整时间显示
                 modifyShowTime(holder.layoutPosition, holder.sendTvDataBinding)
+            }
+            16, 17 -> {
+                (holder as TipHolder).tipDataBinding.setVariable(BR.iMMessage, messages[holder.layoutPosition])
             }
         }
     }
@@ -122,11 +131,11 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         }
         // 接收提醒类型消息
         if (messages[position].msgType == MsgTypeEnum.tip && messages[position].direct == MsgDirectionEnum.In) {
-
+            return 16
         }
         // 发送提醒类型消息
         else if (messages[position].msgType == MsgTypeEnum.tip && messages[position].direct == MsgDirectionEnum.Out) {
-
+            return 17
         }
         // 接收自定义消息
         if (messages[position].msgType == MsgTypeEnum.custom && messages[position].direct == MsgDirectionEnum.In) {
@@ -145,6 +154,10 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
 
     class SendTextViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
         val sendTvDataBinding = viewDataBinding
+    }
+
+    class TipHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val tipDataBinding = viewDataBinding
     }
 
     private fun modifyShowTime(position: Int, viewDataBinding: ViewDataBinding) {

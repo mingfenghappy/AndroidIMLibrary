@@ -6,11 +6,16 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.os.Handler
 import android.view.View
+import android.widget.Toast
 import com.blankj.utilcode.util.SPUtils
+import com.blankj.utilcode.util.Utils
+import com.netease.nimlib.sdk.RequestCallback
+import com.netease.nimlib.sdk.ResponseCode
 import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
+import com.netease.nimlib.sdk.msg.model.RevokeMsgNotification
 import com.renyu.nimapp.bean.Resource
 import com.renyu.nimlibrary.bean.ObserveResponse
 import com.renyu.nimlibrary.bean.ObserveResponseType
@@ -169,7 +174,9 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
      */
     override fun onLongClick(v: View, imMessage: IMMessage): Boolean {
         // 删除消息
-        deleteIMMessage(imMessage)
+//        deleteIMMessage(imMessage)
+        // 消息撤回
+        sendRevokeMessage(imMessage)
         return super.onLongClick(v, imMessage)
     }
 
@@ -209,12 +216,38 @@ class ConversationViewModel(private val contactId: String, private val sessionTy
     }
 
     /**
-     * 消息撤回
+     * 消息主动撤回
      */
-    fun sendRevokeMessage(imMessage: IMMessage) {
-        // 撤回者
-        val revokeNick = if (imMessage.fromAccount == SPUtils.getInstance().getString(CommonParams.SP_UNAME)) "你" else "对方"
-        MessageManager.sendRevokeMessage(imMessage, revokeNick + "撤回了一条消息")
+    private fun sendRevokeMessage(imMessage: IMMessage) {
+        MessageManager.revokeMessage(imMessage, object : RequestCallback<Void> {
+            override fun onSuccess(param: Void?) {
+                deleteItem(imMessage, false)
+                val revokeNick = if (imMessage.fromAccount == SPUtils.getInstance().getString(CommonParams.SP_UNAME)) "你" else "对方"
+                MessageManager.sendRevokeMessage(imMessage, revokeNick + "撤回了一条消息")
+            }
+
+            override fun onFailed(code: Int) {
+                if (code == ResponseCode.RES_OVERDUE.toInt()) {
+                    Toast.makeText(Utils.getApp(), "发送时间超过2分钟的消息，不能被撤回", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(Utils.getApp(), "消息撤回出错", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onException(exception: Throwable?) {
+
+            }
+        })
+    }
+
+    /**
+     * 对方撤回消息
+     */
+    fun receiverRevokeMessage(notification: RevokeMsgNotification) {
+        if (notification.message.sessionId == contactId) {
+            deleteItem(notification.message, false)
+            MessageManager.sendRevokeMessage(notification.message, "对方撤回了一条消息")
+        }
     }
 
     private fun sortMessages(list: List<IMMessage>) {

@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
+import com.netease.nimlib.sdk.msg.model.RevokeMsgNotification
 import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.bean.ObserveResponse
@@ -105,13 +106,17 @@ open class BaseConversationActivity : AppCompatActivity() {
                         if (it.type == ObserveResponseType.MsgStatus) {
                             vm?.updateIMMessage(it)
                         }
+                        // 对方消息撤回
+                        if (it.type == ObserveResponseType.RevokeMessage) {
+                            vm?.receiverRevokeMessage(it.data as RevokeMsgNotification)
+                        }
                     }
                     .subscribe()
 
-//            Handler().postDelayed({
-//                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello32"))
-//                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
-//            }, 5000)
+            Handler().postDelayed({
+                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello34"))
+                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+            }, 5000)
         }
     }
 

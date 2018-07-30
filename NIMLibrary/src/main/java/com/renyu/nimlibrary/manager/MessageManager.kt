@@ -81,7 +81,13 @@ object MessageManager {
      */
     fun observeRevokeMessage() {
         NIMClient.getService(MsgServiceObserve::class.java)
-                .observeRevokeMessage({ t -> Log.d("NIM_APP", "被撤回的消息消息ID：${t.message.uuid}") }, true)
+                .observeRevokeMessage({
+                    if (it?.message == null) {
+                        return@observeRevokeMessage
+                    }
+                    RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.RevokeMessage))
+                    Log.d("NIM_APP", "被撤回的消息消息ID：${it.message.uuid}")
+                }, true)
     }
 
     /**
@@ -91,7 +97,7 @@ object MessageManager {
         NIMClient.getService(MsgServiceObserve::class.java)
                 .observeMessageReceipt({
                     it.forEach {
-                        Log.d("NIM_APP", "被撤回的消息消息ID：${it.sessionId} ${it.time}")
+                        Log.d("NIM_APP", "已读回执消息回执ID：${it.sessionId} ${it.time}")
                     }
 
                 }, true)
