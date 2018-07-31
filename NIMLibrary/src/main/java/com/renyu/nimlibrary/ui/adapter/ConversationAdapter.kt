@@ -8,14 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.android.databinding.library.baseAdapters.BR
+import com.facebook.drawee.view.SimpleDraweeView
+import com.netease.nimlib.sdk.msg.attachment.ImageAttachment
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.binding.EventImpl
-import com.renyu.nimlibrary.databinding.AdapterReceiveTextBinding
-import com.renyu.nimlibrary.databinding.AdapterSendTextBinding
-import com.renyu.nimlibrary.databinding.AdapterTipBinding
+import com.renyu.nimlibrary.databinding.*
+import com.renyu.nimlibrary.ui.fragment.ConversationFragment
+import java.io.File
 
 class ConversationAdapter(private val messages: ArrayList<IMMessage>, private val eventImpl: EventImpl) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -30,6 +32,16 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_text, parent,
                             false))
+            2 -> return ReceiverImageViewHolder(
+                    DataBindingUtil.inflate<AdapterReceivePhotoBinding>(
+                            LayoutInflater.from(parent.context),
+                            R.layout.adapter_receive_photo, parent,
+                            false))
+            3 -> return SendImageViewHolder(
+                    DataBindingUtil.inflate<AdapterSendPhotoBinding>(
+                            LayoutInflater.from(parent.context),
+                            R.layout.adapter_send_photo, parent,
+                            false))
             16, 17 -> return TipHolder(
                     DataBindingUtil.inflate<AdapterTipBinding>(
                             LayoutInflater.from(parent.context),
@@ -42,21 +54,29 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
 
     override fun getItemCount() = messages.size
 
+    private fun initViewDataBinding(viewDataBinding: ViewDataBinding, position: Int) {
+        viewDataBinding.setVariable(BR.iMMessage, messages[position])
+        viewDataBinding.setVariable(BR.eventImpl, eventImpl)
+        viewDataBinding.executePendingBindings()
+        // 调整时间显示
+        modifyShowTime(position, viewDataBinding)
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(getItemViewType(holder.layoutPosition)) {
             0 -> {
-                (holder as ReceiverTextViewHolder).receiverTvDataBinding.setVariable(BR.iMMessage, messages[holder.layoutPosition])
-                holder.receiverTvDataBinding.setVariable(BR.eventImpl, eventImpl)
-                holder.receiverTvDataBinding.executePendingBindings()
-                // 调整时间显示
-                modifyShowTime(holder.layoutPosition, holder.receiverTvDataBinding)
+                initViewDataBinding((holder as ReceiverTextViewHolder).receiverTvDataBinding, holder.layoutPosition)
             }
             1 -> {
-                (holder as SendTextViewHolder).sendTvDataBinding.setVariable(BR.iMMessage, messages[holder.layoutPosition])
-                holder.sendTvDataBinding.setVariable(BR.eventImpl, eventImpl)
-                holder.sendTvDataBinding.executePendingBindings()
-                // 调整时间显示
-                modifyShowTime(holder.layoutPosition, holder.sendTvDataBinding)
+                initViewDataBinding((holder as SendTextViewHolder).sendTvDataBinding, holder.layoutPosition)
+            }
+            2 -> {
+                initViewDataBinding((holder as ReceiverImageViewHolder).receiverIvDataBinding, holder.layoutPosition)
+                openBigImageViewActivity(holder.receiverIvDataBinding.root)
+            }
+            3 -> {
+                initViewDataBinding((holder as SendImageViewHolder).sendIvDataBinding, holder.layoutPosition)
+                openBigImageViewActivity(holder.sendIvDataBinding.root)
             }
             16, 17 -> {
                 (holder as TipHolder).tipDataBinding.setVariable(BR.iMMessage, messages[holder.layoutPosition])
@@ -75,11 +95,11 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         }
         // 接收图片消息
         if (messages[position].msgType == MsgTypeEnum.image && messages[position].direct == MsgDirectionEnum.In) {
-
+            return 2
         }
         // 发送图片消息
         else if (messages[position].msgType == MsgTypeEnum.image && messages[position].direct == MsgDirectionEnum.Out) {
-
+            return 3
         }
         // 接收音频消息
         if (messages[position].msgType == MsgTypeEnum.audio && messages[position].direct == MsgDirectionEnum.In) {
@@ -156,6 +176,14 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         val sendTvDataBinding = viewDataBinding
     }
 
+    class ReceiverImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val receiverIvDataBinding = viewDataBinding
+    }
+
+    class SendImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val sendIvDataBinding = viewDataBinding
+    }
+
     class TipHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
         val tipDataBinding = viewDataBinding
     }
@@ -166,6 +194,33 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         }
         else {
             viewDataBinding.root.findViewById<TextView>(R.id.aurora_tv_msgitem_date).visibility = View.GONE
+        }
+    }
+
+    /**
+     * 打开大图浏览
+     */
+    private fun openBigImageViewActivity(view: View) {
+        view.findViewById<SimpleDraweeView>(R.id.aurora_iv_msgitem_photo).setOnClickListener {
+            val temp = ArrayList<String>()
+            var index = -1
+            messages.filter {
+                it.attachment is ImageAttachment
+            }.forEach {
+                val imageAttachment = it.attachment as ImageAttachment
+                if (imageAttachment.path != null) {
+                    val file = File(imageAttachment.path)
+                    if (file.exists()) {
+                        temp.add(imageAttachment.path)
+                        index++
+                    }
+                }
+                else {
+                    temp.add(imageAttachment.url)
+                    index++
+                }
+            }
+            (view.context as ConversationFragment.ConversationListener).showBigImage(temp, index)
         }
     }
 

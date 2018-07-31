@@ -31,6 +31,7 @@ import com.renyu.nimapp.bean.Status
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.bean.ObserveResponse
 import com.renyu.nimlibrary.bean.ObserveResponseType
+import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.databinding.FragmentConversationBinding
 import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.params.CommonParams
@@ -41,11 +42,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_conversation.*
 import org.json.JSONObject
+import java.io.File
 
 /**
  * Created by Administrator on 2018/7/30.
  */
-class ConversationFragment : Fragment() {
+class ConversationFragment : Fragment(), EventImpl {
 
     companion object {
         fun getInstance(contactId: String, isGroup: Boolean): ConversationFragment {
@@ -73,17 +75,24 @@ class ConversationFragment : Fragment() {
             super.handleMessage(msg)
         }
     }
-    private val titleChangeRunnable: Runnable = Runnable { changeTipListener?.titleChange(true) }
+    private val titleChangeRunnable: Runnable = Runnable { conversationListener?.titleChange(true) }
 
-    private var changeTipListener: ChangeTipListener? = null
-    // "正在输入"提示接口
-    interface ChangeTipListener {
+    var conversationListener: ConversationListener? = null
+    // 使用到的相关接口
+    interface ConversationListener {
+        // "正在输入"
         fun titleChange(reset: Boolean)
+        // 拍照
+        fun takePhoto()
+        // 选择相册
+        fun pickPhoto()
+        // 浏览大图
+        fun showBigImage(images: ArrayList<String>, index: Int)
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        changeTipListener = context as ChangeTipListener
+        conversationListener = context as ConversationListener
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -130,6 +139,7 @@ class ConversationFragment : Fragment() {
                 }
             })
             viewDataBinding?.adapter = vm?.adapter
+            viewDataBinding?.eventImpl = this
 
             initUI()
 
@@ -149,7 +159,7 @@ class ConversationFragment : Fragment() {
                             vm?.sendMsgReceipt()
                             // "正在输入"提示重置
                             titleChangeHandler.removeCallbacks(titleChangeRunnable)
-                            changeTipListener?.titleChange(true)
+                            conversationListener?.titleChange(true)
                         }
                         // 添加发出的消息状态监听
                         if (it.type == ObserveResponseType.MsgStatus) {
@@ -169,7 +179,7 @@ class ConversationFragment : Fragment() {
                                 val content = (it.data as CustomNotification).content
                                 val type = JSONObject(content).getString(CommonParams.TYPE)
                                 if (type == CommonParams.COMMAND_INPUT) {
-                                    changeTipListener?.titleChange(false)
+                                    conversationListener?.titleChange(false)
                                     titleChangeHandler.postDelayed(titleChangeRunnable, 4000)
                                 }
                             }
@@ -207,15 +217,6 @@ class ConversationFragment : Fragment() {
         super.onDestroyView()
 
         disposable?.dispose()
-    }
-
-    /**
-     * 判断当前显示的是不是最后一条
-     */
-    private fun isLastMessageVisible(): Boolean {
-        val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
-        val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
-        return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
     }
 
     private fun initUI() {
@@ -287,5 +288,39 @@ class ConversationFragment : Fragment() {
             params.height = height
             kp_panel_root.layoutParams = params
         }
+    }
+
+    override fun click(view: View) {
+        super.click(view)
+        when(view.id) {
+            R.id.iv_sendvoice -> {}
+            R.id.iv_image -> {
+                // 选择图片
+                conversationListener?.pickPhoto()}
+            R.id.iv_camera -> {
+                // 拍照
+                conversationListener?.takePhoto()
+            }
+            R.id.iv_emoji -> {}
+        }
+    }
+
+    /**
+     * 判断当前显示的是不是最后一条
+     */
+    private fun isLastMessageVisible(): Boolean {
+        val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
+        val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
+        return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
+    }
+
+    /**
+     * 选择完图片后回传
+     */
+    fun sendImageFile(file: File) {
+        Handler().postDelayed({
+            vm?.sendIMMessage(MessageManager.sendImageMessage(arguments?.getString("contactId")!!, file))
+            rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+        }, 500)
     }
 }

@@ -16,6 +16,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.netease.nimlib.sdk.NIMClient
+import com.netease.nimlib.sdk.msg.attachment.ImageAttachment
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
@@ -23,6 +24,7 @@ import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.uinfo.UserService
 import com.renyu.nimlibrary.util.FaceIconUtil
+import java.io.File
 
 object BindingAdapters {
     @JvmStatic
@@ -122,6 +124,41 @@ object BindingAdapters {
         }
         else {
             textView.visibility = View.GONE
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["cvListImageUrl"])
+    fun loadChatListImageUrl(simpleDraweeView: SimpleDraweeView, imMessage: IMMessage) {
+        val imageUrl = if ((imMessage.attachment as ImageAttachment).path == null) {
+            if ((imMessage.attachment as ImageAttachment).thumbUrl == null) {
+                ""
+            }
+            else {
+                (imMessage.attachment as ImageAttachment).thumbUrl
+            }
+        }
+        else {
+            val file = File((imMessage.attachment as ImageAttachment).path)
+            if (file.exists()) {
+                "file://"+(imMessage.attachment as ImageAttachment).path
+            }
+            else {
+                ""
+            }
+        }
+        if (simpleDraweeView.tag !=null &&
+                !TextUtils.isEmpty(simpleDraweeView.tag.toString()) &&
+                simpleDraweeView.tag.toString() == imageUrl) {
+            // 什么都不做，防止Fresco闪烁
+        }
+        else {
+            val request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageUrl))
+                    .setResizeOptions(ResizeOptions(SizeUtils.dp2px(123f), SizeUtils.dp2px(115f))).build()
+            val draweeController = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(request).setAutoPlayAnimations(true).build()
+            simpleDraweeView.controller = draweeController
+            simpleDraweeView.tag = imageUrl
         }
     }
 }

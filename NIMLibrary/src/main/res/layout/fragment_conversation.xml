@@ -5,8 +5,10 @@
         <variable
             name="adapter"
             type="com.renyu.nimlibrary.ui.adapter.ConversationAdapter">
-
         </variable>
+        <variable
+            name="eventImpl"
+            type="com.renyu.nimlibrary.binding.EventImpl"></variable>
     </data>
     <cn.dreamtobe.kpswitch.widget.KPSwitchRootRelativeLayout
         android:orientation="vertical" android:layout_width="match_parent"
@@ -59,25 +61,29 @@
                     android:src="@mipmap/ic_conversation_voice"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:onClick="@{(view) -> eventImpl.click(view)}"/>
                 <ImageView
                     android:id="@+id/iv_image"
                     android:src="@mipmap/ic_conversation_image"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:onClick="@{(view) -> eventImpl.click(view)}"/>
                 <ImageView
                     android:id="@+id/iv_camera"
                     android:src="@mipmap/ic_conversation_camera"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:onClick="@{(view) -> eventImpl.click(view)}"/>
                 <ImageView
                     android:id="@+id/iv_emoji"
                     android:src="@mipmap/ic_conversation_emoji"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:onClick="@{(view) -> eventImpl.click(view)}"/>
             </LinearLayout>
             <View
                 android:layout_width="match_parent"

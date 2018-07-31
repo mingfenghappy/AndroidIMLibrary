@@ -72,7 +72,7 @@ object MessageManager {
         NIMClient.getService(MsgServiceObserve::class.java)
                 .observeMsgStatus({
                     RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.MsgStatus))
-                    Log.d("NIM_APP", "消息状态：${it.fromNick} ${it.content} ${it.status}")
+                    Log.d("NIM_APP", "消息状态：${it.fromNick} ${it.uuid} ${it.status}")
                 }, true)
     }
 

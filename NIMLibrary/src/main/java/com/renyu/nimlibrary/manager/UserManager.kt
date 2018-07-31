@@ -16,7 +16,6 @@ object UserManager {
      */
     fun observeUserInfoUpdate() {
         NIMClient.getService(UserServiceObserve::class.java).observeUserInfoUpdate({
-            RxBus.getDefault().post(ObserveResponse(it, ObserveResponseType.UserInfoUpdate))
             it.forEach {
                 Log.d("NIM_APP", "用户资料变更通知：${it.name}")
             }
