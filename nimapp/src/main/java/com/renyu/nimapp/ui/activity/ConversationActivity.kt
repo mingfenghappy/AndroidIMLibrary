@@ -71,4 +71,13 @@ class ConversationActivity : AppCompatActivity(), ConversationFragment.Conversat
             conversationFragment?.sendImageFile(File(data?.getStringExtra("fileName")))
         }
     }
+
+    /**
+     * 返回的时候先判断面板是否开启
+     */
+    override fun onBackPressed() {
+        if (conversationFragment!!.canBackPressed()) {
+            super.onBackPressed()
+        }
+    }
 }

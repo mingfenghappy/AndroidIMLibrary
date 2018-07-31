@@ -3,6 +3,7 @@ package com.renyu.nimlibrary.util;
 import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.TimeUtils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -80,4 +81,10 @@ public class OtherUtils {
         int subYear = cal1.get(Calendar.YEAR)-cal2.get(Calendar.YEAR);
         return subYear == 0;
     }
+
+    public static long getSecondsByMilliseconds(long milliseconds) {
+        return (long) new BigDecimal((float) milliseconds / (float) 1000).setScale(0,
+                BigDecimal.ROUND_HALF_UP).intValue();
+    }
+
 }

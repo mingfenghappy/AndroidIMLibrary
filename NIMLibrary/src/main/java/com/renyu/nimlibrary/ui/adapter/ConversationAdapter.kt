@@ -6,9 +6,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.android.databinding.library.baseAdapters.BR
+import com.blankj.utilcode.util.ScreenUtils
 import com.facebook.drawee.view.SimpleDraweeView
+import com.netease.nimlib.sdk.msg.attachment.AudioAttachment
 import com.netease.nimlib.sdk.msg.attachment.ImageAttachment
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
@@ -17,6 +20,7 @@ import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.databinding.*
 import com.renyu.nimlibrary.ui.fragment.ConversationFragment
+import com.renyu.nimlibrary.util.OtherUtils
 import java.io.File
 
 class ConversationAdapter(private val messages: ArrayList<IMMessage>, private val eventImpl: EventImpl) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -41,6 +45,16 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                     DataBindingUtil.inflate<AdapterSendPhotoBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_photo, parent,
+                            false))
+            4 -> return ReceiverAudioViewHolder(
+                    DataBindingUtil.inflate<AdapterReceiveVoiceBinding>(
+                            LayoutInflater.from(parent.context),
+                            R.layout.adapter_receive_voice, parent,
+                            false))
+            5 -> return SendAudioViewHolder(
+                    DataBindingUtil.inflate<AdapterSendVoiceBinding>(
+                            LayoutInflater.from(parent.context),
+                            R.layout.adapter_send_voice, parent,
                             false))
             16, 17 -> return TipHolder(
                     DataBindingUtil.inflate<AdapterTipBinding>(
@@ -78,6 +92,14 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                 initViewDataBinding((holder as SendImageViewHolder).sendIvDataBinding, holder.layoutPosition)
                 openBigImageViewActivity(holder.sendIvDataBinding.root)
             }
+            4 -> {
+                initViewDataBinding((holder as ReceiverAudioViewHolder).receiverAudioDataBinding, holder.layoutPosition)
+                calculateBubbleWidth((messages[holder.layoutPosition].attachment as AudioAttachment).duration, holder.receiverAudioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble))
+            }
+            5 -> {
+                initViewDataBinding((holder as SendAudioViewHolder).sendAudioDataBinding, holder.layoutPosition)
+                calculateBubbleWidth((messages[holder.layoutPosition].attachment as AudioAttachment).duration, holder.sendAudioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble))
+            }
             16, 17 -> {
                 (holder as TipHolder).tipDataBinding.setVariable(BR.iMMessage, messages[holder.layoutPosition])
             }
@@ -103,11 +125,11 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         }
         // 接收音频消息
         if (messages[position].msgType == MsgTypeEnum.audio && messages[position].direct == MsgDirectionEnum.In) {
-
+            return 4
         }
         // 发送音频消息
         else if (messages[position].msgType == MsgTypeEnum.audio && messages[position].direct == MsgDirectionEnum.Out) {
-
+            return 5
         }
         // 接收视频消息
         if (messages[position].msgType == MsgTypeEnum.video && messages[position].direct == MsgDirectionEnum.In) {
@@ -182,6 +204,14 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
 
     class SendImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
         val sendIvDataBinding = viewDataBinding
+    }
+
+    class ReceiverAudioViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val receiverAudioDataBinding = viewDataBinding
+    }
+
+    class SendAudioViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val sendAudioDataBinding = viewDataBinding
     }
 
     class TipHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
@@ -318,5 +348,30 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
                 lastShowTimeItem = null
             }
         }
+    }
+
+    /**
+     * 获取气泡的宽度
+     */
+    fun calculateBubbleWidth(duration: Long, view: View) {
+        val seconds = OtherUtils.getSecondsByMilliseconds(duration)
+
+        val maxAudioBubbleWidth = (0.6 * ScreenUtils.getScreenWidth()).toInt()
+        val minAudioBubbleWidth = (0.1875 * ScreenUtils.getScreenWidth()).toInt()
+        var currentBubbleWidth = when {
+            seconds <= 0 -> minAudioBubbleWidth
+            seconds in 1..60 -> (((maxAudioBubbleWidth - minAudioBubbleWidth).toDouble() * (2.0 / Math.PI)
+                    * Math.atan(seconds / 10.0)) + minAudioBubbleWidth).toInt()
+            else -> maxAudioBubbleWidth
+        }
+        if (currentBubbleWidth < minAudioBubbleWidth) {
+            currentBubbleWidth = minAudioBubbleWidth
+        } else if (currentBubbleWidth > maxAudioBubbleWidth) {
+            currentBubbleWidth = maxAudioBubbleWidth
+        }
+
+        val layoutParams = view.layoutParams
+        layoutParams.width = currentBubbleWidth
+        view.layoutParams = layoutParams
     }
 }

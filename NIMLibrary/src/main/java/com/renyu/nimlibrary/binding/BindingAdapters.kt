@@ -16,6 +16,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.netease.nimlib.sdk.NIMClient
+import com.netease.nimlib.sdk.msg.attachment.AudioAttachment
 import com.netease.nimlib.sdk.msg.attachment.ImageAttachment
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum
@@ -113,6 +114,13 @@ object BindingAdapters {
     }
 
     @JvmStatic
+    @BindingAdapter(value = ["cvListAudiolength"])
+    fun changeConversationListAudiolength(textView: TextView, imMessage: IMMessage) {
+        val duration = (imMessage.attachment as AudioAttachment).duration / 1000
+        textView.text = "$duration\'\'"
+    }
+
+    @JvmStatic
     @BindingAdapter(value = ["read"])
     fun changeReadedVisibility(textView: TextView, imMessage: IMMessage) {
         if (imMessage.sessionType == SessionTypeEnum.P2P
@@ -124,6 +132,17 @@ object BindingAdapters {
         }
         else {
             textView.visibility = View.GONE
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["audioRead"])
+    fun changeConversationListAudioRead(imageView: ImageView, msgStatusEnum: MsgStatusEnum) {
+        if (msgStatusEnum == MsgStatusEnum.success) {
+            imageView.visibility = View.VISIBLE
+        }
+        else {
+            imageView.visibility = View.GONE
         }
     }
 

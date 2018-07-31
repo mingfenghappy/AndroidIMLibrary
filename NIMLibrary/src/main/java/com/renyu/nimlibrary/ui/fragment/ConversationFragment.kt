@@ -77,7 +77,7 @@ class ConversationFragment : Fragment(), EventImpl {
     }
     private val titleChangeRunnable: Runnable = Runnable { conversationListener?.titleChange(true) }
 
-    var conversationListener: ConversationListener? = null
+    private var conversationListener: ConversationListener? = null
     // 使用到的相关接口
     interface ConversationListener {
         // "正在输入"
@@ -208,15 +208,22 @@ class ConversationFragment : Fragment(), EventImpl {
 
     override fun onPause() {
         super.onPause()
+
         // 去除正在聊天的对象
         NIMClient.getService(MsgService::class.java).setChattingAccount(MsgService.MSG_CHATTING_ACCOUNT_NONE,
                 SessionTypeEnum.None)
+
+        // 语音处理
+        layout_record.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
         disposable?.dispose()
+
+        // 语音处理
+        layout_record.onDestroy()
     }
 
     private fun initUI() {
@@ -263,6 +270,13 @@ class ConversationFragment : Fragment(), EventImpl {
             }
         })
         // ***********************************  JKeyboardPanelSwitch配置  ***********************************
+        layout_record.setIAudioRecordCallback { audioFile, audioLength, _ ->
+            // 发送语音
+            sendAudio(audioFile, audioLength)
+        }
+        layout_voicechoice.setOnTouchListener { v, event ->
+            layout_record.onPressToSpeakBtnTouch(v, event)
+        }
         KeyboardUtil.attach(context as Activity, kp_panel_root) { isShowing ->
             if (isShowing) {
                 rv_conversation.scrollToPosition(rv_conversation.adapter.itemCount - 1)
@@ -293,7 +307,6 @@ class ConversationFragment : Fragment(), EventImpl {
     override fun click(view: View) {
         super.click(view)
         when(view.id) {
-            R.id.iv_sendvoice -> {}
             R.id.iv_image -> {
                 // 选择图片
                 conversationListener?.pickPhoto()}
@@ -301,7 +314,6 @@ class ConversationFragment : Fragment(), EventImpl {
                 // 拍照
                 conversationListener?.takePhoto()
             }
-            R.id.iv_emoji -> {}
         }
     }
 
@@ -322,5 +334,26 @@ class ConversationFragment : Fragment(), EventImpl {
             vm?.sendIMMessage(MessageManager.sendImageMessage(arguments?.getString("contactId")!!, file))
             rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
         }, 500)
+    }
+
+    /**
+     * 发送语音
+     */
+    private fun sendAudio(file: File, duration: Long) {
+        Handler().postDelayed({
+            vm?.sendIMMessage(MessageManager.sendAudioMessage(arguments?.getString("contactId")!!, file, duration))
+            rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+        }, 500)
+    }
+
+    /**
+     * 返回键处理
+     */
+    fun canBackPressed(): Boolean {
+        if (kp_panel_root.visibility == View.VISIBLE) {
+            KPSwitchConflictUtil.hidePanelAndKeyboard(kp_panel_root)
+            return false
+        }
+        return true
     }
 }

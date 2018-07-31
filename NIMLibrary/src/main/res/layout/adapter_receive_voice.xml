@@ -20,8 +20,11 @@
             android:id="@+id/aurora_tv_msgitem_date"
             style="@style/chat_text_date_style"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@{OtherUtils.getFriendlyTimeSpanByNow2(iMMessage.getTime())}"
+            android:layout_gravity="center" />
         <RelativeLayout
+            android:onLongClick="@{(view) -> eventImpl.onLongClick(view, iMMessage)}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <com.facebook.drawee.view.SimpleDraweeView
@@ -31,6 +34,7 @@
                 android:layout_height="42dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="10dip"
+                app:chatListAvatar="@{iMMessage.getFromAccount()}"
                 fresco:actualImageResource="@drawable/default_grey_avatar"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:placeholderImage="@drawable/default_grey_avatar"
@@ -38,6 +42,16 @@
                 fresco:failureImage="@drawable/default_grey_avatar"
                 fresco:failureImageScaleType="centerCrop"
                 fresco:roundAsCircle="true"/>
+            <TextView
+                android:id="@+id/aurora_tv_msgitem_display_name"
+                style="@style/chat_text_name_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:textSize="13sp"
+                android:layout_toEndOf="@id/bubble"
+                android:visibility="gone"
+                app:chatListName="@{iMMessage.getFromAccount()}" />
             <RelativeLayout
                 android:id="@+id/bubble"
                 android:layout_width="65dip"
@@ -47,7 +61,6 @@
                 android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
                 android:background="@mipmap/ic_conversation_left" >
                 <ImageView
-                    android:id="@+id/iv_voice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="12dp"
@@ -55,32 +68,23 @@
                     android:layout_centerVertical="true"
                     android:src="@mipmap/ease_chatfrom_voice_playing" />
                 <TextView
-                    android:id="@+id/aurora_tv_voice_length"
                     style="@style/chat_text_name_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="8dip"
                     android:layout_alignParentEnd="true"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    app:cvListAudiolength="@{iMMessage}"/>
             </RelativeLayout>
             <ImageView
-                android:id="@+id/aurora_iv_msgitem_read_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="12dip"
                 android:layout_toEndOf="@id/bubble"
+                app:audioRead="@{iMMessage.getStatus()}"
                 android:src="@mipmap/ease_unread_dot" />
-            <TextView
-                android:id="@+id/aurora_tv_msgitem_display_name"
-                style="@style/chat_text_name_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:textSize="13sp"
-                android:layout_toEndOf="@id/bubble"
-                android:visibility="gone" />
         </RelativeLayout>
     </LinearLayout>
 </layout>

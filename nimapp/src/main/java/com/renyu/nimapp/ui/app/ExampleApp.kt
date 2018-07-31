@@ -1,6 +1,5 @@
 package com.renyu.nimapp.ui.app
 
-import android.os.Environment
 import android.support.multidex.MultiDexApplication
 import android.text.TextUtils
 import com.blankj.utilcode.util.SPUtils
@@ -15,7 +14,6 @@ import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.manager.StatueManager
 import com.renyu.nimlibrary.manager.UserManager
 import com.renyu.nimlibrary.params.CommonParams
-import java.io.File
 
 class ExampleApp : MultiDexApplication() {
     override fun onCreate() {

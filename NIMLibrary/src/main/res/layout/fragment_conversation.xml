@@ -61,8 +61,7 @@
                     android:src="@mipmap/ic_conversation_voice"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="@{(view) -> eventImpl.click(view)}"/>
+                    android:layout_weight="1"/>
                 <ImageView
                     android:id="@+id/iv_image"
                     android:src="@mipmap/ic_conversation_image"
@@ -82,8 +81,7 @@
                     android:src="@mipmap/ic_conversation_emoji"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="@{(view) -> eventImpl.click(view)}"/>
+                    android:layout_weight="1"/>
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
