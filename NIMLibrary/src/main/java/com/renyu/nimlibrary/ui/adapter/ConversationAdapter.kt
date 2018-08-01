@@ -2,56 +2,64 @@ package com.renyu.nimlibrary.ui.adapter
 
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding
+import android.graphics.drawable.AnimationDrawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.android.databinding.library.baseAdapters.BR
 import com.blankj.utilcode.util.ScreenUtils
 import com.facebook.drawee.view.SimpleDraweeView
+import com.netease.nimlib.sdk.RequestCallbackWrapper
 import com.netease.nimlib.sdk.msg.attachment.AudioAttachment
 import com.netease.nimlib.sdk.msg.attachment.ImageAttachment
+import com.netease.nimlib.sdk.msg.constant.AttachStatusEnum
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.databinding.*
+import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.ui.fragment.ConversationFragment
 import com.renyu.nimlibrary.util.OtherUtils
+import com.renyu.nimlibrary.util.audio.MessageAudioControl
+import com.renyu.nimlibrary.util.audio.Playable
 import java.io.File
 
-class ConversationAdapter(private val messages: ArrayList<IMMessage>, private val eventImpl: EventImpl) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ConversationAdapter(val messages: ArrayList<IMMessage>, private val eventImpl: EventImpl) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when(viewType) {
-            0 -> return ReceiverTextViewHolder(
+            0 -> return TextViewHolder(
                         DataBindingUtil.inflate<AdapterReceiveTextBinding>(
                                 LayoutInflater.from(parent.context),
                                 R.layout.adapter_receive_text, parent,
                                 false))
-            1 -> return SendTextViewHolder(
+            1 -> return TextViewHolder(
                     DataBindingUtil.inflate<AdapterSendTextBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_text, parent,
                             false))
-            2 -> return ReceiverImageViewHolder(
+            2 -> return ImageViewHolder(
                     DataBindingUtil.inflate<AdapterReceivePhotoBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_receive_photo, parent,
                             false))
-            3 -> return SendImageViewHolder(
+            3 -> return ImageViewHolder(
                     DataBindingUtil.inflate<AdapterSendPhotoBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_photo, parent,
                             false))
-            4 -> return ReceiverAudioViewHolder(
+            4 -> return AudioViewHolder(
                     DataBindingUtil.inflate<AdapterReceiveVoiceBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_receive_voice, parent,
                             false))
-            5 -> return SendAudioViewHolder(
+            5 -> return AudioViewHolder(
                     DataBindingUtil.inflate<AdapterSendVoiceBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_voice, parent,
@@ -79,26 +87,32 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(getItemViewType(holder.layoutPosition)) {
             0 -> {
-                initViewDataBinding((holder as ReceiverTextViewHolder).receiverTvDataBinding, holder.layoutPosition)
+                initViewDataBinding((holder as TextViewHolder).tvDataBinding, holder.layoutPosition)
             }
             1 -> {
-                initViewDataBinding((holder as SendTextViewHolder).sendTvDataBinding, holder.layoutPosition)
+                initViewDataBinding((holder as TextViewHolder).tvDataBinding, holder.layoutPosition)
             }
             2 -> {
-                initViewDataBinding((holder as ReceiverImageViewHolder).receiverIvDataBinding, holder.layoutPosition)
-                openBigImageViewActivity(holder.receiverIvDataBinding.root)
+                initViewDataBinding((holder as ImageViewHolder).ivDataBinding, holder.layoutPosition)
+                openBigImageViewActivity(holder.ivDataBinding.root)
             }
             3 -> {
-                initViewDataBinding((holder as SendImageViewHolder).sendIvDataBinding, holder.layoutPosition)
-                openBigImageViewActivity(holder.sendIvDataBinding.root)
+                initViewDataBinding((holder as ImageViewHolder).ivDataBinding, holder.layoutPosition)
+                openBigImageViewActivity(holder.ivDataBinding.root)
             }
             4 -> {
-                initViewDataBinding((holder as ReceiverAudioViewHolder).receiverAudioDataBinding, holder.layoutPosition)
-                calculateBubbleWidth((messages[holder.layoutPosition].attachment as AudioAttachment).duration, holder.receiverAudioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble))
+                initViewDataBinding((holder as AudioViewHolder).audioDataBinding, holder.layoutPosition)
+                calculateBubbleWidth((messages[holder.layoutPosition].attachment as AudioAttachment).duration, holder.audioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble))
+                holder.imMessage = messages[holder.layoutPosition]
+                holder.audioControl = MessageAudioControl.getInstance()
+                holder.changeUI()
             }
             5 -> {
-                initViewDataBinding((holder as SendAudioViewHolder).sendAudioDataBinding, holder.layoutPosition)
-                calculateBubbleWidth((messages[holder.layoutPosition].attachment as AudioAttachment).duration, holder.sendAudioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble))
+                initViewDataBinding((holder as AudioViewHolder).audioDataBinding, holder.layoutPosition)
+                calculateBubbleWidth((messages[holder.layoutPosition].attachment as AudioAttachment).duration, holder.audioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble))
+                holder.imMessage = messages[holder.layoutPosition]
+                holder.audioControl = MessageAudioControl.getInstance()
+                holder.changeUI()
             }
             16, 17 -> {
                 (holder as TipHolder).tipDataBinding.setVariable(BR.iMMessage, messages[holder.layoutPosition])
@@ -190,28 +204,140 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
         return super.getItemViewType(position)
     }
 
-    class ReceiverTextViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val receiverTvDataBinding = viewDataBinding
+    class TextViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val tvDataBinding = viewDataBinding
     }
 
-    class SendTextViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val sendTvDataBinding = viewDataBinding
+    class ImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val ivDataBinding = viewDataBinding
     }
 
-    class ReceiverImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val receiverIvDataBinding = viewDataBinding
-    }
+    inner class AudioViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
+        val audioDataBinding = viewDataBinding
 
-    class SendImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val sendIvDataBinding = viewDataBinding
-    }
+        // 语音动画
+        private var voiceAnimation: AnimationDrawable? = null
 
-    class ReceiverAudioViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val receiverAudioDataBinding = viewDataBinding
-    }
+        var imMessage: IMMessage? = null
+        var audioControl: MessageAudioControl? = null
 
-    class SendAudioViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val sendAudioDataBinding = viewDataBinding
+        val onPlayListener: MessageAudioControl.AudioControlListener = object : MessageAudioControl.AudioControlListener {
+            override fun onAudioControllerReady(playable: Playable?) {
+                if (!isTheSame(imMessage!!)) {
+                    return
+                }
+                startVoicePlayAnimation()
+                val unReadDot = viewDataBinding.root.findViewById<ImageView>(R.id.aurora_iv_msgitem_read_status)
+                if (unReadDot != null) {
+                    unReadDot.visibility = View.GONE
+                }
+            }
+
+            override fun onEndPlay(playable: Playable?) {
+                if (!isTheSame(imMessage!!)) {
+                    return
+                }
+                stopVoicePlayAnimation()
+            }
+
+            override fun updatePlayingProgress(playable: Playable?, curPosition: Long) {
+                if (!isTheSame(imMessage!!)) {
+                    return
+                }
+            }
+        }
+
+        fun changeUI() {
+            // 判断是否正在播放
+            if (audioControl!!.isMessagePlaying(imMessage)) {
+                // 切换AudioControlListener
+                audioControl!!.changeAudioControlListener(onPlayListener)
+                // 开启动画
+                startVoicePlayAnimation()
+            } else {
+                if (audioControl!!.audioControlListener != null && audioControl!!.audioControlListener == onPlayListener) {
+                    audioControl!!.changeAudioControlListener(null)
+                }
+                // 复原图片
+                if (imMessage!!.direct == MsgDirectionEnum.In) {
+                    audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice).setImageResource(R.mipmap.ease_chatfrom_voice_playing)
+                }
+                else if (imMessage!!.direct == MsgDirectionEnum.Out) {
+                    audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice).setImageResource(R.mipmap.ease_chatto_voice_playing)
+                }
+            }
+            audioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble).setOnClickListener {
+                onItemClick()
+            }
+        }
+
+        /**
+         * 点击播放
+         */
+        private fun onItemClick() {
+            if (audioControl != null) {
+                // 如果收到的消息没有下载完成
+                if (imMessage!!.direct == MsgDirectionEnum.In && imMessage!!.attachStatus != AttachStatusEnum.transferred) {
+                    // 如果状态是下载失败或者是未下载就去下载
+                    if (imMessage!!.attachStatus == AttachStatusEnum.fail || imMessage!!.attachStatus == AttachStatusEnum.def) {
+                        MessageManager.downloadAttachment(imMessage!!, null)
+                    }
+                    return
+                }
+                // 检查附件是否存在
+                val audioAttachment = imMessage!!.attachment as AudioAttachment
+                val file = File(audioAttachment.pathForSave)
+                if (!file.exists()) {
+                    MessageManager.downloadAttachment(imMessage!!, object : RequestCallbackWrapper<Void>() {
+                        override fun onResult(code: Int, result: Void?, exception: Throwable?) {
+                            if (code == 200) {
+                                // 开始播放
+                                audioControl!!.setPlayNext(true, this@ConversationAdapter, imMessage)
+                                audioControl!!.startPlayAudio(imMessage!!, onPlayListener)
+                            }
+                        }
+                    })
+                }
+                // 开始播放
+                audioControl!!.setPlayNext(true, this@ConversationAdapter, imMessage)
+                audioControl!!.startPlayAudio(imMessage!!, onPlayListener)
+            }
+        }
+
+        /**
+         * 播放语音UI
+         */
+        private fun startVoicePlayAnimation() {
+            val imageView = audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice)
+            if (imMessage!!.direct == MsgDirectionEnum.In) {
+                imageView.setImageResource(R.drawable.voice_from_icon)
+            } else {
+                imageView.setImageResource(R.drawable.voice_to_icon)
+            }
+            voiceAnimation = imageView.drawable as AnimationDrawable
+            voiceAnimation!!.start()
+        }
+
+        /**
+         * 停止播放语音UI
+         */
+        private fun stopVoicePlayAnimation() {
+            val imageView = audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice)
+            voiceAnimation?.stop()
+            if (imMessage!!.direct == MsgDirectionEnum.In) {
+                imageView.setImageResource(R.mipmap.ease_chatfrom_voice_playing)
+            } else {
+                imageView.setImageResource(R.mipmap.ease_chatto_voice_playing)
+            }
+        }
+
+        /**
+         * 判断当前消息与回调的消息是不是相同的
+         */
+        fun isTheSame(imMessage: IMMessage): Boolean {
+            val tag = audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice).tag
+            return tag != null && tag.toString() == "iv_anim_"+imMessage.uuid
+        }
     }
 
     class TipHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
@@ -353,7 +479,7 @@ class ConversationAdapter(private val messages: ArrayList<IMMessage>, private va
     /**
      * 获取气泡的宽度
      */
-    fun calculateBubbleWidth(duration: Long, view: View) {
+    private fun calculateBubbleWidth(duration: Long, view: View) {
         val seconds = OtherUtils.getSecondsByMilliseconds(duration)
 
         val maxAudioBubbleWidth = (0.6 * ScreenUtils.getScreenWidth()).toInt()

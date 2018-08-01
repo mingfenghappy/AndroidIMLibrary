@@ -23,18 +23,18 @@ import org.jetbrains.anko.toast
 
 class SignInActivity : AppCompatActivity(), EventImpl {
 
-    var viewDataBinding: ViewDataBinding? = null
+    private var viewDataBinding: ViewDataBinding? = null
 
-    var vm: SignInViewModel? = null
+    private var vm: SignInViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewDataBinding = DataBindingUtil.setContentView<ActivitySigninBinding>(this, R.layout.activity_signin)
         viewDataBinding.also {
-            it?.setVariable(BR.eventImpl, this)
+            it!!.setVariable(BR.eventImpl, this)
 
             vm = ViewModelProviders.of(this).get(SignInViewModel::class.java)
-            vm?.loginInfoResonse?.observe(this, Observer<Resource<LoginInfo>> { t ->
+            vm!!.loginInfoResonse?.observe(this, Observer<Resource<LoginInfo>> { t ->
                 when(t?.status) {
                     Status.LOADING -> {
 
@@ -68,7 +68,7 @@ class SignInActivity : AppCompatActivity(), EventImpl {
     override fun click(view: View) {
         when(view.id) {
             R.id.btn_signin -> {
-                vm?.login(ed_username.text.toString(), ed_pwd.text.toString())
+                vm!!.login(ed_username.text.toString(), ed_pwd.text.toString())
             }
         }
     }

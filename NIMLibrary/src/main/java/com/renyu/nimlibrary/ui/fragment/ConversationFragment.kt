@@ -36,6 +36,7 @@ import com.renyu.nimlibrary.databinding.FragmentConversationBinding
 import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.params.CommonParams
 import com.renyu.nimlibrary.util.RxBus
+import com.renyu.nimlibrary.util.audio.MessageAudioControl
 import com.renyu.nimlibrary.viewmodel.ConversationViewModel
 import com.renyu.nimlibrary.viewmodel.ConversationViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -97,7 +98,7 @@ class ConversationFragment : Fragment(), EventImpl {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_conversation, container, false)
-        return viewDataBinding?.root
+        return viewDataBinding!!.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -107,14 +108,14 @@ class ConversationFragment : Fragment(), EventImpl {
                     ConversationViewModelFactory(arguments!!.getString("contactId"),
                             if (arguments!!.getBoolean("isGroup")) SessionTypeEnum.Team else SessionTypeEnum.P2P))
                     .get(ConversationViewModel::class.java)
-            vm?.messageListResponseBefore?.observe(this, Observer {
+            vm!!.messageListResponseBefore?.observe(this, Observer {
                 when(it?.status) {
                     Status.SUCESS -> {
                         val firstLoad = rv_conversation.adapter.itemCount == 0
-                        vm?.addOldIMMessages(it.data!!)
+                        vm!!.addOldIMMessages(it.data!!)
                         if (firstLoad) {
                             // 首次加载完成发送消息已读回执
-                            vm?.sendMsgReceipt()
+                            vm!!.sendMsgReceipt()
                             // 首次加载完成滚动到最底部
                             rv_conversation.scrollToPosition(rv_conversation.adapter.itemCount - 1)
                         }
@@ -138,8 +139,8 @@ class ConversationFragment : Fragment(), EventImpl {
                     }
                 }
             })
-            viewDataBinding?.adapter = vm?.adapter
-            viewDataBinding?.eventImpl = this
+            viewDataBinding!!.adapter = vm!!.adapter
+            viewDataBinding!!.eventImpl = this
 
             initUI()
 
@@ -151,30 +152,31 @@ class ConversationFragment : Fragment(), EventImpl {
                         if (it.type == ObserveResponseType.ReceiveMessage) {
                             // 如果当前消息是最后一条的话就自动滚动到最底部
                             val isLast = isLastMessageVisible()
-                            vm?.receiveIMMessages(it)
+                            vm!!.receiveIMMessages(it)
                             if (isLast) {
                                 rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
                             }
                             // 发送消息已读回执
-                            vm?.sendMsgReceipt()
+                            vm!!.sendMsgReceipt()
                             // "正在输入"提示重置
                             titleChangeHandler.removeCallbacks(titleChangeRunnable)
                             conversationListener?.titleChange(true)
                         }
                         // 添加发出的消息状态监听
                         if (it.type == ObserveResponseType.MsgStatus) {
-                            vm?.updateIMMessage(it)
+                            vm!!.updateIMMessage(it)
                         }
                         // 对方消息撤回
                         if (it.type == ObserveResponseType.RevokeMessage) {
-                            vm?.receiverRevokeMessage(it.data as RevokeMsgNotification)
+                            vm!!.receiverRevokeMessage(it.data as RevokeMsgNotification)
                         }
                         // 收到已读回执
                         if (it.type == ObserveResponseType.MessageReceipt) {
-                            vm?.receiverMsgReceipt()
+                            vm!!.receiverMsgReceipt()
                         }
+                        // 收到自定义的通知，这里是"正在输入"提示
                         if (it.type == ObserveResponseType.CustomNotification) {
-                            // 收到的自定义通知属于当前会话中的用户
+                            // 判断属于当前会话中的用户
                             if ((it.data as CustomNotification).sessionId == arguments!!.getString("contactId")) {
                                 val content = (it.data as CustomNotification).content
                                 val type = JSONObject(content).getString(CommonParams.TYPE)
@@ -189,11 +191,11 @@ class ConversationFragment : Fragment(), EventImpl {
 
             // 获取会话列表数据
             Handler().postDelayed({
-                vm?.queryMessageLists(null)
+                vm!!.queryMessageLists(null)
             }, 250)
 
 //            Handler().postDelayed({
-//                vm?.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello37"))
+//                vm!!.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello37"))
 //                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
 //            }, 5000)
         }
@@ -215,6 +217,9 @@ class ConversationFragment : Fragment(), EventImpl {
 
         // 语音处理
         layout_record.onPause()
+
+        // 停止语音播放
+        MessageAudioControl.getInstance().stopAudio()
     }
 
     override fun onDestroyView() {
@@ -243,7 +248,7 @@ class ConversationFragment : Fragment(), EventImpl {
                     btn_send_conversation.setBackgroundColor(Color.parseColor("#0099ff"))
                 }
                 // 发送"正在输入"提示
-                vm?.sendTypingCommand()
+                vm!!.sendTypingCommand()
             }
         })
         // 触摸到RecyclerView之后自动收起面板
@@ -265,16 +270,21 @@ class ConversationFragment : Fragment(), EventImpl {
                 // 上拉加载更多
                 val canScrollDown = rv_conversation.canScrollVertically(-1)
                 if (!canScrollDown) {
-                    vm?.loadMoreLocalMessage()
+                    vm!!.loadMoreLocalMessage()
                 }
             }
         })
+
         // ***********************************  JKeyboardPanelSwitch配置  ***********************************
         layout_record.setIAudioRecordCallback { audioFile, audioLength, _ ->
             // 发送语音
             sendAudio(audioFile, audioLength)
         }
         layout_voicechoice.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // 停止语音播放
+                MessageAudioControl.getInstance().stopAudio()
+            }
             layout_record.onPressToSpeakBtnTouch(v, event)
         }
         KeyboardUtil.attach(context as Activity, kp_panel_root) { isShowing ->
@@ -302,6 +312,7 @@ class ConversationFragment : Fragment(), EventImpl {
             params.height = height
             kp_panel_root.layoutParams = params
         }
+        // ***********************************  JKeyboardPanelSwitch配置  ***********************************
     }
 
     override fun click(view: View) {
@@ -331,7 +342,7 @@ class ConversationFragment : Fragment(), EventImpl {
      */
     fun sendImageFile(file: File) {
         Handler().postDelayed({
-            vm?.sendIMMessage(MessageManager.sendImageMessage(arguments?.getString("contactId")!!, file))
+            vm!!.sendIMMessage(MessageManager.sendImageMessage(arguments?.getString("contactId")!!, file))
             rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
         }, 500)
     }
@@ -341,7 +352,7 @@ class ConversationFragment : Fragment(), EventImpl {
      */
     private fun sendAudio(file: File, duration: Long) {
         Handler().postDelayed({
-            vm?.sendIMMessage(MessageManager.sendAudioMessage(arguments?.getString("contactId")!!, file, duration))
+            vm!!.sendIMMessage(MessageManager.sendAudioMessage(arguments?.getString("contactId")!!, file, duration))
             rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
         }, 500)
     }

@@ -58,12 +58,14 @@
                     android:gravity="center"
                     app:cvListAudiolength="@{iMMessage}"/>
                 <ImageView
+                    android:id="@+id/iv_voice"
                     android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:tag="@{`iv_anim_`+iMMessage.getUuid()}"
                     android:src="@mipmap/ease_chatto_voice_playing" />
             </RelativeLayout>
             <ImageView

@@ -69,7 +69,7 @@ class ExampleApp : MultiDexApplication() {
         options.sdkStorageRootPath = CommonParams.SDKROOT
         // 配置数据库加密秘钥
         options.databaseEncryptKey = "house365"
-        // 配置是否需要预下载附件缩略图
+        // 配置是否需要SDK自动预加载多媒体消息的附件
         options.preloadAttach = true
         // 配置附件缩略图的尺寸大小
         options.thumbnailSize =  ScreenUtils.getScreenWidth() / 2

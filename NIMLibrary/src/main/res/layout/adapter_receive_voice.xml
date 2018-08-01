@@ -61,11 +61,13 @@
                 android:layout_toEndOf="@id/aurora_iv_msgitem_avatar"
                 android:background="@mipmap/ic_conversation_left" >
                 <ImageView
+                    android:id="@+id/iv_voice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="12dp"
                     android:paddingEnd="10dp"
                     android:layout_centerVertical="true"
+                    android:tag="@{`iv_anim_`+iMMessage.getUuid()}"
                     android:src="@mipmap/ease_chatfrom_voice_playing" />
                 <TextView
                     style="@style/chat_text_name_style"
@@ -78,6 +80,7 @@
                     app:cvListAudiolength="@{iMMessage}"/>
             </RelativeLayout>
             <ImageView
+                android:id="@+id/aurora_iv_msgitem_read_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"

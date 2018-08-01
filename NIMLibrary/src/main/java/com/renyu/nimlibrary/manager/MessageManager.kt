@@ -6,6 +6,7 @@ import android.util.Log
 import com.blankj.utilcode.util.Utils
 import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.RequestCallback
+import com.netease.nimlib.sdk.RequestCallbackWrapper
 import com.netease.nimlib.sdk.msg.MessageBuilder
 import com.netease.nimlib.sdk.msg.MsgService
 import com.netease.nimlib.sdk.msg.MsgServiceObserve
@@ -349,18 +350,30 @@ object MessageManager {
      * 发送P2P消息已读回执
      */
     fun sendReceipt(account: String, imMessage: IMMessage) {
-        NIMClient.getService(MsgService::class.java).sendMessageReceipt(account, imMessage).setCallback(object : RequestCallback<Void> {
-            override fun onSuccess(param: Void?) {
-                Log.d("NIM_APP", "消息回执发送成功")
-            }
-
-            override fun onFailed(code: Int) {
-
-            }
-
-            override fun onException(exception: Throwable?) {
-
+        NIMClient.getService(MsgService::class.java)
+                .sendMessageReceipt(account, imMessage)
+                .setCallback(object : RequestCallbackWrapper<Void>() {
+            override fun onResult(code: Int, result: Void?, exception: Throwable?) {
+                if (200 == code) {
+                    Log.d("NIM_APP", "消息回执发送成功")
+                }
             }
         })
+    }
+
+    /**
+     * 附件下载失败，重新下载附件
+     */
+    fun downloadAttachment(imMessage: IMMessage, requestCallback: RequestCallbackWrapper<Void>?) {
+        NIMClient.getService(MsgService::class.java)
+                .downloadAttachment(imMessage, false)
+                .setCallback(requestCallback)
+    }
+
+    /**
+     * 更新消息
+     */
+    fun updateIMMessageStatus(imMessage: IMMessage) {
+        NIMClient.getService(MsgService::class.java).updateIMMessageStatus(imMessage)
     }
 }
