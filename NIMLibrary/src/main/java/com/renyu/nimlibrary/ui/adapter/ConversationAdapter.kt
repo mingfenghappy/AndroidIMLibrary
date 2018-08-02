@@ -2,32 +2,30 @@ package com.renyu.nimlibrary.ui.adapter
 
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding
-import android.graphics.drawable.AnimationDrawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.android.databinding.library.baseAdapters.BR
 import com.blankj.utilcode.util.ScreenUtils
 import com.facebook.drawee.view.SimpleDraweeView
-import com.netease.nimlib.sdk.RequestCallbackWrapper
 import com.netease.nimlib.sdk.msg.attachment.AudioAttachment
 import com.netease.nimlib.sdk.msg.attachment.ImageAttachment
-import com.netease.nimlib.sdk.msg.constant.AttachStatusEnum
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.renyu.nimlibrary.R
 import com.renyu.nimlibrary.binding.EventImpl
 import com.renyu.nimlibrary.databinding.*
-import com.renyu.nimlibrary.manager.MessageManager
 import com.renyu.nimlibrary.ui.fragment.ConversationFragment
+import com.renyu.nimlibrary.ui.viewholder.AudioViewHolder
+import com.renyu.nimlibrary.ui.viewholder.ImageViewHolder
+import com.renyu.nimlibrary.ui.viewholder.TextViewHolder
+import com.renyu.nimlibrary.ui.viewholder.TipHolder
 import com.renyu.nimlibrary.util.OtherUtils
 import com.renyu.nimlibrary.util.audio.MessageAudioControl
-import com.renyu.nimlibrary.util.audio.Playable
 import java.io.File
 
 class ConversationAdapter(val messages: ArrayList<IMMessage>, private val eventImpl: EventImpl) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -58,12 +56,12 @@ class ConversationAdapter(val messages: ArrayList<IMMessage>, private val eventI
                     DataBindingUtil.inflate<AdapterReceiveVoiceBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_receive_voice, parent,
-                            false))
+                            false), this)
             5 -> return AudioViewHolder(
                     DataBindingUtil.inflate<AdapterSendVoiceBinding>(
                             LayoutInflater.from(parent.context),
                             R.layout.adapter_send_voice, parent,
-                            false))
+                            false), this)
             16, 17 -> return TipHolder(
                     DataBindingUtil.inflate<AdapterTipBinding>(
                             LayoutInflater.from(parent.context),
@@ -202,146 +200,6 @@ class ConversationAdapter(val messages: ArrayList<IMMessage>, private val eventI
 
         }
         return super.getItemViewType(position)
-    }
-
-    class TextViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val tvDataBinding = viewDataBinding
-    }
-
-    class ImageViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val ivDataBinding = viewDataBinding
-    }
-
-    inner class AudioViewHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val audioDataBinding = viewDataBinding
-
-        // 语音动画
-        private var voiceAnimation: AnimationDrawable? = null
-
-        var imMessage: IMMessage? = null
-        var audioControl: MessageAudioControl? = null
-
-        val onPlayListener: MessageAudioControl.AudioControlListener = object : MessageAudioControl.AudioControlListener {
-            override fun onAudioControllerReady(playable: Playable?) {
-                if (!isTheSame(imMessage!!)) {
-                    return
-                }
-                startVoicePlayAnimation()
-                val unReadDot = viewDataBinding.root.findViewById<ImageView>(R.id.aurora_iv_msgitem_read_status)
-                if (unReadDot != null) {
-                    unReadDot.visibility = View.GONE
-                }
-            }
-
-            override fun onEndPlay(playable: Playable?) {
-                if (!isTheSame(imMessage!!)) {
-                    return
-                }
-                stopVoicePlayAnimation()
-            }
-
-            override fun updatePlayingProgress(playable: Playable?, curPosition: Long) {
-                if (!isTheSame(imMessage!!)) {
-                    return
-                }
-            }
-        }
-
-        fun changeUI() {
-            // 判断是否正在播放
-            if (audioControl!!.isMessagePlaying(imMessage)) {
-                // 切换AudioControlListener
-                audioControl!!.changeAudioControlListener(onPlayListener)
-                // 开启动画
-                startVoicePlayAnimation()
-            } else {
-                if (audioControl!!.audioControlListener != null && audioControl!!.audioControlListener == onPlayListener) {
-                    audioControl!!.changeAudioControlListener(null)
-                }
-                // 复原图片
-                if (imMessage!!.direct == MsgDirectionEnum.In) {
-                    audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice).setImageResource(R.mipmap.ease_chatfrom_voice_playing)
-                }
-                else if (imMessage!!.direct == MsgDirectionEnum.Out) {
-                    audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice).setImageResource(R.mipmap.ease_chatto_voice_playing)
-                }
-            }
-            audioDataBinding.root.findViewById<RelativeLayout>(R.id.bubble).setOnClickListener {
-                onItemClick()
-            }
-        }
-
-        /**
-         * 点击播放
-         */
-        private fun onItemClick() {
-            if (audioControl != null) {
-                // 如果收到的消息没有下载完成
-                if (imMessage!!.direct == MsgDirectionEnum.In && imMessage!!.attachStatus != AttachStatusEnum.transferred) {
-                    // 如果状态是下载失败或者是未下载就去下载
-                    if (imMessage!!.attachStatus == AttachStatusEnum.fail || imMessage!!.attachStatus == AttachStatusEnum.def) {
-                        MessageManager.downloadAttachment(imMessage!!, null)
-                    }
-                    return
-                }
-                // 检查附件是否存在
-                val audioAttachment = imMessage!!.attachment as AudioAttachment
-                val file = File(audioAttachment.pathForSave)
-                if (!file.exists()) {
-                    MessageManager.downloadAttachment(imMessage!!, object : RequestCallbackWrapper<Void>() {
-                        override fun onResult(code: Int, result: Void?, exception: Throwable?) {
-                            if (code == 200) {
-                                // 开始播放
-                                audioControl!!.setPlayNext(true, this@ConversationAdapter, imMessage)
-                                audioControl!!.startPlayAudio(imMessage!!, onPlayListener)
-                            }
-                        }
-                    })
-                }
-                // 开始播放
-                audioControl!!.setPlayNext(true, this@ConversationAdapter, imMessage)
-                audioControl!!.startPlayAudio(imMessage!!, onPlayListener)
-            }
-        }
-
-        /**
-         * 播放语音UI
-         */
-        private fun startVoicePlayAnimation() {
-            val imageView = audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice)
-            if (imMessage!!.direct == MsgDirectionEnum.In) {
-                imageView.setImageResource(R.drawable.voice_from_icon)
-            } else {
-                imageView.setImageResource(R.drawable.voice_to_icon)
-            }
-            voiceAnimation = imageView.drawable as AnimationDrawable
-            voiceAnimation!!.start()
-        }
-
-        /**
-         * 停止播放语音UI
-         */
-        private fun stopVoicePlayAnimation() {
-            val imageView = audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice)
-            voiceAnimation?.stop()
-            if (imMessage!!.direct == MsgDirectionEnum.In) {
-                imageView.setImageResource(R.mipmap.ease_chatfrom_voice_playing)
-            } else {
-                imageView.setImageResource(R.mipmap.ease_chatto_voice_playing)
-            }
-        }
-
-        /**
-         * 判断当前消息与回调的消息是不是相同的
-         */
-        fun isTheSame(imMessage: IMMessage): Boolean {
-            val tag = audioDataBinding.root.findViewById<ImageView>(R.id.iv_voice).tag
-            return tag != null && tag.toString() == "iv_anim_"+imMessage.uuid
-        }
-    }
-
-    class TipHolder(viewDataBinding: ViewDataBinding): RecyclerView.ViewHolder(viewDataBinding.root) {
-        val tipDataBinding = viewDataBinding
     }
 
     private fun modifyShowTime(position: Int, viewDataBinding: ViewDataBinding) {

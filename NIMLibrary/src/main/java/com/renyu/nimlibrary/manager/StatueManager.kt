@@ -62,6 +62,7 @@ object StatueManager {
                             StatusCode.LOGINING -> Log.d("NIM_APP", "登录中")
                             StatusCode.LOGINED -> Log.d("NIM_APP", "登录成功")
                             else -> {
+                                Log.d("NIM_APP", "其他异常：$it")
                             }
                         }
                     }
