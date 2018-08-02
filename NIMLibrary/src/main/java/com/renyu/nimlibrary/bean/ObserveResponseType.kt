@@ -18,5 +18,7 @@ enum class ObserveResponseType {
     // 收到已读回执
     MessageReceipt,
     // 通知类消息
-    CustomNotification
+    CustomNotification,
+    // emoji
+    Emoji
 }

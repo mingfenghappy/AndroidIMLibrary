@@ -34,7 +34,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="10dip"
-                app:chatListAvatar="@{iMMessage.getFromAccount()}"
+                app:avatarImage="@{iMMessage.getFromAccount()}"
                 fresco:actualImageResource="@drawable/default_grey_avatar"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:placeholderImage="@drawable/default_grey_avatar"

@@ -24,7 +24,7 @@ import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum
 import com.netease.nimlib.sdk.msg.model.IMMessage
 import com.netease.nimlib.sdk.uinfo.UserService
-import com.renyu.nimlibrary.util.FaceIconUtil
+import com.renyu.nimlibrary.util.emoji.EmojiUtils
 import java.io.File
 
 object BindingAdapters {
@@ -41,8 +41,8 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["chatListAvatar"])
-    fun loadChatListAvatar(simpleDraweeView: SimpleDraweeView, account: String) {
+    @BindingAdapter(value = ["avatarImage"])
+    fun loadAvatarImage(simpleDraweeView: SimpleDraweeView, account: String) {
         val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(account)
         if (userInfo != null) {
             if (simpleDraweeView.tag !=null &&
@@ -62,8 +62,8 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["tvVisible"])
-    fun changeVisible(textView: TextView, count: Int) {
+    @BindingAdapter(value = ["showUnreadNum"])
+    fun loadUnreadNum(textView: TextView, count: Int) {
         textView.visibility = if (count>0) {
             View.VISIBLE
         } else {
@@ -72,8 +72,8 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["chatListName"])
-    fun loadChatListName(textView: TextView, contactId: String) {
+    @BindingAdapter(value = ["chatName"])
+    fun loadChatName(textView: TextView, contactId: String) {
         val userInfo = NIMClient.getService(UserService::class.java).getUserInfo(contactId)
         if (userInfo != null) {
             textView.text = userInfo.name
@@ -84,9 +84,9 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["cvListContent"])
-    fun loadConversationListContent(textView: SimpleDraweeSpanTextView, text: String) {
-        FaceIconUtil.getInstance().replaceFaceMsgByFresco(textView, text)
+    @BindingAdapter(value = ["emojiText"])
+    fun loadEmojiText(textView: SimpleDraweeSpanTextView, text: String) {
+        EmojiUtils.replaceFaceMsgByFresco(textView, text)
     }
 
     @JvmStatic

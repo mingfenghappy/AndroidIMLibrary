@@ -10,9 +10,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
+import android.text.SpannableString
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -42,6 +45,7 @@ import com.renyu.nimlibrary.viewmodel.ConversationViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_conversation.*
+import kotlinx.android.synthetic.main.panel_emoji.*
 import org.json.JSONObject
 import java.io.File
 
@@ -186,6 +190,12 @@ class ConversationFragment : Fragment(), EventImpl {
                                 }
                             }
                         }
+                        // 收到Emoji
+                        if (it.type == ObserveResponseType.Emoji) {
+                            val currentPosition = edit_conversation.selectionStart
+                            edit_conversation.text.insert(currentPosition, it.data as SpannableString)
+                        }
+
                     }
                     .subscribe()
 
@@ -193,11 +203,6 @@ class ConversationFragment : Fragment(), EventImpl {
             Handler().postDelayed({
                 vm!!.queryMessageLists(null)
             }, 250)
-
-//            Handler().postDelayed({
-//                vm!!.sendIMMessage(MessageManager.sendTextMessage(intent.getStringExtra("contactId"), "Hello37"))
-//                rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
-//            }, 5000)
         }
     }
 
@@ -275,6 +280,15 @@ class ConversationFragment : Fragment(), EventImpl {
             }
         })
 
+        // ***********************************  Emoji配置  ***********************************
+
+        val vpFragments = ArrayList<Fragment>()
+        vpFragments.add(EmojiFragment())
+        val vpAdapter = VpAdapter(childFragmentManager, vpFragments)
+        vp_panel_content.adapter = vpAdapter
+
+        // ***********************************  Emoji配置  ***********************************
+
         // ***********************************  JKeyboardPanelSwitch配置  ***********************************
         layout_record.setIAudioRecordCallback { audioFile, audioLength, _ ->
             // 发送语音
@@ -325,7 +339,17 @@ class ConversationFragment : Fragment(), EventImpl {
                 // 拍照
                 conversationListener?.takePhoto()
             }
+            R.id.btn_send_conversation -> {
+                // 发送文本
+                sendText()
+            }
         }
+    }
+
+    class VpAdapter(fragmentManager: FragmentManager, private val fragments: ArrayList<Fragment>) : FragmentPagerAdapter(fragmentManager) {
+        override fun getItem(position: Int) = fragments[position]
+
+        override fun getCount() = fragments.size
     }
 
     /**
@@ -335,6 +359,17 @@ class ConversationFragment : Fragment(), EventImpl {
         val layoutManager = rv_conversation.layoutManager as LinearLayoutManager
         val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
         return lastVisiblePosition >= vm?.adapter?.itemCount!! - 1
+    }
+
+    private fun sendText() {
+        if (TextUtils.isEmpty(edit_conversation.text.toString())) {
+            return
+        }
+        vm!!.sendIMMessage(MessageManager.sendTextMessage(arguments?.getString("contactId")!!, edit_conversation.text.toString()))
+        rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
+        // 重置文本框
+        edit_conversation.setText("")
+        rv_conversation.smoothScrollToPosition(rv_conversation.adapter.itemCount - 1)
     }
 
     /**

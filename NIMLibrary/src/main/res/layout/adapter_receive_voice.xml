@@ -34,7 +34,7 @@
                 android:layout_height="42dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="10dip"
-                app:chatListAvatar="@{iMMessage.getFromAccount()}"
+                app:avatarImage="@{iMMessage.getFromAccount()}"
                 fresco:actualImageResource="@drawable/default_grey_avatar"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:placeholderImage="@drawable/default_grey_avatar"
@@ -51,7 +51,7 @@
                 android:textSize="13sp"
                 android:layout_toEndOf="@id/bubble"
                 android:visibility="gone"
-                app:chatListName="@{iMMessage.getFromAccount()}" />
+                app:chatName="@{iMMessage.getFromAccount()}" />
             <RelativeLayout
                 android:id="@+id/bubble"
                 android:layout_width="65dip"

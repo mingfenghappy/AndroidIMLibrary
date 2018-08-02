@@ -58,9 +58,9 @@ object StatueManager {
                         when (it) {
                             StatusCode.NET_BROKEN -> Log.d("NIM_APP", "在线状态：当前网络不可用")
                             StatusCode.UNLOGIN -> Log.d("NIM_APP", "在线状态：未登录")
-                            StatusCode.CONNECTING -> Log.d("NIM_APP", "连接中")
-                            StatusCode.LOGINING -> Log.d("NIM_APP", "登录中")
-                            StatusCode.LOGINED -> Log.d("NIM_APP", "登录成功")
+                            StatusCode.CONNECTING -> Log.d("NIM_APP", "在线状态：连接中")
+                            StatusCode.LOGINING -> Log.d("NIM_APP", "在线状态：登录中")
+                            StatusCode.LOGINED -> Log.d("NIM_APP", "在线状态：登录成功")
                             else -> {
                                 Log.d("NIM_APP", "其他异常：$it")
                             }
